@@ -406,6 +406,23 @@ function StudioContent() {
     }
   };
 
+  // Xóa lời chúc lưu bút
+  const handleDeleteWish = async (id?: string) => {
+    if (!id) return;
+    if (!confirm("Bạn có chắc chắn muốn xóa lời chúc này?")) return;
+    try {
+      const res = await fetch(`/api/wishes?id=${id}`, { method: "DELETE" });
+      if (res.ok) {
+        setWishes((prev) => prev.filter((w) => w.id !== id));
+        showToast("Đã xóa lời chúc thành công!", "success");
+      } else {
+        showToast("Không thể xóa lời chúc", "info");
+      }
+    } catch {
+      showToast("Lỗi kết nối khi xóa lời chúc", "info");
+    }
+  };
+
   // Thêm khách mời thủ công
   const handleAddManualGuest = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -2514,6 +2531,54 @@ function StudioContent() {
                         </div>
                       ))
                     )}
+                  </div>
+
+                  {/* Danh sách lời chúc từ Sổ Lưu Bút */}
+                  <div className="pt-4 border-t border-[#E8D5CF]">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs uppercase tracking-wider font-bold text-[#354D2E] flex items-center gap-1.5">
+                        <MessageSquare className="w-3.5 h-3.5 text-[#C4715A]" />
+                        Sổ Lưu Bút ({wishes.length})
+                      </span>
+                    </div>
+
+                    <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
+                      {wishes.length === 0 ? (
+                        <div className="text-center py-5 text-xs text-[#8C6A58] bg-[#FDFAF5] rounded-2xl p-4 border border-[#E8D5CF]">
+                          Chưa có lời chúc nào từ khách.
+                        </div>
+                      ) : (
+                        wishes.map((w, i) => (
+                          <div
+                            key={w.id || i}
+                            className="p-3 bg-[#FDFAF5] border border-[#E8D5CF] rounded-2xl text-xs space-y-1 relative group shadow-2xs"
+                          >
+                            <div className="flex items-center justify-between">
+                              <span className="font-bold text-[#354D2E] text-sm">{w.name}</span>
+                              <div className="flex items-center gap-2">
+                                <span className="text-[10px] text-[#8C6A58] font-mono">
+                                  {new Date(w.createdAt).toLocaleDateString("vi-VN")}
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeleteWish(w.id)}
+                                  title="Xóa lời chúc này"
+                                  className="text-zinc-400 hover:text-[#C4715A] p-1 cursor-pointer transition-colors"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
+                            </div>
+                            {w.relationship && (
+                              <p className="text-[10px] text-[#C4715A] font-semibold">{w.relationship}</p>
+                            )}
+                            <p className="text-[11px] text-[#5C4033] italic font-serif leading-relaxed">
+                              &ldquo;{w.content}&rdquo;
+                            </p>
+                          </div>
+                        ))
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>

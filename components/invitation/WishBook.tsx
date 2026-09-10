@@ -185,18 +185,17 @@ export const WishBook: React.FC = () => {
           </AnimatePresence>
         </motion.div>
 
-        {/* Danh sách lời chúc */}
-        <div className="space-y-3">
-          {loading ? (
-            <div className="text-center py-6 text-xs text-[#8C6A58] italic font-serif">
-              Đang mở trang lưu bút...
+        {/* Danh sách lời chúc - Chỉ hiển thị khi có khách gửi lời chúc thực tế */}
+        {wishes.length > 0 && (
+          <div className="space-y-3 mt-6">
+            <div className="flex items-center justify-between px-1">
+              <span className="text-xs uppercase tracking-wider font-sans font-bold text-[#354D2E]">
+                Lời Chúc Đã Gửi ({wishes.length})
+              </span>
+              <Sparkles className="w-3.5 h-3.5 text-[#C9A84C]" />
             </div>
-          ) : wishes.length === 0 ? (
-            <div className="text-center py-8 rounded-2xl border border-[#E8D5CF] bg-[#FFFDF9] p-4 text-xs text-[#8C6A58] font-serif italic">
-              Hãy là người đầu tiên để lại lời chúc phúc yêu thương!
-            </div>
-          ) : (
-            wishes.map((item, idx) => {
+
+            {wishes.map((item, idx) => {
               const theme = WISH_CARD_THEMES[idx % WISH_CARD_THEMES.length];
               return (
                 <motion.div
@@ -238,9 +237,9 @@ export const WishBook: React.FC = () => {
                   </div>
                 </motion.div>
               );
-            })
-          )}
-        </div>
+            })}
+          </div>
+        )}
       </div>
     </section>
   );

@@ -36,33 +36,13 @@ function getStoredRSVPs(): RSVPSubmission[] {
   try {
     if (fs.existsSync(rsvpsFilePath)) {
       const content = fs.readFileSync(rsvpsFilePath, "utf8");
-      return JSON.parse(content);
+      const parsed = JSON.parse(content);
+      if (Array.isArray(parsed)) return parsed;
     }
   } catch (err) {
     console.warn("Could not read saved_rsvps.json:", err);
   }
-  return [
-    {
-      id: "rsvp-1",
-      fullName: "Nguyễn Văn Đức",
-      phone: "0901234567",
-      guestOf: "groom",
-      attendance: "attending",
-      guestCount: 2,
-      dietaryOrNote: "Chúc hai bạn trăm năm hạnh phúc, viên mãn!",
-      createdAt: new Date(Date.now() - 3600000).toISOString(),
-    },
-    {
-      id: "rsvp-2",
-      fullName: "Trần Mai Phương",
-      phone: "0988776655",
-      guestOf: "bride",
-      attendance: "attending",
-      guestCount: 1,
-      dietaryOrNote: "Háo hức chờ ngày được ngắm cô dâu xinh đẹp nhất!",
-      createdAt: new Date(Date.now() - 7200000).toISOString(),
-    },
-  ];
+  return [];
 }
 
 function saveRSVPs(list: RSVPSubmission[]) {

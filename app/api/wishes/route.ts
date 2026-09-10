@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
+import { Redis } from "@upstash/redis";
 import { WishSubmission } from "@/types/wedding";
 import { getLatestWeddingData } from "@/utils/serverWeddingData";
 import {
@@ -11,41 +12,37 @@ import {
 
 const wishesFilePath = path.join(process.cwd(), "data", "saved_wishes.json");
 
+function getRedisClient(): Redis | null {
+  const url =
+    process.env.UPSTASH_REDIS_REST_URL ||
+    process.env.KV_REST_API_URL ||
+    process.env.UPSTASH_REDIS_REST_KV_URL;
+  const token =
+    process.env.UPSTASH_REDIS_REST_TOKEN ||
+    process.env.KV_REST_API_TOKEN ||
+    process.env.UPSTASH_REDIS_REST_KV_TOKEN;
+
+  if (url && token) {
+    try {
+      return new Redis({ url, token });
+    } catch {
+      return null;
+    }
+  }
+  return null;
+}
+
 function getStoredWishes(): WishSubmission[] {
   try {
     if (fs.existsSync(wishesFilePath)) {
       const content = fs.readFileSync(wishesFilePath, "utf8");
-      return JSON.parse(content);
+      const parsed = JSON.parse(content);
+      if (Array.isArray(parsed)) return parsed;
     }
   } catch (err) {
     console.warn("Could not read saved_wishes.json:", err);
   }
-  return [
-    {
-      id: "wish-1",
-      name: "Thanh Tùng & Mai Anh",
-      relationship: "Bạn thân đại học",
-      content:
-        "Chúc mừng hạnh phúc Công Quyết & Ngọc Hân! Chúc hai bạn trăm năm viên mãn, răng long đầu bạc, tổ ấm nhỏ luôn tràn ngập tiếng cười và yêu thương.",
-      createdAt: "2026-09-08T14:20:00Z",
-    },
-    {
-      id: "wish-2",
-      name: "Bác Hùng & Cô Lan",
-      relationship: "Bà con xóm 6 Minh Châu",
-      content:
-        "Chúc hai cháu trăm năm kết tóc se tơ, sớm hôm hòa thuận, cùng nhau vun vén cho mái ấm nhỏ thật hạnh phúc và bình an!",
-      createdAt: "2026-09-09T09:15:00Z",
-    },
-    {
-      id: "wish-3",
-      name: "Hội Bạn Thân Minh Châu",
-      relationship: "Bạn bè chú rể",
-      content:
-        "Chúc mừng người anh em Công Quyết rước được nàng dâu thảo Ngọc Hân về dinh! Chúc đôi bạn trẻ sớm có quý tử, vạn sự như ý!",
-      createdAt: "2026-09-09T18:40:00Z",
-    },
-  ];
+  return [];
 }
 
 function saveWishes(list: WishSubmission[]) {
@@ -56,12 +53,25 @@ function saveWishes(list: WishSubmission[]) {
   }
 }
 
-const wishesStore: WishSubmission[] = getStoredWishes();
+let wishesStore: WishSubmission[] = getStoredWishes();
 
 export async function GET() {
+  const redis = getRedisClient();
+  if (redis) {
+    try {
+      const remote = await redis.get<WishSubmission[]>("wedding_wishes_list");
+      if (Array.isArray(remote)) {
+        wishesStore = remote;
+      }
+    } catch {
+      // ignore
+    }
+  }
+
   return NextResponse.json({
     success: true,
     data: wishesStore,
+    total: wishesStore.length,
   });
 }
 
@@ -96,6 +106,16 @@ export async function POST(request: Request) {
 
     wishesStore.unshift(newWish);
     saveWishes(wishesStore);
+
+    // Lưu vào Redis (nếu cấu hình)
+    const redis = getRedisClient();
+    if (redis) {
+      try {
+        await redis.set("wedding_wishes_list", wishesStore);
+      } catch (redisErr) {
+        console.warn("[Wishes Redis Error]", redisErr);
+      }
+    }
 
     // 1. Gửi thông báo lời chúc tới Telegram của dâu rể
     try {
@@ -135,5 +155,31 @@ export async function POST(request: Request) {
       { success: false, message: "Không thể gửi lời chúc vào lúc này. Vui lòng thử lại sau." },
       { status: 500 }
     );
+  }
+}
+
+export async function DELETE(req: Request) {
+  try {
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get("id");
+    if (!id) {
+      return NextResponse.json({ success: false, message: "Thiếu ID lời chúc cần xóa" }, { status: 400 });
+    }
+
+    wishesStore = wishesStore.filter((w) => w.id !== id);
+    saveWishes(wishesStore);
+
+    const redis = getRedisClient();
+    if (redis) {
+      try {
+        await redis.set("wedding_wishes_list", wishesStore);
+      } catch (redisErr) {
+        console.warn("[Wishes Delete Redis Error]", redisErr);
+      }
+    }
+
+    return NextResponse.json({ success: true, message: "Đã xóa lời chúc", data: wishesStore });
+  } catch (err: any) {
+    return NextResponse.json({ success: false, error: String(err) }, { status: 500 });
   }
 }
