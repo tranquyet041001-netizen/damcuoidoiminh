@@ -42,33 +42,33 @@ export interface SuggestedSong {
 
 export const SUGGESTED_WEDDING_SONGS: SuggestedSong[] = [
   {
-    title: "Ánh Nắng Của Anh (Acoustic Wedding)",
+    title: "Acoustic Guitar Lãng Mạn (Mặc Định)",
+    artist: "Nhạc Cưới Không Lời",
+    url: "/audio/wedding-acoustic.mp3",
+    type: "mp3",
+  },
+  {
+    title: "Ngày Đầu Tiên (Official MV)",
     artist: "Đức Phúc",
-    url: "https://www.youtube.com/watch?v=3gVd3gY8E0o",
+    url: "https://www.youtube.com/watch?v=rIXhXaQ8tiM",
     type: "youtube",
   },
   {
-    title: "Ngày Đầu Tiên",
+    title: "Ánh Nắng Của Anh (Nhạc Phim)",
     artist: "Đức Phúc",
-    url: "https://www.youtube.com/watch?v=9jDkx_k_N_U",
+    url: "https://www.youtube.com/watch?v=1P4DaXgzVnE",
     type: "youtube",
   },
   {
-    title: "Until I Found You (Piano & Strings)",
-    artist: "Stephen Sanchez",
-    url: "https://www.youtube.com/watch?v=GxldQ9eX2wo",
-    type: "youtube",
-  },
-  {
-    title: "A Thousand Years (Violin & Piano)",
+    title: "A Thousand Years (Piano & Cello)",
     artist: "The Piano Guys",
     url: "https://www.youtube.com/watch?v=QgaTQ5-XfMM",
     type: "youtube",
   },
   {
-    title: "Acoustic Guitar Lãng Mạn (Mặc Định)",
-    artist: "Pixabay Music",
-    url: "https://cdn.pixabay.com/download/audio/2022/05/16/audio_db6591201e.mp3?filename=acoustic-guitar-wedding-love-story-112191.mp3",
-    type: "mp3",
+    title: "Until I Found You (Romantic Strings)",
+    artist: "Stephen Sanchez",
+    url: "https://www.youtube.com/watch?v=GxldQ9eX2wo",
+    type: "youtube",
   },
 ];

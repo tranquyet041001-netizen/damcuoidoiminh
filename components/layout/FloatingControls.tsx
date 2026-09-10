@@ -1,21 +1,24 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Menu,
   Map,
   CheckCircle2,
   Volume2,
   VolumeX,
+  Pause,
+  Play,
   X,
   Share2,
   Heart,
+  Video,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useWeddingData } from "@/context/WeddingDataContext";
-import { useToast } from "@/components/ui/Toast";
+import { useMusic } from "@/context/MusicContext";
 import { ShareModal } from "@/components/invitation/ShareModal";
-import { extractYouTubeId, isYouTubeUrl, YouTubeIcon } from "@/utils/youtube";
+import { YouTubeIcon } from "@/utils/youtube";
 
 interface FloatingControlsProps {
   isGuestView?: boolean;
@@ -36,61 +39,21 @@ const navItems = [
 export const FloatingControls: React.FC<FloatingControlsProps> = ({
   isGuestView = false,
 }) => {
-  const [isPlaying, setIsPlaying] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isShareOpen, setIsShareOpen] = useState(false);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const ytIframeRef = useRef<HTMLIFrameElement | null>(null);
-  const { showToast } = useToast();
+  const [isPillDismissed, setIsPillDismissed] = useState(false);
+
   const { data } = useWeddingData();
-
-  const isYt = isYouTubeUrl(data.musicUrl);
-  const ytId = extractYouTubeId(data.musicUrl);
-
-  // Reset khi đổi link nhạc
-  useEffect(() => {
-    setIsPlaying(false);
-    if (audioRef.current) {
-      audioRef.current.pause();
-    }
-  }, [data.musicUrl]);
-
-  const toggleMusic = () => {
-    if (isYt && ytId) {
-      // Điều khiển YouTube qua postMessage
-      if (isPlaying) {
-        ytIframeRef.current?.contentWindow?.postMessage(
-          JSON.stringify({ event: "command", func: "pauseVideo", args: "" }),
-          "*"
-        );
-        setIsPlaying(false);
-        showToast("Đã tạm dừng nhạc YouTube", "info");
-      } else {
-        ytIframeRef.current?.contentWindow?.postMessage(
-          JSON.stringify({ event: "command", func: "playVideo", args: "" }),
-          "*"
-        );
-        setIsPlaying(true);
-        showToast("Đang phát nhạc nền YouTube 🎵", "success");
-      }
-    } else {
-      // Điều khiển file Audio HTML5 (.mp3)
-      if (!audioRef.current) return;
-      if (isPlaying) {
-        audioRef.current.pause();
-        setIsPlaying(false);
-        showToast("Đã tạm dừng nhạc nền", "info");
-      } else {
-        audioRef.current
-          .play()
-          .then(() => {
-            setIsPlaying(true);
-            showToast("Đang phát điệu nhạc hạnh phúc 🎵", "success");
-          })
-          .catch(() => showToast("Vui lòng chạm lại để bật âm thanh", "info"));
-      }
-    }
-  };
+  const {
+    isPlaying,
+    toggleMusic,
+    isYouTube,
+    currentSongTitle,
+    isMuted,
+    toggleMute,
+    showVideoPreview,
+    setShowVideoPreview,
+  } = useMusic();
 
   const scrollToSection = (id: string) => {
     setIsMenuOpen(false);
@@ -99,24 +62,93 @@ export const FloatingControls: React.FC<FloatingControlsProps> = ({
 
   return (
     <>
-      {/* Trình phát file âm thanh thường (.mp3) */}
-      {!isYt && (
-        <audio ref={audioRef} src={data.musicUrl} preload="none" loop aria-hidden="true" />
-      )}
+      {/* ── MINI FLOATING MUSIC PILL (HIỆN KHI NHẠC ĐANG PHÁT) ── */}
+      <AnimatePresence>
+        {isPlaying && !isPillDismissed && (
+          <motion.aside
+            key="music-pill"
+            aria-label="Trình phát nhạc thu nhỏ"
+            initial={{ opacity: 0, y: 12, scale: 0.96 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 12, scale: 0.96 }}
+            transition={{ duration: 0.25 }}
+            className="fixed bottom-19 left-1/2 -translate-x-1/2 z-40 w-[92%] max-w-[350px] px-3.5 py-2 rounded-full bg-[#FFFDF9]/95 backdrop-blur-md border border-[#C9A84C]/50 shadow-lg flex items-center justify-between gap-2"
+          >
+            {/* Đĩa xoay / Hoa sen & Tên bài hát */}
+            <div className="flex items-center gap-2.5 min-w-0 flex-1">
+              <div className="w-7 h-7 rounded-full bg-[#F0F5EE] border border-[#A8BCA1] flex items-center justify-center shrink-0 shadow-xs">
+                {isYouTube ? (
+                  <YouTubeIcon className="w-3.5 h-3.5 text-[#C4715A] animate-pulse" />
+                ) : (
+                  <span className="text-xs animate-spin-slow inline-block">🌸</span>
+                )}
+              </div>
+              <div className="truncate">
+                <p className="text-[11px] font-serif font-bold text-[#354D2E] truncate leading-tight">
+                  {currentSongTitle}
+                </p>
+                <div className="flex items-center gap-1.5 mt-0.5">
+                  {/* Equalizer bars */}
+                  <div className="flex items-end gap-0.5 h-2.5">
+                    <span className="w-0.5 bg-[#4A6741] animate-equalizer-1 rounded-full" />
+                    <span className="w-0.5 bg-[#C4715A] animate-equalizer-2 rounded-full" />
+                    <span className="w-0.5 bg-[#C9A84C] animate-equalizer-3 rounded-full" />
+                  </div>
+                  <span className="text-[9px] text-[#8C6A58] uppercase tracking-wider font-sans font-medium">
+                    {isYouTube ? "YouTube Audio" : "Acoustic Wedding"}
+                  </span>
+                </div>
+              </div>
+            </div>
 
-      {/* Trình phát ẩn YouTube Background Audio */}
-      {isYt && ytId && (
-        <div className="fixed -left-[9999px] -top-[9999px] opacity-0 pointer-events-none" aria-hidden="true">
-          <iframe
-            ref={ytIframeRef}
-            width="200"
-            height="200"
-            src={`https://www.youtube.com/embed/${ytId}?enablejsapi=1&autoplay=0&loop=1&playlist=${ytId}`}
-            title="YouTube Background Audio"
-            allow="autoplay"
-          />
-        </div>
-      )}
+            {/* Các nút tác vụ nhanh */}
+            <div className="flex items-center gap-1 shrink-0">
+              {isYouTube && (
+                <button
+                  type="button"
+                  onClick={() => setShowVideoPreview(!showVideoPreview)}
+                  title={showVideoPreview ? "Thu nhỏ MV" : "Xem MV YouTube"}
+                  className="px-2 py-1 rounded-full bg-[#FDF0EC] text-[#C4715A] border border-[#E8D5CF] text-[10px] font-semibold flex items-center gap-1 hover:bg-[#F5E2DB] cursor-pointer"
+                >
+                  <Video className="w-3 h-3" />
+                  <span>{showVideoPreview ? "Ẩn" : "MV"}</span>
+                </button>
+              )}
+
+              <button
+                type="button"
+                onClick={toggleMute}
+                title={isMuted ? "Bật tiếng" : "Tắt tiếng"}
+                className="p-1.5 rounded-full text-[#5C4033] hover:text-[#4A6741] hover:bg-black/5 cursor-pointer transition-colors"
+              >
+                {isMuted ? (
+                  <VolumeX className="w-3.5 h-3.5 text-red-500" />
+                ) : (
+                  <Volume2 className="w-3.5 h-3.5 text-[#4A6741]" />
+                )}
+              </button>
+
+              <button
+                type="button"
+                onClick={toggleMusic}
+                title="Tạm dừng nhạc"
+                className="w-7 h-7 rounded-full bg-[#4A6741] text-white flex items-center justify-center hover:bg-[#354D2E] transition-colors cursor-pointer shadow-xs"
+              >
+                <Pause className="w-3.5 h-3.5" />
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setIsPillDismissed(true)}
+                title="Thu gọn thanh nhạc"
+                className="w-5 h-5 rounded-full flex items-center justify-center text-[#8C6A58] hover:text-[#354D2E] cursor-pointer text-xs"
+              >
+                ✕
+              </button>
+            </div>
+          </motion.aside>
+        )}
+      </AnimatePresence>
 
       {/* ── MENU DRAWER ── */}
       <AnimatePresence>
@@ -167,7 +199,7 @@ export const FloatingControls: React.FC<FloatingControlsProps> = ({
                     key={item.id}
                     type="button"
                     onClick={() => scrollToSection(item.id)}
-                    className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-2xl text-left transition-all hover:bg-[#F0F5EE] active:scale-98 group border border-transparent hover:border-[#A8BCA1]/30"
+                    className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-2xl text-left transition-all hover:bg-[#F0F5EE] active:scale-98 group border border-transparent hover:border-[#A8BCA1]/30 cursor-pointer"
                   >
                     <span className="text-base">{item.emoji}</span>
                     <span className="font-serif text-xs text-[#5C4033] group-hover:text-[#354D2E] transition-colors font-semibold">
@@ -185,7 +217,7 @@ export const FloatingControls: React.FC<FloatingControlsProps> = ({
                     setIsMenuOpen(false);
                     setIsShareOpen(true);
                   }}
-                  className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-full text-xs font-serif font-semibold bg-[#FDF0EC] text-[#C4715A] border border-[#E8D5CF] transition-all hover:bg-[#F5E2DB]"
+                  className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-full text-xs font-serif font-semibold bg-[#FDF0EC] text-[#C4715A] border border-[#E8D5CF] transition-all hover:bg-[#F5E2DB] cursor-pointer"
                 >
                   <Share2 className="w-3.5 h-3.5" />
                   <span>Chia Sẻ Thiệp</span>
@@ -194,23 +226,32 @@ export const FloatingControls: React.FC<FloatingControlsProps> = ({
                   type="button"
                   onClick={() => {
                     setIsMenuOpen(false);
+                    setIsPillDismissed(false);
                     toggleMusic();
                   }}
-                  className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-full text-xs font-serif font-semibold transition-all ${
+                  className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-full text-xs font-serif font-semibold transition-all cursor-pointer ${
                     isPlaying
                       ? "bg-[#F0F5EE] text-[#4A6741] border border-[#A8BCA1]/40"
                       : "bg-[#FDFAF5] text-[#8C6A58] border border-[#E8D5CF]"
                   }`}
                 >
-                  {isYt ? (
-                    <YouTubeIcon className={`w-3.5 h-3.5 ${isPlaying ? "text-[#C4715A] animate-pulse" : ""}`} />
+                  {isYouTube ? (
+                    <YouTubeIcon
+                      className={`w-3.5 h-3.5 ${
+                        isPlaying ? "text-[#C4715A] animate-pulse" : ""
+                      }`}
+                    />
                   ) : isPlaying ? (
-                    <Volume2 className="w-3.5 h-3.5 animate-pulse" />
+                    <Volume2 className="w-3.5 h-3.5 animate-pulse text-[#4A6741]" />
                   ) : (
                     <VolumeX className="w-3.5 h-3.5" />
                   )}
                   <span>
-                    {isPlaying ? "Tắt Nhạc" : isYt ? "Bật Nhạc YouTube" : "Bật Nhạc"}
+                    {isPlaying
+                      ? "Tắt Nhạc"
+                      : isYouTube
+                      ? "Bật Nhạc YouTube"
+                      : "Bật Nhạc"}
                   </span>
                 </button>
               </div>
@@ -229,20 +270,24 @@ export const FloatingControls: React.FC<FloatingControlsProps> = ({
           <button
             type="button"
             onClick={() => setIsMenuOpen(true)}
-            className="flex flex-col items-center gap-0.5 px-2 py-1 text-[#5C4033] hover:text-[#4A6741] transition-colors"
+            className="flex flex-col items-center gap-0.5 px-2 py-1 text-[#5C4033] hover:text-[#4A6741] transition-colors cursor-pointer"
           >
             <Menu className="w-4 h-4" />
-            <span className="text-[9px] uppercase tracking-wider font-sans font-semibold">Menu</span>
+            <span className="text-[9px] uppercase tracking-wider font-sans font-semibold">
+              Menu
+            </span>
           </button>
 
           {/* Địa điểm */}
           <button
             type="button"
             onClick={() => scrollToSection("details")}
-            className="flex flex-col items-center gap-0.5 px-2 py-1 text-[#5C4033] hover:text-[#4A6741] transition-colors"
+            className="flex flex-col items-center gap-0.5 px-2 py-1 text-[#5C4033] hover:text-[#4A6741] transition-colors cursor-pointer"
           >
             <Map className="w-4 h-4" />
-            <span className="text-[9px] uppercase tracking-wider font-sans font-semibold">Địa Điểm</span>
+            <span className="text-[9px] uppercase tracking-wider font-sans font-semibold">
+              Địa Điểm
+            </span>
           </button>
 
           {/* Nút RSVP Nhô Cao */}
@@ -254,7 +299,8 @@ export const FloatingControls: React.FC<FloatingControlsProps> = ({
             <div
               className="w-12 h-12 rounded-full flex items-center justify-center text-[#FDFAF5] shadow-md"
               style={{
-                background: "linear-gradient(135deg, #C4715A 0%, #A4503B 100%)",
+                background:
+                  "linear-gradient(135deg, #C4715A 0%, #A4503B 100%)",
                 boxShadow: "0 6px 16px -2px rgba(196, 113, 90, 0.45)",
               }}
             >
@@ -268,19 +314,28 @@ export const FloatingControls: React.FC<FloatingControlsProps> = ({
           {/* Nhạc nền (Hỗ trợ cả YouTube và MP3) */}
           <button
             type="button"
-            onClick={toggleMusic}
-            title={isYt ? "Nhạc nền từ YouTube" : "Nhạc nền"}
-            className={`flex flex-col items-center gap-0.5 px-2 py-1 transition-colors ${
+            onClick={() => {
+              setIsPillDismissed(false);
+              toggleMusic();
+            }}
+            title={isYouTube ? "Nhạc nền từ YouTube" : "Nhạc nền cưới"}
+            className={`flex flex-col items-center gap-0.5 px-2 py-1 transition-colors cursor-pointer ${
               isPlaying ? "text-[#4A6741]" : "text-[#8C6A58]"
             }`}
           >
-            {isYt ? (
+            {isYouTube ? (
               <div className="relative">
-                <Volume2 className={`w-4 h-4 ${isPlaying ? "animate-pulse text-[#4A6741]" : ""}`} />
-                <span className="absolute -top-1 -right-2 text-[8px] font-bold text-[#C4715A] leading-none">YT</span>
+                <Volume2
+                  className={`w-4 h-4 ${
+                    isPlaying ? "animate-pulse text-[#4A6741]" : ""
+                  }`}
+                />
+                <span className="absolute -top-1 -right-2 text-[8px] font-bold text-[#C4715A] leading-none">
+                  YT
+                </span>
               </div>
             ) : isPlaying ? (
-              <Volume2 className="w-4 h-4 animate-pulse" />
+              <Volume2 className="w-4 h-4 animate-pulse text-[#4A6741]" />
             ) : (
               <VolumeX className="w-4 h-4" />
             )}
@@ -293,10 +348,12 @@ export const FloatingControls: React.FC<FloatingControlsProps> = ({
           <button
             type="button"
             onClick={() => scrollToSection("wishes")}
-            className="flex flex-col items-center gap-0.5 px-2 py-1 text-[#5C4033] hover:text-[#C4715A] transition-colors"
+            className="flex flex-col items-center gap-0.5 px-2 py-1 text-[#5C4033] hover:text-[#C4715A] transition-colors cursor-pointer"
           >
             <Heart className="w-4 h-4" />
-            <span className="text-[9px] uppercase tracking-wider font-sans font-semibold">Lời Chúc</span>
+            <span className="text-[9px] uppercase tracking-wider font-sans font-semibold">
+              Lời Chúc
+            </span>
           </button>
         </div>
       </nav>

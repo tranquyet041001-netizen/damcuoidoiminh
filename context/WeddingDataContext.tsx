@@ -13,7 +13,8 @@ interface WeddingDataContextType {
   exportAsCode: () => string;
 }
 
-const LOCAL_STORAGE_KEY = "wedding_invitation_custom_data_v3";
+const LOCAL_STORAGE_KEY = "wedding_invitation_custom_data_v4";
+const LEGACY_LOCAL_STORAGE_KEY = "wedding_invitation_custom_data_v3";
 
 const WeddingDataContext = createContext<WeddingDataContextType | undefined>(undefined);
 
@@ -22,20 +23,45 @@ export const WeddingDataProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const [isModified, setIsModified] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // Load from localStorage on client-side mount
+  // Load from localStorage & server API on client-side mount
   useEffect(() => {
+    let localData: WeddingData | null = null;
     try {
-      const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
+      let saved = localStorage.getItem(LOCAL_STORAGE_KEY);
+      if (!saved) {
+        saved = localStorage.getItem(LEGACY_LOCAL_STORAGE_KEY);
+      }
       if (saved) {
         const parsed = JSON.parse(saved);
+        if (
+          !parsed.musicUrl ||
+          parsed.musicUrl.includes("pixabay.com") ||
+          parsed.musicUrl.includes("3gVd3gY8E0o") ||
+          parsed.musicUrl.includes("9jDkx_k_N_U")
+        ) {
+          parsed.musicUrl = "/audio/wedding-acoustic.mp3";
+        }
+        localData = parsed;
         setData(parsed);
         setIsModified(true);
       }
     } catch {
       // ignore
-    } finally {
-      setIsLoaded(true);
     }
+
+    // Fetch dữ liệu mới nhất từ server nếu client chưa có hoặc đồng bộ
+    fetch("/api/wedding-data")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((serverData) => {
+        if (serverData) {
+          // Nếu không có dữ liệu local hoặc server có dữ liệu hợp lệ
+          if (!localData || JSON.stringify(serverData) !== JSON.stringify(defaultData)) {
+            setData(serverData);
+          }
+        }
+      })
+      .catch(() => {})
+      .finally(() => setIsLoaded(true));
   }, []);
 
   const updateData = useCallback(
@@ -53,6 +79,12 @@ export const WeddingDataProvider: React.FC<{ children: React.ReactNode }> = ({ c
     try {
       localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(data));
       setIsModified(true);
+      // Đồng bộ lên server để mọi thiết bị / điện thoại quét mã QR đều xem được dữ liệu mới
+      fetch("/api/wedding-data", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      }).catch((err) => console.warn("Failed to persist to server API:", err));
     } catch (err) {
       console.error("Failed to save to localStorage", err);
     }
@@ -83,7 +115,7 @@ export const WeddingDataProvider: React.FC<{ children: React.ReactNode }> = ({ c
         exportAsCode,
       }}
     >
-      {isLoaded ? children : null}
+      {children}
     </WeddingDataContext.Provider>
   );
 };

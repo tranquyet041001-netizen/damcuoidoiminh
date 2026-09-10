@@ -180,7 +180,7 @@ export const weddingData: WeddingData = {
     }
   ],
 
-  musicUrl: "https://cdn.pixabay.com/download/audio/2022/05/16/audio_db6591201e.mp3?filename=acoustic-guitar-wedding-love-story-112191.mp3",
+  musicUrl: "/audio/wedding-acoustic.mp3",
   contactPhone: {
     groom: "0912 345 678",
     bride: "0987 654 321"

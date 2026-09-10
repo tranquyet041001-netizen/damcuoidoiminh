@@ -5,6 +5,7 @@ import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, Sparkles, Heart } from "lucide-react";
 import { useWeddingData } from "@/context/WeddingDataContext";
+import { useMusic } from "@/context/MusicContext";
 import {
   VietnameseLotus,
   DongSonBorder,
@@ -15,10 +16,14 @@ import {
 
 export const HeroInvitation: React.FC = () => {
   const { data: weddingData } = useWeddingData();
+  const { playMusic, isPlaying } = useMusic();
   const [isEnvelopeOpen, setIsEnvelopeOpen] = useState(false);
 
   const handleOpenInvitation = () => {
     setIsEnvelopeOpen(true);
+    if (!isPlaying) {
+      playMusic();
+    }
   };
 
   const scrollToContent = () => {

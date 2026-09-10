@@ -31,12 +31,15 @@ import {
   Lock,
   QrCode,
   Play,
+  Pause,
 } from "lucide-react";
 import { WeddingDataProvider, useWeddingData } from "@/context/WeddingDataContext";
+import { MusicProvider, useMusic } from "@/context/MusicContext";
 import { ToastProvider, useToast } from "@/components/ui/Toast";
 import { WeddingInvitationView } from "@/components/invitation/WeddingInvitationView";
 import { ShareModal } from "@/components/invitation/ShareModal";
 import { processAndUploadImage } from "@/utils/imageUpload";
+import { copyToClipboard } from "@/utils/clipboard";
 import {
   extractYouTubeId,
   isYouTubeUrl,
@@ -279,6 +282,7 @@ function StudioContent() {
   };
 
   const currentYtId = extractYouTubeId(data.musicUrl);
+  const { isPlaying: isMusicPlaying, toggleMusic } = useMusic();
 
   return (
     <div className="min-h-screen bg-[#F7F4EE] text-[#5C4033] flex flex-col font-sans selection:bg-[#C4715A] selection:text-[#FDFAF5]">
@@ -671,9 +675,14 @@ function StudioContent() {
                       <button
                         type="button"
                         onClick={async () => {
-                          const link = `${origin}/i/${data.slug || "quyet-han"}`;
-                          await navigator.clipboard.writeText(link);
-                          showToast("Đã sao chép link rút gọn cho khách!", "success");
+                          const base = origin || (typeof window !== "undefined" ? window.location.origin : "http://localhost:3000");
+                          const link = `${base}/i/${data.slug || "quyet-han"}`;
+                          const success = await copyToClipboard(link);
+                          if (success) {
+                            showToast("Đã sao chép link rút gọn cho khách!", "success");
+                          } else {
+                            showToast("Vui lòng bôi đen và sao chép thủ công", "info");
+                          }
                         }}
                         className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#4A6741] hover:bg-[#354D2E] text-[#FDFAF5] text-xs font-medium transition-all active:scale-95 shrink-0 cursor-pointer"
                       >
@@ -848,6 +857,28 @@ function StudioContent() {
                         onChange={(e) => updateData({ musicUrl: e.target.value })}
                         className="flex-1 bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs text-[#354D2E] font-mono focus:outline-none focus:border-[#4A6741]"
                       />
+                      <button
+                        type="button"
+                        onClick={toggleMusic}
+                        title={isMusicPlaying ? "Dừng nghe thử" : "Nghe thử nhạc ngay"}
+                        className={`px-3 py-2 rounded-xl text-xs font-serif font-semibold flex items-center gap-1.5 transition-all cursor-pointer shrink-0 ${
+                          isMusicPlaying
+                            ? "bg-[#4A6741] text-[#FDFAF5] border border-[#4A6741] shadow-2xs animate-pulse"
+                            : "bg-[#FDF0EC] text-[#C4715A] border border-[#E8D5CF] hover:bg-[#F5E2DB]"
+                        }`}
+                      >
+                        {isMusicPlaying ? (
+                          <>
+                            <Pause className="w-3.5 h-3.5" />
+                            <span>Dừng Nghe</span>
+                          </>
+                        ) : (
+                          <>
+                            <Play className="w-3.5 h-3.5" />
+                            <span>Nghe Thử</span>
+                          </>
+                        )}
+                      </button>
                     </div>
 
                     {/* Trạng thái nhận diện link YouTube */}
@@ -1455,7 +1486,9 @@ export default function AdminPage() {
   return (
     <WeddingDataProvider>
       <ToastProvider>
-        <StudioContent />
+        <MusicProvider>
+          <StudioContent />
+        </MusicProvider>
       </ToastProvider>
     </WeddingDataProvider>
   );
