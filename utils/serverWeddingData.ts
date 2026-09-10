@@ -109,6 +109,12 @@ export async function saveLatestWeddingData(data: WeddingData): Promise<{
   if (redis) {
     try {
       await redis.set("wedding_custom_data", data);
+      if (data.notifications?.telegram?.botToken && data.notifications?.telegram?.chatId) {
+        await redis.set("wedding_telegram_config", {
+          botToken: data.notifications.telegram.botToken.trim(),
+          chatId: data.notifications.telegram.chatId.trim(),
+        });
+      }
       target = "redis";
     } catch (err) {
       console.warn("Could not save to Upstash Redis:", err);

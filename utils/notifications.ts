@@ -1,8 +1,29 @@
+import { Redis } from "@upstash/redis";
 import { RSVPSubmission, WishSubmission, WeddingData } from "@/types/wedding";
 
 export interface TelegramConfig {
   botToken?: string;
   chatId?: string;
+}
+
+function getRedisClient(): Redis | null {
+  const url =
+    process.env.UPSTASH_REDIS_REST_URL ||
+    process.env.KV_REST_API_URL ||
+    process.env.UPSTASH_REDIS_REST_KV_URL;
+  const token =
+    process.env.UPSTASH_REDIS_REST_TOKEN ||
+    process.env.KV_REST_API_TOKEN ||
+    process.env.UPSTASH_REDIS_REST_KV_TOKEN;
+
+  if (url && token) {
+    try {
+      return new Redis({ url, token });
+    } catch {
+      return null;
+    }
+  }
+  return null;
 }
 
 /**
@@ -12,13 +33,50 @@ export async function sendTelegramNotification(
   message: string,
   config?: TelegramConfig
 ): Promise<{ success: boolean; error?: string }> {
-  const token = config?.botToken?.trim() || process.env.TELEGRAM_BOT_TOKEN?.trim();
-  const chatId = config?.chatId?.trim() || process.env.TELEGRAM_CHAT_ID?.trim();
+  let token = config?.botToken?.trim() || process.env.TELEGRAM_BOT_TOKEN?.trim();
+  let chatId = config?.chatId?.trim() || process.env.TELEGRAM_CHAT_ID?.trim();
+
+  // 1. Tự động chuẩn hóa nếu người dùng copy thừa chữ "bot" ở đầu token
+  if (token && /^bot\d+:/i.test(token)) {
+    token = token.replace(/^bot/i, "");
+  }
+
+  // 2. Nếu thiếu token hoặc chatId, đọc trực tiếp từ Redis
+  if (!token || !chatId) {
+    const redis = getRedisClient();
+    if (redis) {
+      try {
+        const stored = await redis.get<TelegramConfig>("wedding_telegram_config");
+        if (stored?.botToken && stored?.chatId) {
+          token = token || stored.botToken.trim();
+          chatId = chatId || stored.chatId.trim();
+        }
+        if (!token || !chatId) {
+          const weddingCustom = await redis.get<WeddingData>("wedding_custom_data");
+          if (weddingCustom?.notifications?.telegram) {
+            token = token || weddingCustom.notifications.telegram.botToken?.trim();
+            chatId = chatId || weddingCustom.notifications.telegram.chatId?.trim();
+          }
+        }
+      } catch (err) {
+        console.warn("[Redis Read Telegram Config Error]:", err);
+      }
+    }
+  }
+
+  // Chuẩn hóa token lần 2
+  if (token && /^bot\d+:/i.test(token)) {
+    token = token.replace(/^bot/i, "");
+  }
 
   if (!token || !chatId) {
+    console.warn("[Telegram Notification Warning]: Chưa cấu hình Telegram Bot Token hoặc Chat ID.", {
+      hasToken: Boolean(token),
+      hasChatId: Boolean(chatId),
+    });
     return {
       success: false,
-      error: "Chưa cấu hình Telegram Bot Token hoặc Chat ID.",
+      error: "Chưa cấu hình Telegram Bot Token hoặc Chat ID. Vui lòng kiểm tra tab Thông báo trong /admin hoặc cài đặt Environment Variables trên Vercel.",
     };
   }
 
@@ -37,9 +95,17 @@ export async function sendTelegramNotification(
     const result = await res.json();
     if (!result.ok) {
       console.error("[Telegram API Error]:", result);
+      let friendlyError = result.description || "Lỗi khi gửi tin nhắn qua Telegram Bot.";
+      if (result.description?.includes("chat not found")) {
+        friendlyError = "Lỗi 'chat not found': Bạn hoặc nhóm của bạn chưa gửi tin nhắn cho Bot! Hãy mở Telegram, tìm bot của bạn và bấm nút 'Start' (hoặc gõ /start) để kích hoạt trước.";
+      } else if (result.description?.includes("bot can't initiate conversation")) {
+        friendlyError = "Lỗi 'bot can't initiate conversation': Telegram yêu cầu bạn phải mở Bot và bấm nút 'Start' (/start) trước thì bot mới có quyền gửi tin nhắn cho bạn.";
+      } else if (result.description?.includes("Unauthorized")) {
+        friendlyError = "Lỗi 'Unauthorized': Bot Token không chính xác. Hãy vào @BotFather trên Telegram lấy lại Token chuẩn.";
+      }
       return {
         success: false,
-        error: result.description || "Lỗi khi gửi tin nhắn qua Telegram Bot.",
+        error: friendlyError,
       };
     }
 

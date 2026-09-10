@@ -3,7 +3,7 @@ import fs from "fs";
 import path from "path";
 import { Redis } from "@upstash/redis";
 import { WishSubmission } from "@/types/wedding";
-import { getLatestWeddingData } from "@/utils/serverWeddingData";
+import { getLatestWeddingDataAsync } from "@/utils/serverWeddingData";
 import {
   sendTelegramNotification,
   formatWishTelegramMessage,
@@ -94,7 +94,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const currentWeddingData = getLatestWeddingData();
+    const currentWeddingData = await getLatestWeddingDataAsync();
 
     const newWish: WishSubmission = {
       id: `wish-${Date.now()}`,
@@ -120,10 +120,15 @@ export async function POST(request: Request) {
     // 1. Gửi thông báo lời chúc tới Telegram của dâu rể
     try {
       const telegramText = formatWishTelegramMessage(newWish, currentWeddingData);
-      await sendTelegramNotification(
+      const telResult = await sendTelegramNotification(
         telegramText,
         currentWeddingData.notifications?.telegram
       );
+      if (!telResult.success) {
+        console.warn("[Telegram Wish Notification Failed]:", telResult.error);
+      } else {
+        console.log("[Telegram Wish Notification Sent Successfully]");
+      }
     } catch (telegramErr) {
       console.warn("[Telegram Wish Notification Error]:", telegramErr);
     }

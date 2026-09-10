@@ -3,7 +3,7 @@ import fs from "fs";
 import path from "path";
 import { Redis } from "@upstash/redis";
 import { RSVPSubmission } from "@/types/wedding";
-import { getLatestWeddingData } from "@/utils/serverWeddingData";
+import { getLatestWeddingDataAsync } from "@/utils/serverWeddingData";
 import {
   sendTelegramNotification,
   formatRSVPTelegramMessage,
@@ -182,7 +182,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const currentWeddingData = getLatestWeddingData();
+    const currentWeddingData = await getLatestWeddingDataAsync();
 
     // 1. Phân luồng email nhận thông báo theo lựa chọn của khách
     const groomEmail =
@@ -217,10 +217,15 @@ export async function POST(request: Request) {
     // 2. KÊNH 1: BẮN TIN NHẮN TELEGRAM NGAY TỨC THÌ ĐẾN ĐIỆN THOẠI CỦA DÂU RỂ
     try {
       const telegramText = formatRSVPTelegramMessage(newRSVP, currentWeddingData);
-      await sendTelegramNotification(
+      const telResult = await sendTelegramNotification(
         telegramText,
         currentWeddingData.notifications?.telegram
       );
+      if (!telResult.success) {
+        console.warn("[Telegram RSVP Notification Failed]:", telResult.error);
+      } else {
+        console.log("[Telegram RSVP Notification Sent Successfully]");
+      }
     } catch (telegramErr) {
       console.warn("[Telegram Notification Error]:", telegramErr);
     }

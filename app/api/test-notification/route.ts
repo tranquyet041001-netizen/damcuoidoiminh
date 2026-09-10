@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
 import { sendTelegramNotification, sendGoogleSheetWebhook } from "@/utils/notifications";
-import { getLatestWeddingData } from "@/utils/serverWeddingData";
+import { getLatestWeddingDataAsync } from "@/utils/serverWeddingData";
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
     const { channel, botToken, chatId, webhookUrl } = body;
-    const currentData = getLatestWeddingData();
+    const currentData = await getLatestWeddingDataAsync();
 
     if (channel === "telegram") {
       const testMsg = `
@@ -21,7 +21,12 @@ Kể từ bây giờ, bất cứ khi nào có khách:
 ⏰ <i>${new Date().toLocaleString("vi-VN", { timeZone: "Asia/Ho_Chi_Minh" })}</i>
 `.trim();
 
-      const result = await sendTelegramNotification(testMsg, { botToken, chatId });
+      const effectiveToken = botToken || currentData.notifications?.telegram?.botToken;
+      const effectiveChatId = chatId || currentData.notifications?.telegram?.chatId;
+      const result = await sendTelegramNotification(testMsg, {
+        botToken: effectiveToken,
+        chatId: effectiveChatId,
+      });
       if (!result.success) {
         return NextResponse.json(
           { success: false, error: result.error },
