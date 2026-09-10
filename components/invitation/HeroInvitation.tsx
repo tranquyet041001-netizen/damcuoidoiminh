@@ -14,11 +14,21 @@ import {
   BotanicalBranch,
 } from "@/components/ui/VietnamesePattern";
 
-export const HeroInvitation: React.FC = () => {
+interface HeroInvitationProps {
+  isOpen?: boolean;
+  onOpen?: () => void;
+}
+
+export const HeroInvitation: React.FC<HeroInvitationProps> = ({
+  isOpen: controlledIsOpen,
+  onOpen,
+}) => {
   const { data: weddingData } = useWeddingData();
   const { playMusic, isPlaying } = useMusic();
-  const [isEnvelopeOpen, setIsEnvelopeOpen] = useState(false);
+  const [internalIsOpen, setInternalIsOpen] = useState(false);
   const [guestName, setGuestName] = useState<string>("");
+
+  const isEnvelopeOpen = controlledIsOpen !== undefined ? controlledIsOpen : internalIsOpen;
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -31,7 +41,10 @@ export const HeroInvitation: React.FC = () => {
   }, []);
 
   const handleOpenInvitation = () => {
-    setIsEnvelopeOpen(true);
+    if (controlledIsOpen === undefined) {
+      setInternalIsOpen(true);
+    }
+    onOpen?.();
     if (!isPlaying) {
       playMusic();
     }
@@ -47,7 +60,9 @@ export const HeroInvitation: React.FC = () => {
   return (
     <section
       id="hero"
-      className="relative min-h-[92vh] flex flex-col items-center justify-center px-4 py-16 overflow-hidden bg-peach-texture"
+      className={`relative ${
+        isEnvelopeOpen ? "min-h-[92vh] py-16" : "min-h-[100dvh] py-8 sm:py-12"
+      } flex flex-col items-center justify-center px-4 overflow-hidden bg-peach-texture`}
     >
       {/* Decorative Botanical corners */}
       <div className="absolute top-3 left-3 opacity-60 pointer-events-none">
@@ -73,7 +88,7 @@ export const HeroInvitation: React.FC = () => {
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.94, y: -25 }}
               transition={{ duration: 0.6, ease: "easeOut" }}
-              className="relative rounded-3xl p-6 sm:p-10 text-center shadow-xl border border-[#E8D5CF]/80 bg-[#FDFAF5]"
+              className="relative w-full rounded-3xl p-6 sm:p-10 text-center shadow-xl border border-[#E8D5CF]/80 bg-[#FDFAF5]"
               style={{
                 boxShadow: "0 20px 45px -12px rgba(196, 113, 90, 0.15), 0 0 0 1px rgba(232, 213, 207, 0.5)",
               }}

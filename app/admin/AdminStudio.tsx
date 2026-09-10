@@ -24,6 +24,7 @@ import {
   Loader2,
   Music,
   Mail,
+  MailOpen,
   Send,
   Share2,
   Copy,
@@ -78,6 +79,7 @@ function StudioContent() {
 
   const [activeTab, setActiveTab] = useState<TabId>("couple");
   const [previewDevice, setPreviewDevice] = useState<"desktop" | "mobile">("mobile");
+  const [previewEnvelopeOpen, setPreviewEnvelopeOpen] = useState(true);
   const [autoSaveStatus, setAutoSaveStatus] = useState<"saved" | "saving">("saved");
   const [isManualSaving, setIsManualSaving] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
@@ -535,6 +537,36 @@ function StudioContent() {
               title="Khung máy tính"
             >
               <Monitor className="w-4 h-4" />
+            </button>
+          </div>
+
+          {/* Envelope State Switcher in Preview */}
+          <div className="flex items-center bg-[#F0F5EE] p-0.5 sm:p-1 rounded-xl border border-[#A8BCA1]/30">
+            <button
+              type="button"
+              onClick={() => setPreviewEnvelopeOpen(!previewEnvelopeOpen)}
+              className={`px-2 py-1 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
+                previewEnvelopeOpen
+                  ? "bg-[#4A6741] text-[#FDFAF5] shadow-xs"
+                  : "bg-white text-[#8C6A58] hover:text-[#354D2E] shadow-2xs"
+              }`}
+              title={
+                previewEnvelopeOpen
+                  ? "Xem bìa thiệp đóng"
+                  : "Xem thiệp khi đã mở"
+              }
+            >
+              {previewEnvelopeOpen ? (
+                <>
+                  <MailOpen className="w-3.5 h-3.5 text-[#C9A84C]" />
+                  <span className="hidden sm:inline">Đã Mở</span>
+                </>
+              ) : (
+                <>
+                  <Mail className="w-3.5 h-3.5 text-[#C4715A]" />
+                  <span className="hidden sm:inline">Bìa Đóng</span>
+                </>
+              )}
             </button>
           </div>
         </div>
@@ -2633,7 +2665,11 @@ function StudioContent() {
 
               {/* Màn hình thiệp cưới tương tác trực tiếp */}
               <div className="flex-1 overflow-y-auto no-scrollbar pb-16 relative">
-                <WeddingInvitationView isPreview={true} />
+                <WeddingInvitationView
+                  isPreview={true}
+                  isOpen={previewEnvelopeOpen}
+                  onOpenChange={setPreviewEnvelopeOpen}
+                />
               </div>
             </div>
           ) : (
@@ -2651,7 +2687,11 @@ function StudioContent() {
               </div>
 
               <div className="flex-1 overflow-y-auto pb-16 relative">
-                <WeddingInvitationView isPreview={true} />
+                <WeddingInvitationView
+                  isPreview={true}
+                  isOpen={previewEnvelopeOpen}
+                  onOpenChange={setPreviewEnvelopeOpen}
+                />
               </div>
             </div>
           )}
