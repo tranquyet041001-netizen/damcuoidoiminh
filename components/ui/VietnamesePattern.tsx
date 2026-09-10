@@ -85,13 +85,14 @@ export const DongSonSun: React.FC<PatternProps> = ({
 };
 
 /**
- * Hoa sen thuần Việt tối giản, tao nhã
+ * Biểu tượng Cặp Nhẫn Cưới & Kim Cương Hoàng Gia lồng nhau (Trang nhã, ý nghĩa trọn vẹn, không nhạy cảm)
  */
-export const VietnameseLotus: React.FC<PatternProps> = ({
+export const WeddingRingsCrest: React.FC<PatternProps> = ({
   className = "",
-  size = 64,
+  size = 46,
   color = "currentColor",
-  opacity = 0.8,
+  opacity = 0.9,
+  style,
 }) => {
   return (
     <svg
@@ -101,56 +102,125 @@ export const VietnameseLotus: React.FC<PatternProps> = ({
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className={className}
-      style={{ opacity }}
+      style={{ opacity, ...style }}
       aria-hidden="true"
     >
-      {/* Cánh sen chính giữa */}
+      {/* Tia sáng kim cương lấp lánh */}
       <path
-        d="M50 20 C42 40 44 65 50 78 C56 65 58 40 50 20 Z"
-        stroke={color}
-        strokeWidth="1.6"
-        fill="none"
-        strokeLinecap="round"
-      />
-      {/* Cánh sen bên trái */}
-      <path
-        d="M50 45 C32 40 22 55 26 72 C35 75 44 68 50 62"
-        stroke={color}
+        d="M38 5 L38 9 M38 25 L38 29 M24 17 L28 17 M48 17 L52 17"
+        stroke="#C9A84C"
         strokeWidth="1.4"
-        fill="none"
         strokeLinecap="round"
       />
-      {/* Cánh sen bên phải */}
+      <circle cx="38" cy="17" r="1.5" fill="#C9A84C" />
+
+      {/* Viên kim cương trên nhẫn cô dâu */}
       <path
-        d="M50 45 C68 40 78 55 74 72 C65 75 56 68 50 62"
-        stroke={color}
-        strokeWidth="1.4"
-        fill="none"
-        strokeLinecap="round"
-      />
-      {/* Cánh sen phụ nở ngoài */}
-      <path
-        d="M28 68 C15 72 16 82 28 82 C38 82 46 76 50 72"
-        stroke={color}
-        strokeWidth="1.2"
-        fill="none"
-      />
-      <path
-        d="M72 68 C85 72 84 82 72 82 C62 82 54 76 50 72"
-        stroke={color}
-        strokeWidth="1.2"
-        fill="none"
-      />
-      {/* Đáy đài sen */}
-      <path
-        d="M36 84 C45 87 55 87 64 84"
-        stroke={color}
+        d="M38 10 L44 17 L38 24 L32 17 Z"
+        stroke="#C9A84C"
         strokeWidth="1.5"
+        fill="#FDFAF5"
+        strokeLinejoin="round"
+      />
+      <line x1="32" y1="17" x2="44" y2="17" stroke="#C9A84C" strokeWidth="1" />
+      <line x1="38" y1="10" x2="38" y2="24" stroke="#C9A84C" strokeWidth="0.8" />
+
+      {/* Nhẫn 1 (Cô dâu - có kim cương) */}
+      <circle
+        cx="38"
+        cy="46"
+        r="19"
+        stroke={color}
+        strokeWidth="2.2"
+      />
+      <circle
+        cx="38"
+        cy="46"
+        r="15.5"
+        stroke={color}
+        strokeWidth="0.8"
+        strokeDasharray="3 2"
+        opacity="0.5"
+      />
+
+      {/* Nhẫn 2 (Chú rể - lồng vào bên phải) */}
+      <circle
+        cx="60"
+        cy="50"
+        r="19"
+        stroke={color}
+        strokeWidth="2.2"
+      />
+      <circle
+        cx="60"
+        cy="50"
+        r="15.5"
+        stroke={color}
+        strokeWidth="0.8"
+        strokeDasharray="3 2"
+        opacity="0.5"
+      />
+
+      {/* Điểm lồng đan xen 3D */}
+      <path
+        d="M47 34 A 19 19 0 0 1 54 37"
+        stroke={color}
+        strokeWidth="2.8"
         strokeLinecap="round"
       />
+
+      {/* Cành lá hạnh phúc uốn cong nâng đỡ hai chiếc nhẫn */}
+      <path
+        d="M18 72 C32 84 46 86 50 86"
+        stroke={color}
+        strokeWidth="1.2"
+        strokeLinecap="round"
+      />
+      <path
+        d="M82 72 C68 84 54 86 50 86"
+        stroke={color}
+        strokeWidth="1.2"
+        strokeLinecap="round"
+      />
+
+      {/* Lá nguyệt quế */}
+      <path
+        d="M28 75 C24 73 24 67 28 68 C30 71 29 74 28 75 Z"
+        fill={color}
+        fillOpacity="0.5"
+        stroke={color}
+        strokeWidth="0.6"
+      />
+      <path
+        d="M38 80 C35 78 36 72 40 73 C41 76 40 79 38 80 Z"
+        fill={color}
+        fillOpacity="0.5"
+        stroke={color}
+        strokeWidth="0.6"
+      />
+      <path
+        d="M72 75 C76 73 76 67 72 68 C70 71 71 74 72 75 Z"
+        fill={color}
+        fillOpacity="0.5"
+        stroke={color}
+        strokeWidth="0.6"
+      />
+      <path
+        d="M62 80 C65 78 64 72 60 73 C59 76 60 79 62 80 Z"
+        fill={color}
+        fillOpacity="0.5"
+        stroke={color}
+        strokeWidth="0.6"
+      />
+
+      {/* Điểm xuyết hoa quả son đỏ trung tâm */}
+      <circle cx="50" cy="86" r="2.2" fill="#C4715A" />
     </svg>
   );
 };
+
+// Giữ alias tương thích ngược để toàn bộ thiệp cưới tự động cập nhật biểu tượng mới
+export const VietnameseLotus = WeddingRingsCrest;
 
 /**
  * Đường viền họa tiết hoa cành / Đông Sơn kết hợp
