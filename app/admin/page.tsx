@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import { getLatestWeddingData } from "@/utils/serverWeddingData";
+import { getLatestWeddingDataAsync } from "@/utils/serverWeddingData";
 import AdminStudio from "./AdminStudio";
 
 export const dynamic = "force-dynamic";
@@ -11,6 +11,7 @@ export const metadata: Metadata = {
 };
 
 export default async function AdminPage() {
-  const currentData = getLatestWeddingData();
+  const currentData = await getLatestWeddingDataAsync();
   return <AdminStudio initialData={currentData} />;
 }
+

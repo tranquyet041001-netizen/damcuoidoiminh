@@ -1,28 +1,32 @@
 import { NextResponse } from "next/server";
-import { getLatestWeddingData, saveLatestWeddingData } from "@/utils/serverWeddingData";
+import {
+  getLatestWeddingDataAsync,
+  saveLatestWeddingData,
+} from "@/utils/serverWeddingData";
 
 export async function GET() {
-  const data = getLatestWeddingData();
+  const data = await getLatestWeddingDataAsync();
   return NextResponse.json(data);
 }
 
 export async function POST(request: Request) {
   try {
     const updatedData = await request.json();
-    const success = saveLatestWeddingData(updatedData);
-    if (!success) {
+    if (!updatedData || !updatedData.groom || !updatedData.bride) {
       return NextResponse.json(
-        { success: false, error: "Failed to persist wedding data" },
-        { status: 500 }
+        { success: false, error: "Dữ liệu thiệp cưới không hợp lệ" },
+        { status: 400 }
       );
     }
-    return NextResponse.json({ success: true });
-  } catch (err) {
+    const result = await saveLatestWeddingData(updatedData);
+    return NextResponse.json(result);
+  } catch (err: any) {
     console.error("Error saving wedding data:", err);
     return NextResponse.json(
-      { success: false, error: "Failed to persist wedding data" },
+      { success: false, error: err.message || "Failed to persist wedding data" },
       { status: 500 }
     );
   }
 }
+
 

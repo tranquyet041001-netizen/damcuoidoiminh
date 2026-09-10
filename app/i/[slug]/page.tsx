@@ -1,10 +1,9 @@
 import { Metadata } from "next";
-import { getLatestWeddingData } from "@/utils/serverWeddingData";
+import { getLatestWeddingDataAsync } from "@/utils/serverWeddingData";
 import GuestViewWrapper from "./GuestViewWrapper";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
-
 
 export async function generateMetadata({
   params,
@@ -12,7 +11,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const resolvedParams = await params;
-  const currentData = getLatestWeddingData();
+  const currentData = await getLatestWeddingDataAsync();
 
   const previewImage =
     currentData.gallery && currentData.gallery.length > 0
@@ -48,6 +47,7 @@ export async function generateMetadata({
 }
 
 export default async function GuestPage() {
-  const currentData = getLatestWeddingData();
+  const currentData = await getLatestWeddingDataAsync();
   return <GuestViewWrapper initialData={currentData} />;
 }
+
