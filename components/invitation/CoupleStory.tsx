@@ -9,9 +9,15 @@ import { VietnameseLotus, BotanicalBranch } from "@/components/ui/VietnamesePatt
 
 export const CoupleStory: React.FC = () => {
   const { data: weddingData } = useWeddingData();
+  const isRed = (weddingData.theme || "crimson-gold") === "crimson-gold";
 
   return (
-    <section id="story" className="py-16 px-4 bg-sage-texture relative overflow-hidden">
+    <section
+      id="story"
+      className={`py-16 px-4 relative overflow-hidden ${
+        isRed ? "bg-red-ivory-texture" : "bg-sage-texture"
+      }`}
+    >
       <div className="max-w-xl mx-auto relative z-10">
         {/* Header */}
         <motion.div
@@ -22,12 +28,24 @@ export const CoupleStory: React.FC = () => {
           className="text-center mb-12"
         >
           <div className="inline-flex items-center justify-center mb-2">
-            <Heart className="w-6 h-6 text-[#C4715A] fill-[#C4715A]/15 animate-heartbeat" />
+            <Heart
+              className={`w-6 h-6 animate-heartbeat ${
+                isRed ? "text-[#DC2626] fill-[#DC2626]/20" : "text-[#C4715A] fill-[#C4715A]/15"
+              }`}
+            />
           </div>
-          <p className="text-[11px] uppercase tracking-[0.3em] text-[#4A6741] font-sans font-semibold mb-1">
+          <p
+            className={`text-[11px] uppercase tracking-[0.3em] font-sans font-semibold mb-1 ${
+              isRed ? "text-[#9F171B]" : "text-[#4A6741]"
+            }`}
+          >
             Hành Trình Yêu Thương
           </p>
-          <h2 className="font-serif text-2xl sm:text-3xl font-bold text-[#354D2E] tracking-wide">
+          <h2
+            className={`font-serif text-2xl sm:text-3xl font-bold tracking-wide ${
+              isRed ? "text-[#9F171B]" : "text-[#354D2E]"
+            }`}
+          >
             Câu Chuyện Chúng Mình
           </h2>
           <div className="flex items-center justify-center my-3">

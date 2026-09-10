@@ -11,6 +11,7 @@ import { VietnameseLotus, BotanicalBranch } from "@/components/ui/VietnamesePatt
 export const GiftCard: React.FC = () => {
   const { showToast } = useToast();
   const { data: weddingData } = useWeddingData();
+  const isRed = (weddingData.theme || "crimson-gold") === "crimson-gold";
   const [activeTab, setActiveTab] = useState<"groom" | "bride">("groom");
   const [copiedAccount, setCopiedAccount] = useState<string | null>(null);
 
@@ -32,7 +33,12 @@ export const GiftCard: React.FC = () => {
   };
 
   return (
-    <section id="gift" className="py-16 px-4 bg-ivory-texture relative overflow-hidden">
+    <section
+      id="gift"
+      className={`py-16 px-4 relative overflow-hidden ${
+        isRed ? "bg-red-ivory-texture" : "bg-ivory-texture"
+      }`}
+    >
       <div className="max-w-xl mx-auto relative z-10">
         {/* Header */}
         <motion.div
@@ -43,12 +49,16 @@ export const GiftCard: React.FC = () => {
           className="text-center mb-10"
         >
           <div className="inline-flex items-center justify-center mb-2">
-            <VietnameseLotus size={36} color="#4A6741" opacity={0.85} />
+            <VietnameseLotus size={36} color={isRed ? "#9F171B" : "#4A6741"} opacity={0.85} />
           </div>
           <p className="text-[11px] uppercase tracking-[0.3em] text-[#C4715A] font-sans font-semibold mb-1">
             Hộp Mừng Cưới
           </p>
-          <h2 className="font-serif text-2xl sm:text-3xl font-bold text-[#354D2E] tracking-wide">
+          <h2
+            className={`font-serif text-2xl sm:text-3xl font-bold tracking-wide ${
+              isRed ? "text-[#9F171B]" : "text-[#354D2E]"
+            }`}
+          >
             Mừng Cưới Chúc Phúc
           </h2>
           <div className="flex items-center justify-center my-3">

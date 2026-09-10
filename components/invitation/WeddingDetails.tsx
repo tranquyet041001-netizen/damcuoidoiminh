@@ -8,6 +8,7 @@ import { VietnameseLotus, BotanicalBranch } from "@/components/ui/VietnamesePatt
 
 export const WeddingDetails: React.FC = () => {
   const { data: weddingData } = useWeddingData();
+  const isRed = (weddingData.theme || "crimson-gold") === "crimson-gold";
 
   const handleAddToCalendar = (event: (typeof weddingData.events)[0]) => {
     const title = encodeURIComponent(`${event.title} - ${weddingData.groom.shortName} & ${weddingData.bride.shortName}`);
@@ -18,7 +19,12 @@ export const WeddingDetails: React.FC = () => {
   };
 
   return (
-    <section id="details" className="py-16 px-4 bg-ivory-texture relative overflow-hidden">
+    <section
+      id="details"
+      className={`py-16 px-4 relative overflow-hidden ${
+        isRed ? "bg-red-ivory-texture" : "bg-ivory-texture"
+      }`}
+    >
       <div className="max-w-xl mx-auto relative z-10">
         {/* Header */}
         <motion.div
@@ -29,12 +35,16 @@ export const WeddingDetails: React.FC = () => {
           className="text-center mb-10"
         >
           <div className="inline-flex items-center justify-center mb-2">
-            <VietnameseLotus size={36} color="#4A6741" opacity={0.85} />
+            <VietnameseLotus size={36} color={isRed ? "#9F171B" : "#4A6741"} opacity={0.85} />
           </div>
           <p className="text-[11px] uppercase tracking-[0.3em] text-[#C4715A] font-sans font-semibold mb-1">
             Chương Trình Hôn Lễ
           </p>
-          <h2 className="font-serif text-2xl sm:text-3xl font-bold text-[#354D2E] tracking-wide">
+          <h2
+            className={`font-serif text-2xl sm:text-3xl font-bold tracking-wide ${
+              isRed ? "text-[#9F171B]" : "text-[#354D2E]"
+            }`}
+          >
             Thông Tin Tiệc Cưới
           </h2>
           <div className="flex items-center justify-center my-3">
@@ -65,11 +75,21 @@ export const WeddingDetails: React.FC = () => {
                   <span className="text-[10px] uppercase tracking-[0.2em] font-sans font-bold text-[#C4715A] block">
                     {event.subtitle || "Sự Kiện"}
                   </span>
-                  <h3 className="font-serif text-xl sm:text-2xl font-bold text-[#354D2E] mt-0.5">
+                  <h3
+                    className={`font-serif text-xl sm:text-2xl font-bold mt-0.5 ${
+                      isRed ? "text-[#9F171B]" : "text-[#354D2E]"
+                    }`}
+                  >
                     {event.title}
                   </h3>
                 </div>
-                <div className="px-3 py-1 rounded-full bg-[#F0F5EE] border border-[#A8BCA1]/40 text-[#4A6741] text-xs font-serif font-bold">
+                <div
+                  className={`px-3 py-1 rounded-full text-xs font-serif font-bold border ${
+                    isRed
+                      ? "bg-[#FEF2F2] border-[#C9A84C]/50 text-[#9F171B]"
+                      : "bg-[#F0F5EE] border-[#A8BCA1]/40 text-[#4A6741]"
+                  }`}
+                >
                   {event.time}
                 </div>
               </div>
@@ -79,22 +99,28 @@ export const WeddingDetails: React.FC = () => {
                 <div className="flex items-start gap-3 text-sm text-[#5C4033]">
                   <Calendar className="w-4 h-4 text-[#C4715A] mt-0.5 shrink-0" />
                   <div>
-                    <span className="font-medium text-[#354D2E]">{event.date || weddingData.weddingDateFormatted}</span>
+                    <span className={`font-medium ${isRed ? "text-[#9F171B]" : "text-[#354D2E]"}`}>
+                      {event.date || weddingData.weddingDateFormatted}
+                    </span>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-3 text-sm text-[#5C4033]">
-                  <Clock className="w-4 h-4 text-[#4A6741] mt-0.5 shrink-0" />
+                  <Clock className={`w-4 h-4 mt-0.5 shrink-0 ${isRed ? "text-[#9F171B]" : "text-[#4A6741]"}`} />
                   <div>
                     <span>Vào lúc </span>
-                    <span className="font-semibold text-[#354D2E]">{event.time}</span>
+                    <span className={`font-semibold ${isRed ? "text-[#9F171B]" : "text-[#354D2E]"}`}>
+                      {event.time}
+                    </span>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-3 text-sm text-[#5C4033]">
                   <MapPin className="w-4 h-4 text-[#C9A84C] mt-0.5 shrink-0" />
                   <div>
-                    <div className="font-semibold text-[#354D2E]">{event.venue}</div>
+                    <div className={`font-semibold ${isRed ? "text-[#9F171B]" : "text-[#354D2E]"}`}>
+                      {event.venue}
+                    </div>
                     <div className="text-xs text-[#8C6A58] mt-0.5 leading-relaxed">{event.address}</div>
                   </div>
                 </div>
@@ -113,7 +139,11 @@ export const WeddingDetails: React.FC = () => {
                     href={event.mapUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-full bg-[#4A6741] hover:bg-[#354D2E] text-[#FDFAF5] text-xs font-serif font-semibold tracking-wide transition-all shadow-xs active:scale-98"
+                    className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-full text-[#FDFAF5] text-xs font-serif font-semibold tracking-wide transition-all shadow-xs active:scale-98 ${
+                      isRed
+                        ? "bg-gradient-to-r from-[#9F171B] to-[#7F1D1D] hover:brightness-110"
+                        : "bg-[#4A6741] hover:bg-[#354D2E]"
+                    }`}
                   >
                     <Navigation className="w-3.5 h-3.5" />
                     <span>Xem Bản Đồ &amp; Chỉ Đường</span>

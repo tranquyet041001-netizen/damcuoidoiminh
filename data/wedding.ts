@@ -187,5 +187,13 @@ export const weddingData: WeddingData = {
     "allowGuestCount": true,
     "maxGuests": 5,
     "showNotesField": true
+  },
+  "theme": "crimson-gold",
+  "envelopeStyle": "vintage-envelope",
+  "animations": {
+    "fallingPetals": true,
+    "dragonPhoenix": true,
+    "floatingHearts": true,
+    "sparkles": true
   }
 };

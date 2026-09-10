@@ -72,8 +72,15 @@ export const RSVPForm: React.FC = () => {
     }
   };
 
+  const isRed = (weddingData.theme || "crimson-gold") === "crimson-gold";
+
   return (
-    <section id="rsvp" className="py-16 px-4 bg-ivory-texture relative overflow-hidden">
+    <section
+      id="rsvp"
+      className={`py-16 px-4 relative overflow-hidden ${
+        isRed ? "bg-red-ivory-texture" : "bg-ivory-texture"
+      }`}
+    >
       <div className="max-w-lg mx-auto relative z-10">
         {/* Header */}
         <motion.div
@@ -84,12 +91,16 @@ export const RSVPForm: React.FC = () => {
           className="text-center mb-10"
         >
           <div className="inline-flex items-center justify-center mb-2">
-            <VietnameseLotus size={36} color="#4A6741" opacity={0.85} />
+            <VietnameseLotus size={36} color={isRed ? "#9F171B" : "#4A6741"} opacity={0.85} />
           </div>
           <p className="text-[11px] uppercase tracking-[0.3em] text-[#C4715A] font-sans font-semibold mb-1">
             {weddingData.rsvpSettings?.subtitle || "Xác Nhận Tham Dự"}
           </p>
-          <h2 className="font-serif text-2xl sm:text-3xl font-bold text-[#354D2E] tracking-wide">
+          <h2
+            className={`font-serif text-2xl sm:text-3xl font-bold tracking-wide ${
+              isRed ? "text-[#9F171B]" : "text-[#354D2E]"
+            }`}
+          >
             {weddingData.rsvpSettings?.title || "Sự Hiện Diện Của Bạn"}
           </h2>
           <div className="flex items-center justify-center my-3">
@@ -277,8 +288,12 @@ export const RSVPForm: React.FC = () => {
                   disabled={submitting}
                   className="w-full flex items-center justify-center gap-2 py-3.5 px-6 rounded-full text-sm font-serif font-semibold text-[#FDFAF5] transition-all shadow-md active:scale-98 disabled:opacity-70 cursor-pointer"
                   style={{
-                    background: "linear-gradient(135deg, #C4715A 0%, #A4503B 100%)",
-                    boxShadow: "0 8px 20px -4px rgba(196, 113, 90, 0.4)",
+                    background: isRed
+                      ? "linear-gradient(135deg, #9F171B 0%, #7F1D1D 100%)"
+                      : "linear-gradient(135deg, #C4715A 0%, #A4503B 100%)",
+                    boxShadow: isRed
+                      ? "0 8px 20px -4px rgba(159, 23, 27, 0.45)"
+                      : "0 8px 20px -4px rgba(196, 113, 90, 0.4)",
                   }}
                 >
                   {submitting ? (

@@ -14,12 +14,19 @@ interface FooterProps {
 export const Footer: React.FC<FooterProps> = ({ isGuestView = false }) => {
   const { data } = useWeddingData();
 
+  const theme = data.theme || "crimson-gold";
+  const isRed = theme === "crimson-gold";
+
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   return (
-    <footer className="relative pt-16 pb-12 px-4 text-center overflow-hidden bg-green-texture text-[#FDFAF5]">
+    <footer
+      className={`relative pt-16 pb-12 px-4 text-center overflow-hidden text-[#FDFAF5] ${
+        isRed ? "bg-crimson-texture" : "bg-green-texture"
+      }`}
+    >
       <div className="max-w-md mx-auto relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 15 }}

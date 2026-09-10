@@ -5,9 +5,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Send, Heart, Sparkles, Feather } from "lucide-react";
 import { WishSubmission } from "@/types/wedding";
 import { useToast } from "@/components/ui/Toast";
+import { useWeddingData } from "@/context/WeddingDataContext";
 import { VietnameseLotus, BotanicalBranch } from "@/components/ui/VietnamesePattern";
 
 const WISH_CARD_THEMES = [
+  { bg: "#FEF2F2", border: "#FCA5A5", tagBg: "#FEE2E2", tagText: "#9F171B" },
   { bg: "#FDFAF5", border: "#E8D5CF", tagBg: "#FDF0EC", tagText: "#C4715A" },
   { bg: "#F0F5EE", border: "#C8D9C5", tagBg: "#E2EBDD", tagText: "#4A6741" },
   { bg: "#FFFDF9", border: "#E2C97A", tagBg: "#FDF9EB", tagText: "#C9A84C" },
@@ -15,6 +17,8 @@ const WISH_CARD_THEMES = [
 
 export const WishBook: React.FC = () => {
   const { showToast } = useToast();
+  const { data: weddingData } = useWeddingData();
+  const isRed = (weddingData.theme || "crimson-gold") === "crimson-gold";
   const [wishes, setWishes] = useState<WishSubmission[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -68,7 +72,12 @@ export const WishBook: React.FC = () => {
   };
 
   return (
-    <section id="wishes" className="py-16 px-4 bg-peach-texture relative overflow-hidden">
+    <section
+      id="wishes"
+      className={`py-16 px-4 relative overflow-hidden ${
+        isRed ? "bg-red-ivory-texture" : "bg-peach-texture"
+      }`}
+    >
       <div className="max-w-xl mx-auto relative z-10">
         {/* Header */}
         <motion.div
@@ -79,16 +88,20 @@ export const WishBook: React.FC = () => {
           className="text-center mb-10"
         >
           <div className="inline-flex items-center justify-center mb-2">
-            <VietnameseLotus size={36} color="#4A6741" opacity={0.85} />
+            <VietnameseLotus size={36} color={isRed ? "#9F171B" : "#4A6741"} opacity={0.85} />
           </div>
           <p className="text-[11px] uppercase tracking-[0.3em] text-[#C4715A] font-sans font-semibold mb-1">
             Gửi Trọn Yêu Thương
           </p>
-          <h2 className="font-serif text-2xl sm:text-3xl font-bold text-[#354D2E] tracking-wide">
+          <h2
+            className={`font-serif text-2xl sm:text-3xl font-bold tracking-wide ${
+              isRed ? "text-[#9F171B]" : "text-[#354D2E]"
+            }`}
+          >
             Sổ Lưu Bút
           </h2>
           <div className="flex items-center justify-center my-3">
-            <BotanicalBranch size={52} color="#C9A84C" opacity={0.7} />
+            <BotanicalBranch size={52} color={isRed ? "#C9A84C" : "#4A6741"} opacity={0.7} />
           </div>
           <p className="text-xs sm:text-sm text-[#8C6A58] italic font-serif max-w-sm mx-auto">
             Những dòng nhắn gửi chân thành là món quà tinh thần quý báu nhất của chúng mình.
@@ -174,7 +187,9 @@ export const WishBook: React.FC = () => {
                   disabled={submitting}
                   className="w-full flex items-center justify-center gap-2 py-3 px-6 rounded-full text-xs font-serif font-semibold text-[#FDFAF5] transition-all shadow-sm active:scale-98 disabled:opacity-70 cursor-pointer"
                   style={{
-                    background: "linear-gradient(135deg, #4A6741 0%, #354D2E 100%)",
+                    background: isRed
+                      ? "linear-gradient(135deg, #9F171B 0%, #7F1D1D 100%)"
+                      : "linear-gradient(135deg, #4A6741 0%, #354D2E 100%)",
                   }}
                 >
                   <Send className="w-3.5 h-3.5" />

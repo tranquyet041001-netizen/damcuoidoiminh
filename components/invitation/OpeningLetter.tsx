@@ -12,9 +12,15 @@ import {
 
 export const OpeningLetter: React.FC = () => {
   const { data: weddingData } = useWeddingData();
+  const isRed = (weddingData.theme || "crimson-gold") === "crimson-gold";
 
   return (
-    <section id="letter" className="py-16 px-4 bg-ivory-texture relative overflow-hidden">
+    <section
+      id="letter"
+      className={`py-16 px-4 relative overflow-hidden ${
+        isRed ? "bg-red-ivory-texture" : "bg-ivory-texture"
+      }`}
+    >
       <div className="max-w-xl mx-auto relative z-10">
         {/* Header section */}
         <motion.div
@@ -25,12 +31,16 @@ export const OpeningLetter: React.FC = () => {
           className="text-center mb-8"
         >
           <div className="inline-flex items-center justify-center mb-3">
-            <VietnameseLotus size={38} color="#4A6741" opacity={0.9} />
+            <VietnameseLotus size={38} color={isRed ? "#9F171B" : "#4A6741"} opacity={0.9} />
           </div>
           <p className="text-[11px] uppercase tracking-[0.3em] text-[#C4715A] font-sans font-semibold mb-1">
             Thiệp Hồng Báo Hỷ
           </p>
-          <h2 className="font-serif text-2xl sm:text-3xl font-bold text-[#354D2E] tracking-wide">
+          <h2
+            className={`font-serif text-2xl sm:text-3xl font-bold tracking-wide ${
+              isRed ? "text-[#9F171B]" : "text-[#354D2E]"
+            }`}
+          >
             {weddingData.openingLetter.title || "Lời Ngỏ Yêu Thương"}
           </h2>
           <div className="flex items-center justify-center my-3">
@@ -57,14 +67,28 @@ export const OpeningLetter: React.FC = () => {
           {/* Hai gia đình */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-8 pb-6 border-b border-[#E8D5CF]/70">
             {/* Nhà Trai */}
-            <div className="text-center sm:text-left p-4 rounded-2xl bg-[#F0F5EE]/60 border border-[#A8BCA1]/30">
-              <span className="text-[10px] uppercase tracking-[0.2em] font-sans font-bold text-[#4A6741] block mb-1">
+            <div
+              className={`text-center sm:text-left p-4 rounded-2xl border ${
+                isRed
+                  ? "bg-[#FEF2F2]/70 border-[#FCA5A5]/40"
+                  : "bg-[#F0F5EE]/60 border-[#A8BCA1]/30"
+              }`}
+            >
+              <span
+                className={`text-[10px] uppercase tracking-[0.2em] font-sans font-bold block mb-1 ${
+                  isRed ? "text-[#9F171B]" : "text-[#4A6741]"
+                }`}
+              >
                 Họ Nhà Trai
               </span>
               <p className="text-xs sm:text-sm text-[#5C4033] font-serif leading-relaxed">
                 {weddingData.groom.parents}
               </p>
-              <div className="font-calligraphy text-2xl text-[#354D2E] mt-2">
+              <div
+                className={`font-calligraphy text-2xl mt-2 ${
+                  isRed ? "text-[#9F171B]" : "text-[#354D2E]"
+                }`}
+              >
                 CR. {weddingData.groom.fullName}
               </div>
             </div>
@@ -100,7 +124,11 @@ export const OpeningLetter: React.FC = () => {
             <p className="text-xs text-[#8C6A58] uppercase tracking-wider font-sans mb-1">
               {weddingData.openingLetter.closing || "Trân trọng kính mời"}
             </p>
-            <div className="font-calligraphy text-2xl sm:text-3xl text-[#4A6741]">
+            <div
+              className={`font-calligraphy text-2xl sm:text-3xl ${
+                isRed ? "text-[#9F171B]" : "text-[#4A6741]"
+              }`}
+            >
               {weddingData.groom.shortName} &amp; {weddingData.bride.shortName}
             </div>
           </div>

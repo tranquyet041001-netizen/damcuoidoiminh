@@ -37,6 +37,7 @@ import {
   Bell,
   HelpCircle,
   MessageSquare,
+  Palette,
 } from "lucide-react";
 import { WeddingDataProvider, useWeddingData } from "@/context/WeddingDataContext";
 import { MusicProvider, useMusic } from "@/context/MusicContext";
@@ -62,6 +63,7 @@ import {
 
 const ADMIN_TABS = [
   { id: "couple", label: "Dâu & Rể", icon: Heart },
+  { id: "theme", label: "Giao Diện & Phong Thư", icon: Palette },
   { id: "email", label: "Báo Tin & Link", icon: Bell },
   { id: "time", label: "Lịch & Nhạc YT", icon: Calendar },
   { id: "events", label: "Sự Kiện Cưới", icon: Clock },
@@ -848,6 +850,267 @@ function StudioContent() {
                           className="flex-1 bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs text-[#354D2E] focus:outline-none focus:border-[#4A6741]"
                         />
                       </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* 1.5. TÙY CHỌN GIAO DIỆN & PHONG BÌ THƯ 3D */}
+            {activeTab === "theme" && (
+              <div className="space-y-6 animate-in fade-in duration-300">
+                {/* 1. CHỌN MÀU CHỦ ĐẠO (THEME COLOR) */}
+                <div className="bg-[#FFFDF9] border border-[#E8D5CF] p-5 rounded-2xl space-y-4 shadow-xs">
+                  <div className="flex items-center gap-2 pb-2 border-b border-[#E8D5CF]">
+                    <div className="w-8 h-8 rounded-full bg-amber-500/10 flex items-center justify-center text-amber-600">
+                      <Palette className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <h3 className="font-serif text-base font-bold text-[#354D2E]">
+                        Tông Màu Chủ Đạo Của Thiệp
+                      </h3>
+                      <p className="text-[11px] text-[#8C6A58]">
+                        Chọn phong cách màu sắc hiển thị cho toàn bộ website thiệp cưới
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+                    {/* Giao diện Đỏ Hoàng Gia */}
+                    <div
+                      onClick={() => updateData({ theme: "crimson-gold" })}
+                      className={`relative p-4 rounded-2xl border-2 transition-all cursor-pointer flex flex-col justify-between ${
+                        (data.theme || "crimson-gold") === "crimson-gold"
+                          ? "border-[#9F171B] bg-[#FEF2F2]/60 shadow-md ring-2 ring-[#9F171B]/20"
+                          : "border-[#E8D5CF] bg-[#FDFAF5] hover:border-[#9F171B]/40"
+                      }`}
+                    >
+                      {(data.theme || "crimson-gold") === "crimson-gold" && (
+                        <div className="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-[#9F171B] text-white text-[10px] font-bold">
+                          Đang Chọn
+                        </div>
+                      )}
+                      <div>
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="text-xl">🏮</span>
+                          <h4 className="font-serif font-bold text-sm text-[#9F171B]">
+                            Đỏ Hoàng Gia (Song Hỷ & Long Phụng)
+                          </h4>
+                        </div>
+                        <p className="text-xs text-[#5C4033] leading-relaxed mb-3">
+                          Sắc đỏ son cung đình kết hợp viền vàng kim cát tường, họa tiết Long Phụng sum vầy và chữ Song Hỷ 囍 đậm nét truyền thống đại hỷ.
+                        </p>
+                      </div>
+
+                      {/* Bảng màu mẫu */}
+                      <div className="flex items-center gap-1.5 pt-2 border-t border-[#FCA5A5]/40">
+                        <div className="w-5 h-5 rounded-full bg-[#9F171B] shadow-xs" title="Đỏ son" />
+                        <div className="w-5 h-5 rounded-full bg-[#881337] shadow-xs" title="Đỏ rượu" />
+                        <div className="w-5 h-5 rounded-full bg-[#C9A84C] shadow-xs" title="Vàng kim" />
+                        <div className="w-5 h-5 rounded-full bg-[#FFFDF7] border border-[#C9A84C]/50 shadow-xs" title="Giấy ngà son" />
+                        <span className="text-[10px] text-[#8C6A58] ml-auto font-serif italic">Khuyên dùng</span>
+                      </div>
+                    </div>
+
+                    {/* Giao diện Xanh Thanh Nhã */}
+                    <div
+                      onClick={() => updateData({ theme: "sage-green" })}
+                      className={`relative p-4 rounded-2xl border-2 transition-all cursor-pointer flex flex-col justify-between ${
+                        data.theme === "sage-green"
+                          ? "border-[#4A6741] bg-[#F0F5EE]/60 shadow-md ring-2 ring-[#4A6741]/20"
+                          : "border-[#E8D5CF] bg-[#FDFAF5] hover:border-[#4A6741]/40"
+                      }`}
+                    >
+                      {data.theme === "sage-green" && (
+                        <div className="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-[#4A6741] text-white text-[10px] font-bold">
+                          Đang Chọn
+                        </div>
+                      )}
+                      <div>
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="text-xl">🌿</span>
+                          <h4 className="font-serif font-bold text-sm text-[#4A6741]">
+                            Xanh Thanh Nhã (Botanical Romance)
+                          </h4>
+                        </div>
+                        <p className="text-xs text-[#5C4033] leading-relaxed mb-3">
+                          Tông màu xanh lá trà thanh khiết, hoa sen thanh tao và giấy ngà ấm, phong cách lãng mạn, trẻ trung hiện đại.
+                        </p>
+                      </div>
+
+                      {/* Bảng màu mẫu */}
+                      <div className="flex items-center gap-1.5 pt-2 border-t border-[#A8BCA1]/40">
+                        <div className="w-5 h-5 rounded-full bg-[#4A6741] shadow-xs" title="Xanh trà" />
+                        <div className="w-5 h-5 rounded-full bg-[#A8BCA1] shadow-xs" title="Xanh sage" />
+                        <div className="w-5 h-5 rounded-full bg-[#C4715A] shadow-xs" title="Hồng đào" />
+                        <div className="w-5 h-5 rounded-full bg-[#FDFAF5] border border-[#E8D5CF] shadow-xs" title="Giấy ngà ấm" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 2. CHỌN KIỂU MỞ THIỆP (ENVELOPE STYLE) */}
+                <div className="bg-[#FFFDF9] border border-[#E8D5CF] p-5 rounded-2xl space-y-4 shadow-xs">
+                  <div className="flex items-center gap-2 pb-2 border-b border-[#E8D5CF]">
+                    <div className="w-8 h-8 rounded-full bg-red-500/10 flex items-center justify-center text-red-600">
+                      <MailOpen className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <h3 className="font-serif text-base font-bold text-[#354D2E]">
+                        Kiểu Dáng Mở Thiệp
+                      </h3>
+                      <p className="text-[11px] text-[#8C6A58]">
+                        Chọn cách thiệp cưới xuất hiện trước mắt khách mời
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+                    {/* Phong Bì Thư 3D */}
+                    <div
+                      onClick={() => updateData({ envelopeStyle: "vintage-envelope" })}
+                      className={`relative p-4 rounded-2xl border-2 transition-all cursor-pointer ${
+                        (data.envelopeStyle || "vintage-envelope") === "vintage-envelope"
+                          ? "border-[#9F171B] bg-[#FEF2F2]/60 shadow-md ring-2 ring-[#9F171B]/20"
+                          : "border-[#E8D5CF] bg-[#FDFAF5] hover:border-[#9F171B]/40"
+                      }`}
+                    >
+                      {(data.envelopeStyle || "vintage-envelope") === "vintage-envelope" && (
+                        <div className="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-[#9F171B] text-white text-[10px] font-bold">
+                          Đang Chọn
+                        </div>
+                      )}
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="text-xl">✉️</span>
+                        <h4 className="font-serif font-bold text-sm text-[#9F171B]">
+                          Phong Bì Thư Hoàng Gia 3D
+                        </h4>
+                      </div>
+                      <p className="text-xs text-[#5C4033] leading-relaxed">
+                        Phong bì dập nổi chỉ vàng kim, nắp gập tam giác với con dấu sáp Song Hỷ mở lật 3D chân thực và thiệp cưới trượt lên sống động.
+                      </p>
+                    </div>
+
+                    {/* Bìa Thiệp Tròn */}
+                    <div
+                      onClick={() => updateData({ envelopeStyle: "modern-card" })}
+                      className={`relative p-4 rounded-2xl border-2 transition-all cursor-pointer ${
+                        data.envelopeStyle === "modern-card"
+                          ? "border-[#4A6741] bg-[#F0F5EE]/60 shadow-md ring-2 ring-[#4A6741]/20"
+                          : "border-[#E8D5CF] bg-[#FDFAF5] hover:border-[#4A6741]/40"
+                      }`}
+                    >
+                      {data.envelopeStyle === "modern-card" && (
+                        <div className="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-[#4A6741] text-white text-[10px] font-bold">
+                          Đang Chọn
+                        </div>
+                      )}
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="text-xl">📜</span>
+                        <h4 className="font-serif font-bold text-sm text-[#4A6741]">
+                          Bìa Thiệp Hiện Đại
+                        </h4>
+                      </div>
+                      <p className="text-xs text-[#5C4033] leading-relaxed">
+                        Bìa thiệp phẳng truyền thống thanh lịch với nút mở thiệp bo tròn trang nhã.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 3. HOẠT ẢNH CƯỚI LÃNG MẠN (WEDDING ANIMATIONS) */}
+                <div className="bg-[#FFFDF9] border border-[#E8D5CF] p-5 rounded-2xl space-y-4 shadow-xs">
+                  <div className="flex items-center gap-2 pb-2 border-b border-[#E8D5CF]">
+                    <div className="w-8 h-8 rounded-full bg-pink-500/10 flex items-center justify-center text-pink-600">
+                      <Sparkles className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <h3 className="font-serif text-base font-bold text-[#354D2E]">
+                        Hoạt Ảnh Đám Cưới
+                      </h3>
+                      <p className="text-[11px] text-[#8C6A58]">
+                        Bật hoặc tắt các hiệu ứng động đẹp mắt tạo không khí ngày đại hỷ
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-3 pt-1">
+                    {/* Cánh hoa rơi */}
+                    <div className="flex items-center justify-between p-3 rounded-xl bg-[#FDFAF5] border border-[#E8D5CF]">
+                      <div className="flex items-center gap-2.5">
+                        <span className="text-lg">🌸</span>
+                        <div>
+                          <p className="text-xs font-serif font-bold text-[#354D2E]">
+                            Mưa Cánh Hoa Đào / Hoa Hồng Rơi
+                          </p>
+                          <p className="text-[11px] text-[#8C6A58]">
+                            Những cánh hoa đào son và hồng phấn bay bồng bềnh lãng mạn
+                          </p>
+                        </div>
+                      </div>
+                      <input
+                        type="checkbox"
+                        checked={data.animations?.fallingPetals !== false}
+                        onChange={(e) =>
+                          updateData((prev) => ({
+                            ...prev,
+                            animations: { ...prev.animations, fallingPetals: e.target.checked },
+                          }))
+                        }
+                        className="w-5 h-5 accent-[#9F171B] rounded cursor-pointer"
+                      />
+                    </div>
+
+                    {/* Rồng Phượng bay xoắn */}
+                    <div className="flex items-center justify-between p-3 rounded-xl bg-[#FDFAF5] border border-[#E8D5CF]">
+                      <div className="flex items-center gap-2.5">
+                        <span className="text-lg">🐲</span>
+                        <div>
+                          <p className="text-xs font-serif font-bold text-[#354D2E]">
+                            Rồng Phượng Thêu Gấm Bay Xoắn Vào Nhau
+                          </p>
+                          <p className="text-[11px] text-[#8C6A58]">
+                            Vũ điệu Long Phụng Sum Vầy quanh Hỏa Châu khi ấn mở thiệp
+                          </p>
+                        </div>
+                      </div>
+                      <input
+                        type="checkbox"
+                        checked={data.animations?.dragonPhoenix !== false}
+                        onChange={(e) =>
+                          updateData((prev) => ({
+                            ...prev,
+                            animations: { ...prev.animations, dragonPhoenix: e.target.checked },
+                          }))
+                        }
+                        className="w-5 h-5 accent-[#9F171B] rounded cursor-pointer"
+                      />
+                    </div>
+
+                    {/* Song Hỷ & Trái Tim Bay */}
+                    <div className="flex items-center justify-between p-3 rounded-xl bg-[#FDFAF5] border border-[#E8D5CF]">
+                      <div className="flex items-center gap-2.5">
+                        <span className="text-lg">囍</span>
+                        <div>
+                          <p className="text-xs font-serif font-bold text-[#354D2E]">
+                            Song Hỷ 囍 &amp; Trái Tim Bay Bồng Bềnh
+                          </p>
+                          <p className="text-[11px] text-[#8C6A58]">
+                            Biểu tượng Song Hỷ vàng kim và trái tim son lơ lửng hai bên mạn thiệp
+                          </p>
+                        </div>
+                      </div>
+                      <input
+                        type="checkbox"
+                        checked={data.animations?.floatingHearts !== false}
+                        onChange={(e) =>
+                          updateData((prev) => ({
+                            ...prev,
+                            animations: { ...prev.animations, floatingHearts: e.target.checked },
+                          }))
+                        }
+                        className="w-5 h-5 accent-[#9F171B] rounded cursor-pointer"
+                      />
                     </div>
                   </div>
                 </div>
