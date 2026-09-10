@@ -103,6 +103,20 @@ function StudioContent() {
   const [wishes, setWishes] = useState<WishSubmission[]>([]);
   const [loadingGuests, setLoadingGuests] = useState(false);
 
+  // Trạng thái tạo link mời đích danh và thêm khách thủ công
+  const [guestInviteName, setGuestInviteName] = useState("");
+  const [guestInvitePrefix, setGuestInvitePrefix] = useState("Kính mời");
+  const [showAddGuestPanel, setShowAddGuestPanel] = useState(false);
+  const [manualGuest, setManualGuest] = useState({
+    fullName: "",
+    phone: "",
+    guestOf: "both" as "groom" | "bride" | "both",
+    attendance: "attending" as "attending" | "declined",
+    guestCount: 1,
+    dietaryOrNote: "",
+  });
+  const [submittingManualGuest, setSubmittingManualGuest] = useState(false);
+
   // Upload states
   const [uploadingGroomAvatar, setUploadingGroomAvatar] = useState(false);
   const [uploadingBrideAvatar, setUploadingBrideAvatar] = useState(false);
@@ -373,6 +387,60 @@ function StudioContent() {
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
     showToast("Đã xuất danh sách khách mời ra file Excel (CSV)!", "success");
+  };
+
+  // Xóa phản hồi của khách
+  const handleDeleteRSVP = async (id?: string) => {
+    if (!id) return;
+    if (!confirm("Bạn có chắc chắn muốn xóa phản hồi này khỏi danh sách?")) return;
+    try {
+      const res = await fetch(`/api/rsvp?id=${id}`, { method: "DELETE" });
+      if (res.ok) {
+        setRsvps((prev) => prev.filter((r) => r.id !== id));
+        showToast("Đã xóa phản hồi thành công!", "success");
+      } else {
+        showToast("Không thể xóa phản hồi", "info");
+      }
+    } catch {
+      showToast("Lỗi kết nối khi xóa phản hồi", "info");
+    }
+  };
+
+  // Thêm khách mời thủ công
+  const handleAddManualGuest = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!manualGuest.fullName.trim()) {
+      showToast("Vui lòng nhập tên khách mời", "info");
+      return;
+    }
+    setSubmittingManualGuest(true);
+    try {
+      const res = await fetch("/api/rsvp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(manualGuest),
+      });
+      const resData = await res.json();
+      if (resData.success) {
+        setRsvps((prev) => [resData.data, ...prev]);
+        setShowAddGuestPanel(false);
+        setManualGuest({
+          fullName: "",
+          phone: "",
+          guestOf: "both",
+          attendance: "attending",
+          guestCount: 1,
+          dietaryOrNote: "",
+        });
+        showToast("Đã thêm khách mời vào danh sách!", "success");
+      } else {
+        showToast(resData.message || "Không thể thêm khách mời", "info");
+      }
+    } catch {
+      showToast("Lỗi kết nối khi thêm khách", "info");
+    } finally {
+      setSubmittingManualGuest(false);
+    }
   };
 
   const currentYtId = extractYouTubeId(data.musicUrl);
@@ -1979,79 +2047,474 @@ function StudioContent() {
               </div>
             )}
 
-            {/* 8. KHÁCH MỜI & PHẢN HỒI */}
+            {/* 8. KHÁCH MỜI & TÙY CHỈNH PHẦN KHÁCH */}
             {activeTab === "rsvps" && (
-              <div className="space-y-4 animate-in fade-in duration-300">
-                <div className="grid grid-cols-3 gap-2">
-                  <div className="bg-[#FDFAF5] border border-[#E8D5CF] p-3 rounded-2xl text-center">
-                    <div className="text-[10px] uppercase text-[#8C6A58] font-semibold">Phản Hồi</div>
-                    <div className="font-serif font-bold text-lg text-[#354D2E]">{rsvps.length}</div>
+              <div className="space-y-5 animate-in fade-in duration-300">
+                {/* 1. TẠO LINK MỜI ĐÍCH DANH TỪNG KHÁCH (IN TÊN LÊN BÌA THIỆP) */}
+                <div className="bg-[#FDFAF5] border-2 border-[#C4715A]/40 p-4 sm:p-5 rounded-2xl space-y-3.5 shadow-2xs">
+                  <div className="flex items-center justify-between pb-2 border-b border-[#E8D5CF]">
+                    <div className="flex items-center gap-2">
+                      <Sparkles className="w-4 h-4 text-[#C4715A]" />
+                      <h3 className="font-serif font-bold text-sm text-[#354D2E]">
+                        Tạo Link Mời Đích Danh Cho Từng Khách
+                      </h3>
+                    </div>
+                    <span className="text-[10px] text-[#C4715A] bg-[#FDF0EC] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">
+                      In Tên Lên Thiệp
+                    </span>
                   </div>
-                  <div className="bg-[#FDFAF5] border border-[#E8D5CF] p-3 rounded-2xl text-center">
-                    <div className="text-[10px] uppercase text-emerald-700 font-semibold">Tham Dự</div>
-                    <div className="font-serif font-bold text-lg text-emerald-700">
-                      {rsvps.filter((r) => r.attendance === "attending").length}
+
+                  <p className="text-xs text-[#5C4033] leading-relaxed">
+                    Nhập tên khách mời để tạo đường link riêng. Khi khách mở thiệp, trên phong bì sẽ hiện trang trọng <strong>&quot;Kính mời: [Tên khách]&quot;</strong> và tự động điền sẵn tên vào phần xác nhận!
+                  </p>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                    <div>
+                      <label className="text-[10px] text-[#8C6A58] block mb-1 font-bold uppercase">
+                        Xưng hô
+                      </label>
+                      <select
+                        value={guestInvitePrefix}
+                        onChange={(e) => setGuestInvitePrefix(e.target.value)}
+                        className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-2.5 py-2 text-xs text-[#354D2E] focus:outline-none focus:border-[#4A6741]"
+                      >
+                        <option value="Kính mời">Kính mời</option>
+                        <option value="Thân gửi">Thân gửi</option>
+                        <option value="Trân trọng kính mời">Trân trọng kính mời</option>
+                        <option value="Mời bạn">Mời bạn</option>
+                      </select>
+                    </div>
+
+                    <div className="sm:col-span-2">
+                      <label className="text-[10px] text-[#8C6A58] block mb-1 font-bold uppercase">
+                        Tên Khách Mời / Đại Gia Đình
+                      </label>
+                      <input
+                        type="text"
+                        value={guestInviteName}
+                        onChange={(e) => setGuestInviteName(e.target.value)}
+                        placeholder="Ví dụ: Bác Tuấn &amp; Gia Đình, Bạn Lan C3, Anh Hoàng..."
+                        className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs text-[#354D2E] font-medium focus:outline-none focus:border-[#4A6741]"
+                      />
                     </div>
                   </div>
-                  <div className="bg-[#FDFAF5] border border-[#E8D5CF] p-3 rounded-2xl text-center">
-                    <div className="text-[10px] uppercase text-[#C4715A] font-semibold">Tổng Khách</div>
-                    <div className="font-serif font-bold text-lg text-[#C4715A]">
-                      {rsvps
-                        .filter((r) => r.attendance === "attending")
-                        .reduce((sum, r) => sum + (r.guestCount || 1), 0)}
+
+                  {/* Xem trước link và nút sao chép */}
+                  <div className="p-3 bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl space-y-2">
+                    <div className="text-[10px] uppercase font-bold tracking-wider text-[#8C6A58]">
+                      Link Mời Dành Riêng Cho Khách Này:
+                    </div>
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="font-mono text-xs text-[#C4715A] font-bold truncate">
+                        {`${origin}/i/${data.slug || "quyet-han"}${
+                          guestInviteName.trim()
+                            ? `?to=${encodeURIComponent(guestInviteName.trim())}`
+                            : ""
+                        }`}
+                      </span>
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-[#E8D5CF]/60">
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          const name = guestInviteName.trim() || "Quý Khách";
+                          const base = origin || (typeof window !== "undefined" ? window.location.origin : "http://localhost:3000");
+                          const link = `${base}/i/${data.slug || "quyet-han"}?to=${encodeURIComponent(name)}`;
+                          const inviteMsg = `${guestInvitePrefix} ${name},\n\n${data.groom.shortName} & ${data.bride.shortName} trân trọng kính mời ${name} cùng người thương tới dự bữa cơm thân mật chung vui cùng gia đình chúng mình vào ngày ${data.weddingDateFormatted}.\n\n💌 Thiệp cưới online dành riêng cho ${name}:\n${link}\n\nSự hiện diện của ${name} là niềm hạnh phúc lớn nhất của chúng mình!`;
+
+                          const ok = await copyToClipboard(inviteMsg);
+                          if (ok) {
+                            showToast(`Đã sao chép lời mời Zalo dành riêng cho "${name}"!`, "success");
+                          } else {
+                            showToast("Vui lòng sao chép thủ công", "info");
+                          }
+                        }}
+                        className="flex-1 py-2 px-3 rounded-xl bg-[#4A6741] hover:bg-[#354D2E] text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-all active:scale-95 cursor-pointer shadow-2xs"
+                      >
+                        <Copy className="w-3.5 h-3.5 text-[#C9A84C]" />
+                        <span>Sao Chép Lời Mời Kèm Link (Zalo)</span>
+                      </button>
+
+                      <a
+                        href={`/i/${data.slug || "quyet-han"}${
+                          guestInviteName.trim() ? `?to=${encodeURIComponent(guestInviteName.trim())}` : ""
+                        }`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="py-2 px-3 rounded-xl bg-[#FDFAF5] hover:bg-[#FDF0EC] border border-[#E8D5CF] text-[#C4715A] text-xs font-semibold flex items-center justify-center gap-1 transition-colors"
+                      >
+                        <ExternalLink className="w-3.5 h-3.5 text-[#C4715A]" />
+                        <span>Xem Thử Bìa Thiệp</span>
+                      </a>
                     </div>
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between pt-1">
-                  <h4 className="font-serif font-bold text-xs text-[#354D2E]">Danh Sách Phản Hồi</h4>
-                  <button
-                    type="button"
-                    onClick={exportRsvpsToCSV}
-                    className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-[#4A6741] hover:bg-[#354D2E] text-[#FDFAF5] text-xs font-semibold shadow-2xs cursor-pointer"
-                  >
-                    <FileSpreadsheet className="w-3.5 h-3.5 text-[#C9A84C]" />
-                    <span>Xuất Excel / CSV</span>
-                  </button>
-                </div>
+                {/* 2. CẤU HÌNH TÙY CHỈNH FORM XÁC NHẬN (RSVP SETTINGS) */}
+                <div className="bg-[#FDFAF5] border border-[#E8D5CF] p-4 sm:p-5 rounded-2xl space-y-3.5 shadow-2xs">
+                  <div className="flex items-center justify-between pb-2 border-b border-[#E8D5CF]">
+                    <div className="flex items-center gap-2">
+                      <Users className="w-4 h-4 text-[#4A6741]" />
+                      <h3 className="font-serif font-bold text-sm text-[#354D2E]">
+                        Tùy Chỉnh Form Khách Mời (RSVP)
+                      </h3>
+                    </div>
+                    <label className="flex items-center gap-2 cursor-pointer select-none">
+                      <span className="text-xs font-bold text-[#5C4033]">
+                        {data.rsvpSettings?.enabled !== false ? "Đang bật" : "Đã tắt"}
+                      </span>
+                      <input
+                        type="checkbox"
+                        checked={data.rsvpSettings?.enabled !== false}
+                        onChange={(e) =>
+                          updateData((prev) => ({
+                            ...prev,
+                            rsvpSettings: {
+                              ...prev.rsvpSettings,
+                              enabled: e.target.checked,
+                            },
+                          }))
+                        }
+                        className="w-4 h-4 accent-[#4A6741] cursor-pointer"
+                      />
+                    </label>
+                  </div>
 
-                <div className="space-y-2 max-h-80 overflow-y-auto pr-1">
-                  {loadingGuests ? (
-                    <div className="text-center py-6 text-xs text-[#8C6A58]">Đang tải phản hồi...</div>
-                  ) : rsvps.length === 0 ? (
-                    <div className="text-center py-6 text-xs text-[#8C6A58] bg-[#FDFAF5] rounded-2xl p-4 border border-[#E8D5CF]">
-                      Chưa có phản hồi nào.
+                  {data.rsvpSettings?.enabled !== false ? (
+                    <div className="space-y-3">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                        <div>
+                          <label className="text-[10px] text-[#8C6A58] block mb-1 font-bold uppercase">
+                            Tiêu Đề Mục Trên Thiệp
+                          </label>
+                          <input
+                            type="text"
+                            value={data.rsvpSettings?.title || "Sự Hiện Diện Của Bạn"}
+                            onChange={(e) =>
+                              updateData((prev) => ({
+                                ...prev,
+                                rsvpSettings: { ...prev.rsvpSettings, title: e.target.value },
+                              }))
+                            }
+                            placeholder="Sự Hiện Diện Của Bạn"
+                            className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-1.5 text-xs text-[#354D2E]"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="text-[10px] text-[#8C6A58] block mb-1 font-bold uppercase">
+                            Phụ Đề Mục
+                          </label>
+                          <input
+                            type="text"
+                            value={data.rsvpSettings?.subtitle || "Xác Nhận Tham Dự"}
+                            onChange={(e) =>
+                              updateData((prev) => ({
+                                ...prev,
+                                rsvpSettings: { ...prev.rsvpSettings, subtitle: e.target.value },
+                              }))
+                            }
+                            placeholder="Xác Nhận Tham Dự"
+                            className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-1.5 text-xs text-[#C4715A]"
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <div className="flex items-center justify-between mb-1">
+                          <label className="text-[10px] text-[#8C6A58] font-bold uppercase">
+                            Lời Dặn / Hạn Chót Xác Nhận
+                          </label>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              updateData((prev) => ({
+                                ...prev,
+                                rsvpSettings: {
+                                  ...prev.rsvpSettings,
+                                  deadlineText: `Để gia đình đón tiếp chu đáo nhất, xin vui lòng phản hồi trước ngày ${prev.weddingDateFormatted}.`,
+                                },
+                              }));
+                              showToast("Đã cập nhật theo ngày cưới chính!", "success");
+                            }}
+                            className="text-[10px] text-[#4A6741] hover:underline font-medium cursor-pointer"
+                          >
+                            ⚡ Lấy theo ngày cưới chính
+                          </button>
+                        </div>
+                        <input
+                          type="text"
+                          value={
+                            data.rsvpSettings?.deadlineText ||
+                            `Để gia đình đón tiếp chu đáo nhất, xin vui lòng phản hồi trước ngày ${data.weddingDateFormatted}.`
+                          }
+                          onChange={(e) =>
+                            updateData((prev) => ({
+                              ...prev,
+                              rsvpSettings: { ...prev.rsvpSettings, deadlineText: e.target.value },
+                            }))
+                          }
+                          className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-1.5 text-xs text-[#354D2E]"
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 border-t border-[#E8D5CF]/60">
+                        <label className="flex items-center gap-2 text-xs text-[#5C4033] cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={data.rsvpSettings?.allowGuestCount !== false}
+                            onChange={(e) =>
+                              updateData((prev) => ({
+                                ...prev,
+                                rsvpSettings: { ...prev.rsvpSettings, allowGuestCount: e.target.checked },
+                              }))
+                            }
+                            className="w-3.5 h-3.5 accent-[#4A6741] cursor-pointer"
+                          />
+                          <span>Cho phép chọn số lượng người đi cùng</span>
+                        </label>
+
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-[#8C6A58]">Số người tối đa:</span>
+                          <select
+                            value={data.rsvpSettings?.maxGuests || 4}
+                            onChange={(e) =>
+                              updateData((prev) => ({
+                                ...prev,
+                                rsvpSettings: { ...prev.rsvpSettings, maxGuests: Number(e.target.value) },
+                              }))
+                            }
+                            className="bg-[#FFFDF9] border border-[#E8D5CF] rounded-lg px-2 py-1 text-xs text-[#354D2E]"
+                          >
+                            <option value={2}>2 Người</option>
+                            <option value={3}>3 Người</option>
+                            <option value={4}>4 Người</option>
+                            <option value={5}>5 Người</option>
+                            <option value={6}>6 Người</option>
+                            <option value={8}>8 Người</option>
+                          </select>
+                        </div>
+                      </div>
                     </div>
                   ) : (
-                    rsvps.map((r, i) => (
-                      <div key={i} className="p-3 bg-[#FDFAF5] border border-[#E8D5CF] rounded-2xl text-xs space-y-1">
-                        <div className="flex items-center justify-between">
-                          <span className="font-bold text-[#354D2E]">{r.fullName}</span>
-                          <span className="font-mono text-[11px] text-[#C4715A]">{r.phone}</span>
-                        </div>
-                        <div className="flex items-center justify-between text-[11px] text-[#5C4033]">
-                          <span>
-                            {r.guestOf === "groom"
-                              ? "Nhà Trai"
-                              : r.guestOf === "bride"
-                              ? "Nhà Gái"
-                              : "Cả Hai"}{" "}
-                            • <strong className="text-[#354D2E]">{r.guestCount} người</strong>
-                          </span>
-                          <span className={r.attendance === "attending" ? "text-emerald-700 font-bold" : "text-[#8C6A58]"}>
-                            {r.attendance === "attending" ? "Tham dự" : "Vắng mặt"}
-                          </span>
-                        </div>
-
-                        {r.emailSentTo && r.emailSentTo.length > 0 && (
-                          <div className="text-[10px] text-[#8C6A58] flex items-center gap-1 pt-0.5">
-                            <Send className="w-2.5 h-2.5 text-[#4A6741]" />
-                            <span>Đã gửi tới: {r.emailSentTo.join(", ")}</span>
-                          </div>
-                        )}
-                      </div>
-                    ))
+                    <div className="p-3 bg-[#F0F5EE] rounded-xl text-xs text-[#4A6741]">
+                      Mục Xác Nhận Tham Dự đang tạm ẩn trên thiệp cưới của bạn. Khách sẽ chỉ xem thông tin cưới và sổ lời chúc.
+                    </div>
                   )}
+                </div>
+
+                {/* 3. THỐNG KÊ & QUẢN LÝ DANH SÁCH KHÁCH PHẢN HỒI */}
+                <div className="space-y-3">
+                  <div className="grid grid-cols-3 gap-2">
+                    <div className="bg-[#FDFAF5] border border-[#E8D5CF] p-3 rounded-2xl text-center shadow-2xs">
+                      <div className="text-[10px] uppercase text-[#8C6A58] font-semibold">Phản Hồi</div>
+                      <div className="font-serif font-bold text-lg text-[#354D2E]">{rsvps.length}</div>
+                    </div>
+                    <div className="bg-[#FDFAF5] border border-[#E8D5CF] p-3 rounded-2xl text-center shadow-2xs">
+                      <div className="text-[10px] uppercase text-emerald-700 font-semibold">Tham Dự</div>
+                      <div className="font-serif font-bold text-lg text-emerald-700">
+                        {rsvps.filter((r) => r.attendance === "attending").length}
+                      </div>
+                    </div>
+                    <div className="bg-[#FDFAF5] border border-[#E8D5CF] p-3 rounded-2xl text-center shadow-2xs">
+                      <div className="text-[10px] uppercase text-[#C4715A] font-semibold">Tổng Khách</div>
+                      <div className="font-serif font-bold text-lg text-[#C4715A]">
+                        {rsvps
+                          .filter((r) => r.attendance === "attending")
+                          .reduce((sum, r) => sum + (r.guestCount || 1), 0)}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between pt-1">
+                    <h4 className="font-serif font-bold text-xs text-[#354D2E]">
+                      Danh Sách Khách Phản Hồi ({rsvps.length})
+                    </h4>
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => setShowAddGuestPanel(!showAddGuestPanel)}
+                        className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-[#FDFAF5] hover:bg-[#F0F5EE] text-[#4A6741] text-xs font-semibold border border-[#A8BCA1]/40 cursor-pointer transition-colors"
+                      >
+                        <Plus className="w-3.5 h-3.5" />
+                        <span>Thêm Khách</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={exportRsvpsToCSV}
+                        className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-[#4A6741] hover:bg-[#354D2E] text-[#FDFAF5] text-xs font-semibold shadow-2xs cursor-pointer transition-all"
+                      >
+                        <FileSpreadsheet className="w-3.5 h-3.5 text-[#C9A84C]" />
+                        <span>Xuất Excel</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Form thêm khách mời thủ công (khi người nhà gọi điện báo) */}
+                  {showAddGuestPanel && (
+                    <form
+                      onSubmit={handleAddManualGuest}
+                      className="p-3.5 bg-[#F0F5EE] border border-[#A8BCA1]/50 rounded-2xl space-y-2.5 text-xs animate-in fade-in"
+                    >
+                      <div className="font-serif font-bold text-xs text-[#354D2E] pb-1 border-b border-[#A8BCA1]/30">
+                        Thêm Khách Mời Thủ Công (Báo trực tiếp)
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        <input
+                          type="text"
+                          required
+                          placeholder="Họ và tên khách *"
+                          value={manualGuest.fullName}
+                          onChange={(e) =>
+                            setManualGuest((prev) => ({ ...prev, fullName: e.target.value }))
+                          }
+                          className="bg-white border border-[#E8D5CF] rounded-xl px-2.5 py-1.5 text-xs"
+                        />
+                        <input
+                          type="text"
+                          placeholder="Số điện thoại"
+                          value={manualGuest.phone}
+                          onChange={(e) =>
+                            setManualGuest((prev) => ({ ...prev, phone: e.target.value }))
+                          }
+                          className="bg-white border border-[#E8D5CF] rounded-xl px-2.5 py-1.5 text-xs font-mono"
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-3 gap-2">
+                        <select
+                          value={manualGuest.guestOf}
+                          onChange={(e) =>
+                            setManualGuest((prev) => ({
+                              ...prev,
+                              guestOf: e.target.value as any,
+                            }))
+                          }
+                          className="bg-white border border-[#E8D5CF] rounded-xl px-2 py-1.5 text-xs"
+                        >
+                          <option value="both">Khách Cả Hai</option>
+                          <option value="groom">Khách Nhà Trai</option>
+                          <option value="bride">Khách Nhà Gái</option>
+                        </select>
+
+                        <select
+                          value={manualGuest.attendance}
+                          onChange={(e) =>
+                            setManualGuest((prev) => ({
+                              ...prev,
+                              attendance: e.target.value as any,
+                            }))
+                          }
+                          className="bg-white border border-[#E8D5CF] rounded-xl px-2 py-1.5 text-xs"
+                        >
+                          <option value="attending">Tham dự</option>
+                          <option value="declined">Vắng mặt</option>
+                        </select>
+
+                        <div className="flex items-center gap-1">
+                          <span className="text-[11px] text-[#8C6A58] shrink-0">Đi cùng:</span>
+                          <input
+                            type="number"
+                            min={1}
+                            max={10}
+                            value={manualGuest.guestCount}
+                            onChange={(e) =>
+                              setManualGuest((prev) => ({
+                                ...prev,
+                                guestCount: Number(e.target.value),
+                              }))
+                            }
+                            className="w-full bg-white border border-[#E8D5CF] rounded-xl px-2 py-1.5 text-xs"
+                          />
+                        </div>
+                      </div>
+
+                      <input
+                        type="text"
+                        placeholder="Ghi chú / Chế độ ăn uống..."
+                        value={manualGuest.dietaryOrNote}
+                        onChange={(e) =>
+                          setManualGuest((prev) => ({ ...prev, dietaryOrNote: e.target.value }))
+                        }
+                        className="w-full bg-white border border-[#E8D5CF] rounded-xl px-2.5 py-1.5 text-xs"
+                      />
+
+                      <div className="flex justify-end gap-2 pt-1">
+                        <button
+                          type="button"
+                          onClick={() => setShowAddGuestPanel(false)}
+                          className="px-3 py-1 rounded-xl bg-white border border-[#E8D5CF] text-xs cursor-pointer"
+                        >
+                          Hủy
+                        </button>
+                        <button
+                          type="submit"
+                          disabled={submittingManualGuest}
+                          className="px-3 py-1 rounded-xl bg-[#4A6741] text-white text-xs font-bold cursor-pointer disabled:opacity-60"
+                        >
+                          {submittingManualGuest ? "Đang lưu..." : "Lưu Khách Mời"}
+                        </button>
+                      </div>
+                    </form>
+                  )}
+
+                  {/* Danh sách phản hồi */}
+                  <div className="space-y-2 max-h-80 overflow-y-auto pr-1">
+                    {loadingGuests ? (
+                      <div className="text-center py-6 text-xs text-[#8C6A58]">Đang tải phản hồi...</div>
+                    ) : rsvps.length === 0 ? (
+                      <div className="text-center py-6 text-xs text-[#8C6A58] bg-[#FDFAF5] rounded-2xl p-4 border border-[#E8D5CF]">
+                        Chưa có phản hồi nào.
+                      </div>
+                    ) : (
+                      rsvps.map((r, i) => (
+                        <div key={r.id || i} className="p-3 bg-[#FDFAF5] border border-[#E8D5CF] rounded-2xl text-xs space-y-1 relative group shadow-2xs">
+                          <div className="flex items-center justify-between">
+                            <span className="font-bold text-[#354D2E] text-sm">{r.fullName}</span>
+                            <div className="flex items-center gap-2">
+                              <span className="font-mono text-[11px] text-[#C4715A]">{r.phone}</span>
+                              <button
+                                type="button"
+                                onClick={() => handleDeleteRSVP(r.id)}
+                                title="Xóa phản hồi này"
+                                className="text-zinc-400 hover:text-[#C4715A] p-1 cursor-pointer transition-colors"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          </div>
+                          <div className="flex items-center justify-between text-[11px] text-[#5C4033]">
+                            <span>
+                              {r.guestOf === "groom"
+                                ? "Khách Nhà Trai"
+                                : r.guestOf === "bride"
+                                ? "Khách Nhà Gái"
+                                : "Khách Cả Hai"}{" "}
+                              • <strong className="text-[#354D2E]">{r.guestCount || 1} người</strong>
+                            </span>
+                            <span className={r.attendance === "attending" ? "text-emerald-700 font-bold" : "text-[#8C6A58]"}>
+                              {r.attendance === "attending" ? "Tham dự" : "Vắng mặt"}
+                            </span>
+                          </div>
+
+                          {r.dietaryOrNote && (
+                            <p className="text-[11px] text-[#8C6A58] italic font-serif pt-0.5">
+                              &ldquo;{r.dietaryOrNote}&rdquo;
+                            </p>
+                          )}
+
+                          {r.emailSentTo && r.emailSentTo.length > 0 && (
+                            <div className="text-[10px] text-[#8C6A58] flex items-center gap-1 pt-0.5 border-t border-[#E8D5CF]/40">
+                              <Send className="w-2.5 h-2.5 text-[#4A6741]" />
+                              <span>Đã gửi tới: {r.emailSentTo.join(", ")}</span>
+                            </div>
+                          )}
+                        </div>
+                      ))
+                    )}
+                  </div>
                 </div>
               </div>
             )}

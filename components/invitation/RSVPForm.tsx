@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Send, CheckCircle2, Heart, Users, Check, X, HelpCircle, Loader2 } from "lucide-react";
 import { useWeddingData } from "@/context/WeddingDataContext";
@@ -20,6 +20,22 @@ export const RSVPForm: React.FC = () => {
 
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+
+  // Đọc tên khách từ URL (?to= hoặc ?guest=)
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const to = params.get("to") || params.get("guest") || params.get("khach");
+      if (to) {
+        setFullName(decodeURIComponent(to).trim());
+      }
+    }
+  }, []);
+
+  // Nếu gia đình tắt mục RSVP
+  if (weddingData.rsvpSettings?.enabled === false) {
+    return null;
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -71,16 +87,16 @@ export const RSVPForm: React.FC = () => {
             <VietnameseLotus size={36} color="#4A6741" opacity={0.85} />
           </div>
           <p className="text-[11px] uppercase tracking-[0.3em] text-[#C4715A] font-sans font-semibold mb-1">
-            Xác Nhận Tham Dự
+            {weddingData.rsvpSettings?.subtitle || "Xác Nhận Tham Dự"}
           </p>
           <h2 className="font-serif text-2xl sm:text-3xl font-bold text-[#354D2E] tracking-wide">
-            Sự Hiện Diện Của Bạn
+            {weddingData.rsvpSettings?.title || "Sự Hiện Diện Của Bạn"}
           </h2>
           <div className="flex items-center justify-center my-3">
             <BotanicalBranch size={48} color="#C9A84C" opacity={0.7} />
           </div>
           <p className="text-xs sm:text-sm text-[#8C6A58] italic font-serif max-w-sm mx-auto">
-            Để gia đình đón tiếp chu đáo nhất, xin vui lòng phản hồi trước ngày {weddingData.weddingDateFormatted}.
+            {weddingData.rsvpSettings?.deadlineText || `Để gia đình đón tiếp chu đáo nhất, xin vui lòng phản hồi trước ngày ${weddingData.weddingDateFormatted}.`}
           </p>
         </motion.div>
 
@@ -214,20 +230,20 @@ export const RSVPForm: React.FC = () => {
                 </div>
 
                 {/* Số lượng người nếu tham dự */}
-                {attendance === "attending" && (
+                {attendance === "attending" && weddingData.rsvpSettings?.allowGuestCount !== false && (
                   <div>
                     <label className="block text-xs uppercase tracking-wider text-[#8C6A58] font-sans font-bold mb-1">
                       Số Lượng Người Tham Dự
                     </label>
-                    <div className="flex items-center gap-3">
-                      {[1, 2, 3, 4].map((num) => (
+                    <div className="flex items-center gap-2 flex-wrap">
+                      {Array.from({ length: weddingData.rsvpSettings?.maxGuests || 4 }, (_, i) => i + 1).map((num) => (
                         <button
                           key={num}
                           type="button"
                           onClick={() => setGuestCount(num)}
-                          className={`flex-1 py-2 rounded-xl text-xs font-serif font-bold transition-all ${
+                          className={`flex-1 min-w-[60px] py-2 rounded-xl text-xs font-serif font-bold transition-all cursor-pointer ${
                             guestCount === num
-                              ? "bg-[#4A6741] text-[#FDFAF5]"
+                              ? "bg-[#4A6741] text-[#FDFAF5] shadow-xs"
                               : "bg-[#FDFAF5] border border-[#E8D5CF] text-[#5C4033] hover:border-[#4A6741]"
                           }`}
                         >
@@ -239,19 +255,21 @@ export const RSVPForm: React.FC = () => {
                 )}
 
                 {/* Lời nhắn / Ăn uống */}
-                <div>
-                  <label htmlFor="dietary" className="block text-xs uppercase tracking-wider text-[#8C6A58] font-sans font-bold mb-1">
-                    Lời Nhắn Hoặc Chế Độ Ăn Uống (nếu có)
-                  </label>
-                  <textarea
-                    id="dietary"
-                    rows={2}
-                    value={dietaryOrNote}
-                    onChange={(e) => setDietaryOrNote(e.target.value)}
-                    placeholder="Ví dụ: Ăn chay, dị ứng hải sản..."
-                    className="w-full px-4 py-2 rounded-xl bg-[#FDFAF5] border border-[#E8D5CF] text-sm text-[#354D2E] placeholder-[#8C6A58]/60 focus:outline-none focus:ring-2 focus:ring-[#4A6741]/20 focus:border-[#4A6741] transition-all font-sans resize-none"
-                  />
-                </div>
+                {weddingData.rsvpSettings?.showNotesField !== false && (
+                  <div>
+                    <label htmlFor="dietary" className="block text-xs uppercase tracking-wider text-[#8C6A58] font-sans font-bold mb-1">
+                      Lời Nhắn Hoặc Chế Độ Ăn Uống (nếu có)
+                    </label>
+                    <textarea
+                      id="dietary"
+                      rows={2}
+                      value={dietaryOrNote}
+                      onChange={(e) => setDietaryOrNote(e.target.value)}
+                      placeholder="Ví dụ: Ăn chay, dị ứng hải sản, gửi lời chúc..."
+                      className="w-full px-4 py-2 rounded-xl bg-[#FDFAF5] border border-[#E8D5CF] text-sm text-[#354D2E] placeholder-[#8C6A58]/60 focus:outline-none focus:ring-2 focus:ring-[#4A6741]/20 focus:border-[#4A6741] transition-all font-sans resize-none"
+                    />
+                  </div>
+                )}
 
                 {/* Nút gửi */}
                 <button

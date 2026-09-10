@@ -81,6 +81,17 @@ export interface WeddingData {
     bride: string;
   };
   notifications?: NotificationSettings;
+  rsvpSettings?: RSVPSettings;
+}
+
+export interface RSVPSettings {
+  enabled?: boolean; // Bật/tắt mục xác nhận tham dự trên thiệp
+  title?: string; // Tiêu đề mục
+  subtitle?: string; // Tiêu đề phụ
+  deadlineText?: string; // Hạn chót phản hồi
+  allowGuestCount?: boolean; // Cho phép chọn số lượng người đi cùng
+  maxGuests?: number; // Số người tối đa
+  showNotesField?: boolean; // Hiển thị ô ghi chú
 }
 
 export interface NotificationSettings {

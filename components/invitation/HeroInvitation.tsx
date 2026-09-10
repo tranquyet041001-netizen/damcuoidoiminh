@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, Sparkles, Heart } from "lucide-react";
@@ -18,6 +18,17 @@ export const HeroInvitation: React.FC = () => {
   const { data: weddingData } = useWeddingData();
   const { playMusic, isPlaying } = useMusic();
   const [isEnvelopeOpen, setIsEnvelopeOpen] = useState(false);
+  const [guestName, setGuestName] = useState<string>("");
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const to = params.get("to") || params.get("guest") || params.get("khach");
+      if (to) {
+        setGuestName(decodeURIComponent(to).trim());
+      }
+    }
+  }, []);
 
   const handleOpenInvitation = () => {
     setIsEnvelopeOpen(true);
@@ -82,9 +93,25 @@ export const HeroInvitation: React.FC = () => {
                 <VietnameseLotus size={46} color="#4A6741" opacity={0.85} className="animate-breathe" />
               </div>
 
+              {/* Badge Đích Danh Khách Mời (Nếu link có ?to= hoặc ?guest=) */}
+              {guestName && (
+                <motion.div
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="mb-4 inline-flex items-center gap-2 px-5 py-2 rounded-2xl bg-[#FDF0EC] border border-[#E8D5CF] shadow-xs"
+                >
+                  <span className="text-xs uppercase tracking-widest text-[#8C6A58] font-sans font-bold">
+                    Kính mời:
+                  </span>
+                  <span className="font-calligraphy text-2xl sm:text-3xl text-[#C4715A] font-bold">
+                    {guestName}
+                  </span>
+                </motion.div>
+              )}
+
               {/* Tiêu đề thiệp */}
               <p className="text-xs uppercase tracking-[0.3em] text-[#8C6A58] font-sans font-semibold mb-2">
-                Trân Trọng Kính Mời
+                {guestName ? "Tới Dự Hôn Lễ Của" : "Trân Trọng Kính Mời"}
               </p>
 
               {/* Tên dâu rể thư pháp lãng mạn */}
@@ -220,6 +247,18 @@ export const HeroInvitation: React.FC = () => {
               </div>
 
               <DongSonBorder color="#4A6741" opacity={0.3} className="max-w-xs mx-auto" />
+
+              {/* Tên khách trên thiệp mở */}
+              {guestName && (
+                <div className="my-3 px-4 py-2 rounded-2xl bg-[#FDF0EC]/80 border border-[#E8D5CF] inline-block shadow-2xs">
+                  <span className="text-[11px] uppercase tracking-widest text-[#8C6A58] block font-sans font-bold">
+                    Trân trọng kính mời
+                  </span>
+                  <span className="font-calligraphy text-2xl sm:text-3xl text-[#C4715A] font-bold block mt-0.5">
+                    {guestName}
+                  </span>
+                </div>
+              )}
 
               {/* Lời chúc mở đầu */}
               <p className="font-serif italic text-sm sm:text-base text-[#5C4033] leading-relaxed max-w-md mx-auto my-4">

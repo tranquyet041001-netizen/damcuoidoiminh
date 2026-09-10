@@ -176,5 +176,14 @@
   "contactPhone": {
     "groom": "0912 345 678",
     "bride": "0987 654 321"
+  },
+  "rsvpSettings": {
+    "enabled": true,
+    "title": "Sự Hiện Diện Của Bạn",
+    "subtitle": "Xác Nhận Tham Dự",
+    "deadlineText": "Để gia đình đón tiếp chu đáo nhất, xin vui lòng phản hồi trước ngày cưới.",
+    "allowGuestCount": true,
+    "maxGuests": 5,
+    "showNotesField": true
   }
 }

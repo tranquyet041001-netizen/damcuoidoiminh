@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
+import { Redis } from "@upstash/redis";
 import { RSVPSubmission } from "@/types/wedding";
 import { getLatestWeddingData } from "@/utils/serverWeddingData";
 import {
@@ -10,6 +11,26 @@ import {
 } from "@/utils/notifications";
 
 const rsvpsFilePath = path.join(process.cwd(), "data", "saved_rsvps.json");
+
+function getRedisClient(): Redis | null {
+  const url =
+    process.env.UPSTASH_REDIS_REST_URL ||
+    process.env.KV_REST_API_URL ||
+    process.env.UPSTASH_REDIS_REST_KV_URL;
+  const token =
+    process.env.UPSTASH_REDIS_REST_TOKEN ||
+    process.env.KV_REST_API_TOKEN ||
+    process.env.UPSTASH_REDIS_REST_KV_TOKEN;
+
+  if (url && token) {
+    try {
+      return new Redis({ url, token });
+    } catch {
+      return null;
+    }
+  }
+  return null;
+}
 
 function getStoredRSVPs(): RSVPSubmission[] {
   try {
@@ -56,6 +77,18 @@ function saveRSVPs(list: RSVPSubmission[]) {
 let rsvpStore: RSVPSubmission[] = getStoredRSVPs();
 
 export async function GET() {
+  const redis = getRedisClient();
+  if (redis) {
+    try {
+      const remote = await redis.get<RSVPSubmission[]>("wedding_rsvps_list");
+      if (Array.isArray(remote) && remote.length > 0) {
+        rsvpStore = remote;
+      }
+    } catch {
+      // ignore
+    }
+  }
+
   return NextResponse.json({
     success: true,
     data: rsvpStore,
@@ -266,6 +299,16 @@ export async function POST(request: Request) {
       }
     }
 
+    // Lưu vào Redis (nếu có)
+    const redis = getRedisClient();
+    if (redis) {
+      try {
+        await redis.set("wedding_rsvps_list", rsvpStore);
+      } catch (redisErr) {
+        console.warn("[RSVP Redis Error]", redisErr);
+      }
+    }
+
     return NextResponse.json({
       success: true,
       message: "Cảm ơn bạn đã phản hồi! Thông tin đã được chuyển tới dâu rể.",
@@ -278,5 +321,31 @@ export async function POST(request: Request) {
       { success: false, message: "Có lỗi xảy ra khi gửi phản hồi. Vui lòng thử lại." },
       { status: 500 }
     );
+  }
+}
+
+export async function DELETE(req: Request) {
+  try {
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get("id");
+    if (!id) {
+      return NextResponse.json({ success: false, message: "Thiếu ID phản hồi cần xóa" }, { status: 400 });
+    }
+
+    rsvpStore = rsvpStore.filter((r) => r.id !== id);
+    saveRSVPs(rsvpStore);
+
+    const redis = getRedisClient();
+    if (redis) {
+      try {
+        await redis.set("wedding_rsvps_list", rsvpStore);
+      } catch (redisErr) {
+        console.warn("[RSVP Delete Redis Error]", redisErr);
+      }
+    }
+
+    return NextResponse.json({ success: true, message: "Đã xóa phản hồi", data: rsvpStore });
+  } catch (err: any) {
+    return NextResponse.json({ success: false, error: String(err) }, { status: 500 });
   }
 }
