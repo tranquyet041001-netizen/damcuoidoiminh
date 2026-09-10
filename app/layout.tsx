@@ -38,7 +38,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: `Thiệp Cưới • ${weddingData.groom.shortName} & ${weddingData.bride.shortName}`,
     description: `Trân trọng kính mời bạn đến chung vui cùng chúng mình vào ${weddingData.weddingDateFormatted}.`,
-    url: "https://an-minh.vn",
+    url: "/i/quyet-han",
     siteName: `Thiệp Cưới ${weddingData.groom.shortName} & ${weddingData.bride.shortName}`,
     images: [
       {

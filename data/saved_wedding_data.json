@@ -1,6 +1,4 @@
-import { WeddingData } from "@/types/wedding";
-
-export const weddingData: WeddingData = {
+{
   "slug": "quyet-han",
   "groom": {
     "fullName": "Trần Công Quyết",
@@ -179,4 +177,4 @@ export const weddingData: WeddingData = {
     "groom": "0912 345 678",
     "bride": "0987 654 321"
   }
-};
+}

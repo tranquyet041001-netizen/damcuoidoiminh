@@ -80,7 +80,25 @@ export interface WeddingData {
     groom: string;
     bride: string;
   };
+  notifications?: NotificationSettings;
 }
+
+export interface NotificationSettings {
+  telegram?: {
+    enabled?: boolean;
+    botToken?: string;
+    chatId?: string;
+  };
+  googleSheet?: {
+    enabled?: boolean;
+    webhookUrl?: string;
+  };
+  email?: {
+    enabled?: boolean;
+    resendApiKey?: string;
+  };
+}
+
 
 export interface RSVPSubmission {
   id?: string;

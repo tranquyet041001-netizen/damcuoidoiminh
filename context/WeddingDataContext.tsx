@@ -1,73 +1,90 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+} from "react";
 import { WeddingData } from "@/types/wedding";
 import { weddingData as defaultData } from "@/data/wedding";
 
 interface WeddingDataContextType {
   data: WeddingData;
-  updateData: (updater: Partial<WeddingData> | ((prev: WeddingData) => WeddingData)) => void;
-  resetToDefault: () => void;
+  updateData: (
+    updater: Partial<WeddingData> | ((prev: WeddingData) => WeddingData)
+  ) => void;
+  resetToDefault: () => Promise<void>;
   isModified: boolean;
-  saveChanges: () => void;
+  saveChanges: (customData?: WeddingData) => Promise<boolean>;
   exportAsCode: () => string;
 }
 
 const LOCAL_STORAGE_KEY = "wedding_invitation_custom_data_v4";
-const LEGACY_LOCAL_STORAGE_KEY = "wedding_invitation_custom_data_v3";
 
-const WeddingDataContext = createContext<WeddingDataContextType | undefined>(undefined);
+const WeddingDataContext = createContext<WeddingDataContextType | undefined>(
+  undefined
+);
 
-export const WeddingDataProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [data, setData] = useState<WeddingData>(defaultData);
+export const WeddingDataProvider: React.FC<{
+  children: React.ReactNode;
+  initialData?: WeddingData;
+}> = ({ children, initialData }) => {
+  const [data, setData] = useState<WeddingData>(initialData || defaultData);
   const [isModified, setIsModified] = useState(false);
-  const [isLoaded, setIsLoaded] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(Boolean(initialData));
 
-  // Load from localStorage & server API on client-side mount
+  // Tải dữ liệu đồng nhất: Server API là nguồn chuẩn, localStorage làm bộ nhớ đệm
   useEffect(() => {
-    let localData: WeddingData | null = null;
-    try {
-      let saved = localStorage.getItem(LOCAL_STORAGE_KEY);
-      if (!saved) {
-        saved = localStorage.getItem(LEGACY_LOCAL_STORAGE_KEY);
-      }
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (
-          !parsed.musicUrl ||
-          parsed.musicUrl.includes("pixabay.com") ||
-          parsed.musicUrl.includes("3gVd3gY8E0o") ||
-          parsed.musicUrl.includes("9jDkx_k_N_U")
-        ) {
-          parsed.musicUrl = "/audio/wedding-acoustic.mp3";
-        }
-        localData = parsed;
-        setData(parsed);
-        setIsModified(true);
-      }
-    } catch {
-      // ignore
+    if (initialData) {
+      setData(initialData);
+      setIsLoaded(true);
+      return;
     }
 
-    // Fetch dữ liệu mới nhất từ server nếu client chưa có hoặc đồng bộ
+    let isSubscribed = true;
+
+    // Ưu tiên đồng bộ dữ liệu mới nhất từ server
     fetch("/api/wedding-data")
       .then((res) => (res.ok ? res.json() : null))
       .then((serverData) => {
-        if (serverData) {
-          // Nếu không có dữ liệu local hoặc server có dữ liệu hợp lệ
-          if (!localData || JSON.stringify(serverData) !== JSON.stringify(defaultData)) {
-            setData(serverData);
+        if (!isSubscribed) return;
+        if (serverData && typeof serverData === "object" && serverData.groom) {
+          setData(serverData);
+          try {
+            localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(serverData));
+          } catch {
+            // ignore
           }
         }
       })
-      .catch(() => {})
-      .finally(() => setIsLoaded(true));
-  }, []);
+      .catch(() => {
+        if (!isSubscribed) return;
+        // Nếu offline, đọc từ localStorage
+        try {
+          const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
+          if (saved) {
+            setData(JSON.parse(saved));
+          }
+        } catch {
+          // ignore
+        }
+      })
+      .finally(() => {
+        if (isSubscribed) setIsLoaded(true);
+      });
+
+    return () => {
+      isSubscribed = false;
+    };
+  }, [initialData]);
 
   const updateData = useCallback(
     (updater: Partial<WeddingData> | ((prev: WeddingData) => WeddingData)) => {
       setData((prev) => {
-        const next = typeof updater === "function" ? updater(prev) : { ...prev, ...updater };
+        const next =
+          typeof updater === "function" ? updater(prev) : { ...prev, ...updater };
         setIsModified(true);
         return next;
       });
@@ -75,25 +92,44 @@ export const WeddingDataProvider: React.FC<{ children: React.ReactNode }> = ({ c
     []
   );
 
-  const saveChanges = useCallback(() => {
+  const saveChanges = useCallback(
+    async (customData?: WeddingData): Promise<boolean> => {
+      const payload = customData || data;
+      try {
+        // 1. Lưu vào localStorage
+        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(payload));
+        setIsModified(false);
+
+        // 2. Lưu đồng bộ lên server qua API (ghi vào data/saved_wedding_data.json và data/wedding.ts)
+        const res = await fetch("/api/wedding-data", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+
+        return res.ok;
+      } catch (err) {
+        console.error("Lỗi khi lưu dữ liệu thiệp cưới:", err);
+        return false;
+      }
+    },
+    [data]
+  );
+
+
+  const resetToDefault = useCallback(async () => {
     try {
-      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(data));
-      setIsModified(true);
-      // Đồng bộ lên server để mọi thiết bị / điện thoại quét mã QR đều xem được dữ liệu mới
-      fetch("/api/wedding-data", {
+      localStorage.removeItem(LOCAL_STORAGE_KEY);
+      setData(defaultData);
+      setIsModified(false);
+      await fetch("/api/wedding-data", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      }).catch((err) => console.warn("Failed to persist to server API:", err));
-    } catch (err) {
-      console.error("Failed to save to localStorage", err);
+        body: JSON.stringify(defaultData),
+      });
+    } catch {
+      // ignore
     }
-  }, [data]);
-
-  const resetToDefault = useCallback(() => {
-    localStorage.removeItem(LOCAL_STORAGE_KEY);
-    setData(defaultData);
-    setIsModified(false);
   }, []);
 
   const exportAsCode = useCallback(() => {

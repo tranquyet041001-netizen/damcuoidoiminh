@@ -1,6 +1,10 @@
 import { Metadata } from "next";
-import { weddingData } from "@/data/wedding";
+import { getLatestWeddingData } from "@/utils/serverWeddingData";
 import GuestViewWrapper from "./GuestViewWrapper";
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 
 export async function generateMetadata({
   params,
@@ -8,20 +12,27 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const resolvedParams = await params;
+  const currentData = getLatestWeddingData();
+
+  const previewImage =
+    currentData.gallery && currentData.gallery.length > 0
+      ? currentData.gallery[0].url
+      : currentData.groom.avatarUrl;
+
   return {
-    title: `Thiệp Cưới • ${weddingData.groom.shortName} & ${weddingData.bride.shortName}`,
-    description: `${weddingData.welcomeQuote} — Kính mời bạn tới chung vui cùng chúng mình vào ngày ${weddingData.weddingDateFormatted}.`,
+    title: `Thiệp Cưới • ${currentData.groom.shortName} & ${currentData.bride.shortName}`,
+    description: `${currentData.welcomeQuote} — Kính mời bạn tới chung vui cùng chúng mình vào ngày ${currentData.weddingDateFormatted}.`,
     openGraph: {
-      title: `Thiệp Cưới • ${weddingData.groom.shortName} & ${weddingData.bride.shortName}`,
-      description: `Trân trọng kính mời bạn đến chung vui cùng chúng mình vào ${weddingData.weddingDateFormatted}.`,
-      url: `/i/${resolvedParams.slug || "minh-an"}`,
-      siteName: `Thiệp Cưới ${weddingData.groom.shortName} & ${weddingData.bride.shortName}`,
+      title: `Thiệp Cưới • ${currentData.groom.shortName} & ${currentData.bride.shortName}`,
+      description: `Trân trọng kính mời bạn đến chung vui cùng chúng mình vào ${currentData.weddingDateFormatted}.`,
+      url: `/i/${resolvedParams.slug || currentData.slug || "quyet-han"}`,
+      siteName: `Thiệp Cưới ${currentData.groom.shortName} & ${currentData.bride.shortName}`,
       images: [
         {
-          url: "https://images.unsplash.com/photo-1583939003579-730e3918a45a?q=80&w=1200&auto=format&fit=crop",
+          url: previewImage,
           width: 1200,
           height: 630,
-          alt: `Thiệp cưới ${weddingData.groom.shortName} & ${weddingData.bride.shortName}`,
+          alt: `Thiệp cưới ${currentData.groom.shortName} & ${currentData.bride.shortName}`,
         },
       ],
       locale: "vi_VN",
@@ -29,16 +40,14 @@ export async function generateMetadata({
     },
     twitter: {
       card: "summary_large_image",
-      title: `Thiệp Cưới • ${weddingData.groom.shortName} & ${weddingData.bride.shortName}`,
-      description: `${weddingData.welcomeQuote}`,
+      title: `Thiệp Cưới • ${currentData.groom.shortName} & ${currentData.bride.shortName}`,
+      description: `${currentData.welcomeQuote}`,
+      images: [previewImage],
     },
   };
 }
 
-export function generateStaticParams() {
-  return [{ slug: "quyet-han" }, { slug: "minh-an" }];
-}
-
-export default function GuestPage() {
-  return <GuestViewWrapper />;
+export default async function GuestPage() {
+  const currentData = getLatestWeddingData();
+  return <GuestViewWrapper initialData={currentData} />;
 }

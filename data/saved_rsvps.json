@@ -1,0 +1,35 @@
+[
+  {
+    "id": "rsvp-1789023566397",
+    "fullName": "Test Guest",
+    "phone": "0912345678",
+    "guestOf": "groom",
+    "attendance": "attending",
+    "guestCount": 2,
+    "dietaryOrNote": "Chúc mừng hạnh phúc!",
+    "createdAt": "2026-09-10T06:59:26.397Z",
+    "emailSentTo": [
+      "congquyet.wedding@gmail.com"
+    ]
+  },
+  {
+    "id": "rsvp-1",
+    "fullName": "Nguyễn Văn Đức",
+    "phone": "0901234567",
+    "guestOf": "groom",
+    "attendance": "attending",
+    "guestCount": 2,
+    "dietaryOrNote": "Chúc hai bạn trăm năm hạnh phúc, viên mãn!",
+    "createdAt": "2026-09-10T05:59:26.394Z"
+  },
+  {
+    "id": "rsvp-2",
+    "fullName": "Trần Mai Phương",
+    "phone": "0988776655",
+    "guestOf": "bride",
+    "attendance": "attending",
+    "guestCount": 1,
+    "dietaryOrNote": "Háo hức chờ ngày được ngắm cô dâu xinh đẹp nhất!",
+    "createdAt": "2026-09-10T04:59:26.394Z"
+  }
+]

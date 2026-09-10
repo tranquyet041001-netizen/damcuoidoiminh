@@ -7,7 +7,7 @@ import { ToastProvider } from "@/components/ui/Toast";
 import { WeddingInvitationView } from "@/components/invitation/WeddingInvitationView";
 import { WeddingData } from "@/types/wedding";
 
-export default function GuestViewWrapper({
+export default function HomeViewWrapper({
   initialData,
 }: {
   initialData?: WeddingData;
@@ -16,8 +16,7 @@ export default function GuestViewWrapper({
     <WeddingDataProvider initialData={initialData}>
       <ToastProvider>
         <MusicProvider>
-          {/* Chế độ khách xem: không hiển thị nút chỉnh sửa / admin */}
-          <WeddingInvitationView isGuestView={true} />
+          <WeddingInvitationView />
         </MusicProvider>
       </ToastProvider>
     </WeddingDataProvider>

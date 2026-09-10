@@ -1,0 +1,30 @@
+[
+  {
+    "id": "wish-1789023574448",
+    "name": "Anh Em Xóm 6",
+    "relationship": "Bạn chú rể",
+    "content": "Chúc Công Quyết & Ngọc Hân hạnh phúc viên mãn!",
+    "createdAt": "2026-09-10T06:59:34.448Z"
+  },
+  {
+    "id": "wish-1",
+    "name": "Thanh Tùng & Mai Anh",
+    "relationship": "Bạn thân đại học",
+    "content": "Chúc mừng hạnh phúc Công Quyết & Ngọc Hân! Chúc hai bạn trăm năm viên mãn, răng long đầu bạc, tổ ấm nhỏ luôn tràn ngập tiếng cười và yêu thương.",
+    "createdAt": "2026-09-08T14:20:00Z"
+  },
+  {
+    "id": "wish-2",
+    "name": "Bác Hùng & Cô Lan",
+    "relationship": "Bà con xóm 6 Minh Châu",
+    "content": "Chúc hai cháu trăm năm kết tóc se tơ, sớm hôm hòa thuận, cùng nhau vun vén cho mái ấm nhỏ thật hạnh phúc và bình an!",
+    "createdAt": "2026-09-09T09:15:00Z"
+  },
+  {
+    "id": "wish-3",
+    "name": "Hội Bạn Thân Minh Châu",
+    "relationship": "Bạn bè chú rể",
+    "content": "Chúc mừng người anh em Công Quyết rước được nàng dâu thảo Ngọc Hân về dinh! Chúc đôi bạn trẻ sớm có quý tử, vạn sự như ý!",
+    "createdAt": "2026-09-09T18:40:00Z"
+  }
+]
