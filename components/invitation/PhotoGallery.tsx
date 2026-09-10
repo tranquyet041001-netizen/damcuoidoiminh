@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ChevronLeft, ChevronRight, ZoomIn } from "lucide-react";
@@ -10,24 +10,66 @@ import { VietnameseLotus, BotanicalBranch } from "@/components/ui/VietnamesePatt
 export const PhotoGallery: React.FC = () => {
   const { data: weddingData } = useWeddingData();
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const [direction, setDirection] = useState<number>(0);
+  const touchStartRef = useRef<{ x: number; y: number; time: number } | null>(null);
   const gallery = weddingData.gallery;
 
   const openLightbox = (i: number) => {
+    setDirection(0);
     setLightboxIndex(i);
     document.body.style.overflow = "hidden";
   };
+
   const closeLightbox = useCallback(() => {
     setLightboxIndex(null);
     document.body.style.overflow = "";
   }, []);
+
   const next = useCallback(() => {
-    if (lightboxIndex === null) return;
-    setLightboxIndex((lightboxIndex + 1) % gallery.length);
-  }, [lightboxIndex, gallery.length]);
+    if (lightboxIndex === null || gallery.length <= 1) return;
+    setDirection(1);
+    setLightboxIndex((prev) => (prev !== null ? (prev + 1) % gallery.length : 0));
+  }, [gallery.length, lightboxIndex]);
+
   const prev = useCallback(() => {
-    if (lightboxIndex === null) return;
-    setLightboxIndex((lightboxIndex - 1 + gallery.length) % gallery.length);
-  }, [lightboxIndex, gallery.length]);
+    if (lightboxIndex === null || gallery.length <= 1) return;
+    setDirection(-1);
+    setLightboxIndex((prev) => (prev !== null ? (prev - 1 + gallery.length) % gallery.length : 0));
+  }, [gallery.length, lightboxIndex]);
+
+  // Nhận diện thao tác vuốt cảm ứng trên màn hình điện thoại
+  const handleTouchStart = (e: React.TouchEvent) => {
+    const touch = e.touches[0];
+    touchStartRef.current = {
+      x: touch.clientX,
+      y: touch.clientY,
+      time: Date.now(),
+    };
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (!touchStartRef.current) return;
+    const touch = e.changedTouches[0];
+    const deltaX = touch.clientX - touchStartRef.current.x;
+    const deltaY = touch.clientY - touchStartRef.current.y;
+    touchStartRef.current = null;
+
+    // Ưu tiên cử chỉ vuốt ngang nếu khoảng cách vuốt ngang lớn hơn
+    if (Math.abs(deltaX) > Math.abs(deltaY)) {
+      if (Math.abs(deltaX) > 35) {
+        if (deltaX < 0) {
+          next(); // Vuốt sang trái -> xem ảnh tiếp
+        } else {
+          prev(); // Vuốt sang phải -> xem ảnh trước
+        }
+      }
+    } else {
+      // Vuốt dọc xuống (> 60px) -> đóng album
+      if (deltaY > 60) {
+        closeLightbox();
+      }
+    }
+  };
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -39,6 +81,13 @@ export const PhotoGallery: React.FC = () => {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [lightboxIndex, closeLightbox, next, prev]);
+
+  // Đảm bảo mở lại cuộn trang khi component bị tháo dỡ
+  useEffect(() => {
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, []);
 
   // Chia thành 2 cột masonry
   const col1 = gallery.filter((_, i) => i % 2 === 0);
@@ -147,86 +196,200 @@ export const PhotoGallery: React.FC = () => {
         </div>
       </div>
 
-      {/* Lightbox */}
+      {/* Lightbox Chi Tiết Ảnh Cưới - Thao Tác Cực Mượt Trên Điện Thoại */}
       <AnimatePresence>
-        {lightboxIndex !== null && (
+        {lightboxIndex !== null && gallery[lightboxIndex] && (
           <motion.div
-            key="lightbox"
+            key="lightbox-overlay"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.25 }}
             role="dialog"
             aria-modal="true"
-            className="fixed inset-0 z-50 flex flex-col items-center justify-center p-4 bg-[#1B291A]/95 backdrop-blur-sm"
+            aria-label="Xem chi tiết ảnh cưới"
+            onClick={(e) => {
+              // Chạm vào nền tối bên ngoài ảnh để đóng album ngay lập tức
+              if (e.target === e.currentTarget) {
+                closeLightbox();
+              }
+            }}
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
+            className="fixed inset-0 z-[100] flex flex-col items-center justify-between p-3 sm:p-6 bg-black/92 backdrop-blur-md select-none"
           >
-            <button
-              type="button"
-              onClick={closeLightbox}
-              className="absolute top-4 right-4 w-10 h-10 rounded-full flex items-center justify-center text-[#FDFAF5] bg-white/10 hover:bg-white/20 transition-colors cursor-pointer"
-            >
-              <X className="w-5 h-5" />
-            </button>
+            {/* Thanh trên cùng: Đếm số ảnh & Nút Đóng siêu dễ chạm */}
+            <div className="w-full max-w-4xl flex items-center justify-between z-50 pt-2 px-1">
+              {/* Badge số thứ tự ảnh */}
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 border border-white/20 text-[#FDFAF5] text-xs font-serif shadow-md backdrop-blur-md">
+                <span className="text-[#C9A84C] font-bold text-sm">
+                  {lightboxIndex + 1}
+                </span>
+                <span className="text-white/40">/</span>
+                <span className="text-white/80">{gallery.length}</span>
+              </div>
 
-            <button
-              type="button"
-              onClick={prev}
-              className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center text-[#FDFAF5] bg-white/10 hover:bg-white/20 transition-all cursor-pointer"
-            >
-              <ChevronLeft className="w-5 h-5" />
-            </button>
-
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={lightboxIndex}
-                initial={{ opacity: 0, scale: 0.96 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.96 }}
-                transition={{ duration: 0.2 }}
-                className="relative max-w-2xl max-h-[75vh] w-full h-full flex items-center justify-center"
+              {/* Nút Đóng to, rõ ràng với chữ và icon */}
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  closeLightbox();
+                }}
+                aria-label="Đóng album ảnh"
+                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/15 hover:bg-white/25 active:scale-95 text-[#FDFAF5] border border-white/30 backdrop-blur-md shadow-lg transition-all cursor-pointer"
               >
-                <div className="relative w-full h-full max-h-[75vh]">
-                  <Image
-                    src={gallery[lightboxIndex].url}
-                    alt={gallery[lightboxIndex].title}
-                    fill
-                    className="object-contain"
-                    sizes="100vw"
-                    priority
-                  />
-                </div>
-              </motion.div>
-            </AnimatePresence>
+                <X className="w-4 h-4 text-white" />
+                <span className="text-xs font-serif font-semibold">Đóng</span>
+              </button>
+            </div>
 
-            <button
-              type="button"
-              onClick={next}
-              className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center text-[#FDFAF5] bg-white/10 hover:bg-white/20 transition-all cursor-pointer"
+            {/* Vùng giữa: Hiển thị ảnh & 2 Nút Mũi Tên điều hướng */}
+            <div
+              className="relative flex-1 w-full max-w-4xl flex items-center justify-center my-2 overflow-hidden"
+              onClick={(e) => {
+                if (e.target === e.currentTarget) {
+                  closeLightbox();
+                }
+              }}
             >
-              <ChevronRight className="w-5 h-5" />
-            </button>
-
-            <div className="mt-4 text-center space-y-1 max-w-sm px-4 text-[#FDFAF5]">
-              <p className="font-serif text-base font-medium">
-                {gallery[lightboxIndex].title}
-              </p>
-              {gallery[lightboxIndex].caption && (
-                <p className="text-xs text-[#A8BCA1] italic">{gallery[lightboxIndex].caption}</p>
+              {/* Nút Ảnh trước */}
+              {gallery.length > 1 && (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    prev();
+                  }}
+                  aria-label="Ảnh trước"
+                  className="absolute left-1 sm:left-3 top-1/2 -translate-y-1/2 z-40 w-11 h-11 sm:w-13 sm:h-13 rounded-full flex items-center justify-center text-[#FDFAF5] bg-black/50 hover:bg-black/75 border border-white/25 backdrop-blur-md shadow-2xl transition-all active:scale-90 cursor-pointer"
+                >
+                  <ChevronLeft className="w-6 h-6 sm:w-7 sm:h-7" />
+                </button>
               )}
-              <div className="flex items-center justify-center gap-1.5 pt-2">
-                {gallery.map((_, i) => (
-                  <button
-                    key={i}
-                    type="button"
-                    onClick={() => setLightboxIndex(i)}
-                    className="rounded-full transition-all"
-                    style={{
-                      width: i === lightboxIndex ? 16 : 6,
-                      height: 6,
-                      background: i === lightboxIndex ? "#C9A84C" : "rgba(253,250,245,0.3)",
-                    }}
-                  />
-                ))}
+
+              {/* Ảnh trình diễn với hiệu ứng trượt mượt mà theo phương hướng */}
+              <AnimatePresence initial={false} custom={direction} mode="wait">
+                <motion.div
+                  key={lightboxIndex}
+                  custom={direction}
+                  variants={{
+                    enter: (dir: number) => ({
+                      x: dir > 0 ? 80 : dir < 0 ? -80 : 0,
+                      opacity: 0,
+                      scale: 0.96,
+                    }),
+                    center: {
+                      x: 0,
+                      opacity: 1,
+                      scale: 1,
+                      transition: {
+                        x: { type: "spring", stiffness: 350, damping: 30 },
+                        opacity: { duration: 0.2 },
+                        scale: { duration: 0.2 },
+                      },
+                    },
+                    exit: (dir: number) => ({
+                      x: dir > 0 ? -80 : dir < 0 ? 80 : 0,
+                      opacity: 0,
+                      scale: 0.96,
+                      transition: {
+                        x: { type: "spring", stiffness: 350, damping: 30 },
+                        opacity: { duration: 0.15 },
+                        scale: { duration: 0.15 },
+                      },
+                    }),
+                  }}
+                  initial="enter"
+                  animate="center"
+                  exit="exit"
+                  className="relative w-full h-full max-h-[66vh] sm:max-h-[74vh] flex items-center justify-center p-1"
+                >
+                  <div className="relative w-full h-full">
+                    <Image
+                      src={gallery[lightboxIndex].url}
+                      alt={gallery[lightboxIndex].title || "Ảnh cưới"}
+                      fill
+                      className="object-contain drop-shadow-2xl"
+                      sizes="(max-width: 768px) 100vw, 900px"
+                      priority
+                    />
+                  </div>
+                </motion.div>
+              </AnimatePresence>
+
+              {/* Nút Ảnh tiếp theo */}
+              {gallery.length > 1 && (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    next();
+                  }}
+                  aria-label="Ảnh tiếp theo"
+                  className="absolute right-1 sm:right-3 top-1/2 -translate-y-1/2 z-40 w-11 h-11 sm:w-13 sm:h-13 rounded-full flex items-center justify-center text-[#FDFAF5] bg-black/50 hover:bg-black/75 border border-white/25 backdrop-blur-md shadow-2xl transition-all active:scale-90 cursor-pointer"
+                >
+                  <ChevronRight className="w-6 h-6 sm:w-7 sm:h-7" />
+                </button>
+              )}
+            </div>
+
+            {/* Thanh dưới cùng: Tiêu đề ảnh, Dải chấm chọn & Hướng dẫn cử chỉ */}
+            <div className="w-full max-w-md text-center space-y-2 px-4 pb-2 z-50">
+              {/* Tiêu đề & Chú thích ảnh */}
+              <div>
+                <p className="font-serif text-sm sm:text-base font-bold text-[#FDFAF5] drop-shadow-sm line-clamp-1">
+                  {gallery[lightboxIndex].title}
+                </p>
+                {gallery[lightboxIndex].caption && (
+                  <p className="text-xs text-[#A8BCA1] italic mt-0.5 line-clamp-2">
+                    {gallery[lightboxIndex].caption}
+                  </p>
+                )}
+              </div>
+
+              {/* Dải chấm chỉ số có vùng chạm lớn */}
+              {gallery.length > 1 && (
+                <div className="flex items-center justify-center gap-1 sm:gap-1.5 flex-wrap max-w-xs mx-auto">
+                  {gallery.map((_, i) => (
+                    <button
+                      key={i}
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setDirection(i > (lightboxIndex ?? 0) ? 1 : -1);
+                        setLightboxIndex(i);
+                      }}
+                      aria-label={`Xem ảnh ${i + 1}`}
+                      className="py-1.5 px-0.5 cursor-pointer group"
+                    >
+                      <span
+                        className="block rounded-full transition-all duration-300"
+                        style={{
+                          width: i === lightboxIndex ? 20 : 6,
+                          height: 6,
+                          background:
+                            i === lightboxIndex
+                              ? "#C9A84C"
+                              : "rgba(253,250,245,0.35)",
+                        }}
+                      />
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {/* Hướng dẫn thao tác vuốt & thoát */}
+              <div className="flex items-center justify-center gap-2 text-[11px] text-white/50 font-sans tracking-wide">
+                <span>Vuốt ngón tay để đổi ảnh</span>
+                <span>•</span>
+                <button
+                  type="button"
+                  onClick={closeLightbox}
+                  className="underline hover:text-white transition-colors cursor-pointer"
+                >
+                  Chạm nền đen để đóng
+                </button>
               </div>
             </div>
           </motion.div>
