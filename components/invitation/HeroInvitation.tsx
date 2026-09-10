@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, Sparkles } from "lucide-react";
-import { weddingData } from "@/data/wedding";
+import { useWeddingData } from "@/context/WeddingDataContext";
 import { DongSonSun, VietnameseLotus, RedSealStamp } from "@/components/ui/VietnamesePattern";
 import confetti from "canvas-confetti";
 
@@ -13,6 +13,7 @@ interface HeroInvitationProps {
 
 export const HeroInvitation: React.FC<HeroInvitationProps> = ({ onOpenCard }) => {
   const [isOpened, setIsOpened] = useState(false);
+  const { data: weddingData } = useWeddingData();
 
   const handleOpen = () => {
     setIsOpened(true);

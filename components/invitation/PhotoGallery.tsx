@@ -3,10 +3,11 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { X, ChevronLeft, ChevronRight, Maximize2 } from "lucide-react";
-import { weddingData } from "@/data/wedding";
+import { useWeddingData } from "@/context/WeddingDataContext";
 import { SectionTitle } from "@/components/ui/SectionTitle";
 
 export const PhotoGallery: React.FC = () => {
+  const { data: weddingData } = useWeddingData();
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
   const openLightbox = (index: number) => {

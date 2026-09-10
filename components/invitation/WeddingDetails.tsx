@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Calendar, Clock, MapPin, Navigation, CalendarPlus } from "lucide-react";
-import { weddingData } from "@/data/wedding";
+import { useWeddingData } from "@/context/WeddingDataContext";
 import { WeddingEvent } from "@/types/wedding";
 import { SectionTitle } from "@/components/ui/SectionTitle";
 import { PaperCard } from "@/components/ui/PaperTexture";
@@ -11,6 +11,7 @@ import { useToast } from "@/components/ui/Toast";
 
 export const WeddingDetails: React.FC = () => {
   const { showToast } = useToast();
+  const { data: weddingData } = useWeddingData();
 
   const handleAddToCalendar = (event: WeddingEvent) => {
     // Generate .ics calendar file content

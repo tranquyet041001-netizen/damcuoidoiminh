@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { Volume2, VolumeX, Share2, Send, ArrowUp } from "lucide-react";
-import { weddingData } from "@/data/wedding";
+import { useWeddingData } from "@/context/WeddingDataContext";
 import { useToast } from "@/components/ui/Toast";
 
 export const FloatingControls: React.FC = () => {
@@ -10,6 +10,7 @@ export const FloatingControls: React.FC = () => {
   const [showScrollTop, setShowScrollTop] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const { showToast } = useToast();
+  const { data } = useWeddingData();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -41,8 +42,8 @@ export const FloatingControls: React.FC = () => {
 
   const handleShare = async () => {
     const shareData = {
-      title: `Thiệp Cưới • ${weddingData.groom.shortName} & ${weddingData.bride.shortName}`,
-      text: `${weddingData.welcomeQuote} — Kính mời bạn tới chung vui cùng chúng mình vào ${weddingData.weddingDateFormatted}!`,
+      title: `Thiệp Cưới • ${data.groom.shortName} & ${data.bride.shortName}`,
+      text: `${data.welcomeQuote} — Kính mời bạn tới chung vui cùng chúng mình vào ${data.weddingDateFormatted}!`,
       url: window.location.href,
     };
 
@@ -77,7 +78,7 @@ export const FloatingControls: React.FC = () => {
     <>
       <audio
         ref={audioRef}
-        src={weddingData.musicUrl}
+        src={data.musicUrl}
         preload="none"
         loop
         aria-hidden="true"

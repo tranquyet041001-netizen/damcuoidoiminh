@@ -4,11 +4,12 @@ import React from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { MapPin } from "lucide-react";
-import { weddingData } from "@/data/wedding";
+import { useWeddingData } from "@/context/WeddingDataContext";
 import { SectionTitle } from "@/components/ui/SectionTitle";
 import { PaperCard } from "@/components/ui/PaperTexture";
 
 export const CoupleStory: React.FC = () => {
+  const { data: weddingData } = useWeddingData();
   return (
     <section id="story" className="py-12 sm:py-16 px-4">
       <div className="max-w-xl mx-auto">

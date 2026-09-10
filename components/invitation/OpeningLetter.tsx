@@ -1,10 +1,13 @@
+"use client";
+
 import React from "react";
-import { weddingData } from "@/data/wedding";
+import { useWeddingData } from "@/context/WeddingDataContext";
 import { PaperCard } from "@/components/ui/PaperTexture";
 import { SectionTitle } from "@/components/ui/SectionTitle";
 import { DongSonBorder } from "@/components/ui/VietnamesePattern";
 
 export const OpeningLetter: React.FC = () => {
+  const { data: weddingData } = useWeddingData();
   return (
     <section id="letter" className="py-12 sm:py-16 px-4">
       <div className="max-w-xl mx-auto">

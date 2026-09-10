@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { weddingData } from "@/data/wedding";
+import { useWeddingData } from "@/context/WeddingDataContext";
 import { SectionTitle } from "@/components/ui/SectionTitle";
 
 interface TimeLeft {
@@ -13,6 +13,7 @@ interface TimeLeft {
 }
 
 export const Countdown: React.FC = () => {
+  const { data: weddingData } = useWeddingData();
   const [timeLeft, setTimeLeft] = useState<TimeLeft>({
     days: 0,
     hours: 0,

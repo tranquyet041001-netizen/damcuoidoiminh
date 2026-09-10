@@ -1,4 +1,7 @@
+"use client";
+
 import React from "react";
+import { WeddingDataProvider } from "@/context/WeddingDataContext";
 import { ToastProvider } from "@/components/ui/Toast";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
@@ -15,7 +18,8 @@ import { GiftCard } from "@/components/invitation/GiftCard";
 
 export default function Home() {
   return (
-    <ToastProvider>
+    <WeddingDataProvider>
+      <ToastProvider>
       <div className="relative min-h-screen bg-do-texture flex flex-col selection:bg-[#9E3D32] selection:text-[#FFF9EE]">
         {/* Thanh tiêu đề cuộn nhẹ */}
         <Header />
@@ -55,6 +59,7 @@ export default function Home() {
         {/* Nút nổi điều khiển nhạc, chia sẻ và RSVP nhanh */}
         <FloatingControls />
       </div>
-    </ToastProvider>
+      </ToastProvider>
+    </WeddingDataProvider>
   );
 }

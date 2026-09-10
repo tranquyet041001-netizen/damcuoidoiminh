@@ -3,13 +3,14 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import { Copy, Check, QrCode } from "lucide-react";
-import { weddingData } from "@/data/wedding";
+import { useWeddingData } from "@/context/WeddingDataContext";
 import { SectionTitle } from "@/components/ui/SectionTitle";
 import { PaperCard } from "@/components/ui/PaperTexture";
 import { useToast } from "@/components/ui/Toast";
 
 export const GiftCard: React.FC = () => {
   const { showToast } = useToast();
+  const { data: weddingData } = useWeddingData();
   const [activeTab, setActiveTab] = useState<"groom" | "bride">("groom");
   const [copiedAccount, setCopiedAccount] = useState<string | null>(null);
 
