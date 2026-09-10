@@ -5,6 +5,7 @@ export interface PersonInfo {
   parents: string; // e.g. "Ái nữ của Ông... và Bà..."
   avatarUrl: string;
   bio?: string;
+  email?: string; // Email nhận phản hồi RSVP
 }
 
 export interface WeddingEvent {
@@ -18,7 +19,7 @@ export interface WeddingEvent {
   address: string;
   mapUrl: string;
   mapEmbedUrl?: string;
-  notes?: string; // "Trang phục nhã nhặn, sắc trầm / truyền thống"
+  notes?: string;
 }
 
 export interface StoryMilestone {
@@ -40,9 +41,9 @@ export interface GalleryItem {
 
 export interface BankAccount {
   ownerType: "groom" | "bride";
-  label: string; // "Mừng cưới Chú Rể", "Mừng cưới Cô Dâu"
+  label: string;
   bankName: string;
-  bankCode?: string; // e.g. "VCB", "MB", "TCB"
+  bankCode?: string;
   accountNumber: string;
   accountHolder: string;
   branch?: string;
@@ -50,12 +51,18 @@ export interface BankAccount {
   customNote?: string;
 }
 
+export interface ContactEmails {
+  groom: string;
+  bride: string;
+}
+
 export interface WeddingData {
   groom: PersonInfo;
   bride: PersonInfo;
+  contactEmails: ContactEmails;
   weddingDate: string; // ISO 8601 string for countdown
   weddingDateFormatted: string;
-  lunarDateFormatted: string; // "Ngày 17 tháng Chạp năm Bính Ngọ"
+  lunarDateFormatted: string;
   welcomeQuote: string;
   welcomeMessage: string;
   openingLetter: {
@@ -83,12 +90,13 @@ export interface RSVPSubmission {
   guestCount: number;
   dietaryOrNote?: string;
   createdAt?: string;
+  emailSentTo?: string[];
 }
 
 export interface WishSubmission {
   id: string;
   name: string;
-  relationship?: string; // "Bạn cấp 3", "Đồng nghiệp", "Họ hàng"
+  relationship?: string;
   content: string;
   createdAt: string;
 }

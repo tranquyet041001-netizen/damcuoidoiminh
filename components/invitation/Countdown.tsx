@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useWeddingData } from "@/context/WeddingDataContext";
-import { SectionTitle } from "@/components/ui/SectionTitle";
+import { VietnameseLotus } from "@/components/ui/VietnamesePattern";
 
 interface TimeLeft {
   days: number;
@@ -47,52 +47,54 @@ export const Countdown: React.FC = () => {
     updateCountdown();
     const interval = setInterval(updateCountdown, 1000);
     return () => clearInterval(interval);
-  }, []);
+  }, [weddingData.weddingDate]);
 
   if (!mounted) {
     return null;
   }
 
   return (
-    <section className="py-10 px-4">
-      <div className="max-w-xl mx-auto text-center">
-        <SectionTitle
-          subtitle="Khoảnh Khắc Mong Chờ"
-          title="Đếm Ngược Ngày Vui"
-          variant="minimal"
-        />
+    <section className="py-12 px-4 bg-[#FAF3E8]">
+      <div className="max-w-md mx-auto text-center relative">
+        {/* Tiêu đề theo ảnh mẫu */}
+        <h2 className="text-xl sm:text-2xl font-serif font-bold tracking-wider uppercase text-[#183A3A] mb-8">
+          ĐẾM NGƯỢC ĐẾN NGÀY VUI
+        </h2>
 
-        {timeLeft.isPast ? (
-          <div className="p-6 bg-[#FFF9EE] border border-[#EADBCE] rounded-sm max-w-sm mx-auto shadow-sm">
-            <p className="font-serif text-lg text-[#9E3D32]">
-              Hôn lễ đã diễn ra trong niềm hân hoan trọn vẹn!
-            </p>
+        {/* Khung số đếm ngược với hoa sen in chìm ở tâm */}
+        <div className="relative py-4">
+          {/* Đóa sen in chìm trung tâm theo ảnh mẫu */}
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <VietnameseLotus size={100} color="#D4AF37" opacity={0.25} />
           </div>
-        ) : (
-          <div className="grid grid-cols-4 gap-2.5 sm:gap-4 max-w-md mx-auto">
-            {[
-              { label: "Ngày", value: timeLeft.days },
-              { label: "Giờ", value: timeLeft.hours },
-              { label: "Phút", value: timeLeft.minutes },
-              { label: "Giây", value: timeLeft.seconds },
-            ].map((unit, idx) => (
-              <div
-                key={idx}
-                className="relative bg-[#FFF9EE] border border-[#E5D4B6] rounded-sm py-4 px-2 shadow-sm text-center"
-              >
-                <div className="absolute top-1 left-1 w-2 h-2 border-t border-l border-[#9E3D32]/40" />
-                <div className="absolute top-1 right-1 w-2 h-2 border-t border-r border-[#9E3D32]/40" />
 
-                <div className="font-serif text-2xl sm:text-3xl font-semibold text-[#183A3A] tabular-nums">
-                  {String(unit.value).padStart(2, "0")}
+          <div className="flex items-center justify-center gap-3 sm:gap-6 relative z-10">
+            {[
+              { label: "NGÀY", value: timeLeft.days },
+              { label: "GIỜ", value: timeLeft.hours },
+              { label: "PHÚT", value: timeLeft.minutes },
+              { label: "GIÂY", value: timeLeft.seconds },
+            ].map((item, idx) => (
+              <React.Fragment key={idx}>
+                <div className="text-center min-w-[50px] sm:min-w-[65px]">
+                  <div className="font-serif text-3xl sm:text-4xl font-semibold text-[#B8860B] tabular-nums tracking-tight">
+                    {String(item.value).padStart(2, "0")}
+                  </div>
+                  <div className="text-[10px] sm:text-xs tracking-[0.2em] font-medium text-[#78928A] uppercase mt-1">
+                    {item.label}
+                  </div>
                 </div>
-                <div className="text-[11px] sm:text-xs uppercase tracking-widest text-[#78928A] font-medium mt-1">
-                  {unit.label}
-                </div>
-              </div>
+
+                {/* Dấu hai chấm giữa các cụm */}
+                {idx < 3 && (
+                  <span className="text-2xl sm:text-3xl text-[#D4AF37]/80 font-serif -mt-4 select-none">
+                    :
+                  </span>
+                )}
+              </React.Fragment>
             ))}
           </div>
-        )}
+        </div>
       </div>
     </section>
   );

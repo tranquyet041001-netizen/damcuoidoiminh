@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Send, CheckCircle2, Heart, User, Phone, Users, MessageSquare } from "lucide-react";
+import { Send, CheckCircle2, Heart, User, Phone, Users, MessageSquare, Mail } from "lucide-react";
 import { SectionTitle } from "@/components/ui/SectionTitle";
 import { PaperCard } from "@/components/ui/PaperTexture";
 import { useToast } from "@/components/ui/Toast";
@@ -11,6 +11,7 @@ export const RSVPForm: React.FC = () => {
   const { showToast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [sentRecipients, setSentRecipients] = useState<string[]>([]);
 
   const [formData, setFormData] = useState({
     fullName: "",
@@ -52,13 +53,16 @@ export const RSVPForm: React.FC = () => {
 
       if (data.success) {
         setIsSubmitted(true);
-        showToast("Xác nhận tham dự thành công!", "success");
+        if (Array.isArray(data.emailSentTo)) {
+          setSentRecipients(data.emailSentTo);
+        }
+        showToast("Xác nhận thành công! Thông báo đã gửi tới email dâu rể.", "success");
         try {
           confetti({
             particleCount: 50,
             spread: 70,
             origin: { y: 0.7 },
-            colors: ["#9E3D32", "#F4E8D2", "#183A3A"],
+            colors: ["#D4AF37", "#9E3D32", "#F4E8D2", "#183A3A"],
           });
         } catch {
           // ignore
@@ -74,52 +78,62 @@ export const RSVPForm: React.FC = () => {
   };
 
   return (
-    <section id="rsvp" className="py-12 sm:py-16 px-4">
-      <div className="max-w-xl mx-auto">
+    <section id="rsvp" className="py-14 px-4 bg-[#FAF3E8]">
+      <div className="max-w-md mx-auto">
         <SectionTitle
-          subtitle="Sự Hiện Diện Của Bạn"
-          title="Xác Nhận Tham Dự"
+          subtitle="SỰ HIỆN DIỆN CỦA BẠN"
+          title="XÁC NHẬN THAM DỰ"
           description="Để chúng mình chuẩn bị đón tiếp chu đáo nhất, xin vui lòng gửi phản hồi trước ngày 15 tháng 01 năm 2027."
           variant="lotus"
         />
 
-        <PaperCard className="relative overflow-hidden">
+        <PaperCard className="relative overflow-hidden shadow-lg border-2 border-[#EADBCE]">
           {isSubmitted ? (
-            <div className="py-12 text-center space-y-4">
+            <div className="py-10 text-center space-y-4">
               <div className="w-16 h-16 mx-auto rounded-full bg-[#FAF3E8] border border-[#78928A] flex items-center justify-center text-[#9E3D32]">
                 <Heart className="w-8 h-8 fill-current" />
               </div>
 
-              <h3 className="font-serif text-2xl text-[#183A3A] font-semibold">
+              <h3 className="font-serif text-2xl text-[#183A3A] font-bold">
                 Cảm Ơn Bạn Rất Nhiều!
               </h3>
 
-              <p className="text-sm sm:text-base text-[#5A473E] max-w-md mx-auto leading-relaxed">
-                Thông tin của bạn đã được ghi nhận. Sự hiện diện và lời chúc của bạn chính là niềm vinh hạnh to lớn của gia đình chúng mình.
+              <p className="text-sm text-[#5A473E] leading-relaxed">
+                Thông tin xác nhận của bạn đã được ghi nhận.
               </p>
+
+              {sentRecipients.length > 0 && (
+                <div className="p-3 bg-[#FAF3E8] rounded-lg border border-[#EADBCE] text-xs text-[#183A3A] flex items-center justify-center gap-2">
+                  <Mail className="w-4 h-4 text-[#9E3D32]" />
+                  <span>
+                    Email thông báo đã gửi tới:{" "}
+                    <strong>{sentRecipients.join(", ")}</strong>
+                  </span>
+                </div>
+              )}
 
               <div className="pt-4">
                 <button
                   type="button"
                   onClick={() => setIsSubmitted(false)}
-                  className="text-xs uppercase tracking-wider text-[#9E3D32] hover:underline font-medium"
+                  className="text-xs uppercase tracking-wider text-[#9E3D32] hover:underline font-semibold"
                 >
                   Gửi lại phản hồi khác
                 </button>
               </div>
             </div>
           ) : (
-            <form onSubmit={handleSubmit} className="space-y-5">
-              {/* Bạn là khách của ai */}
+            <form onSubmit={handleSubmit} className="space-y-4 text-xs sm:text-sm">
+              {/* Lựa chọn đối tượng khách mời */}
               <div>
-                <label className="block text-xs uppercase tracking-wider text-[#6B5549] font-semibold mb-2">
-                  Bạn Là Khách Của
+                <label className="block text-[11px] uppercase tracking-wider text-[#6B5549] font-bold mb-1.5">
+                  Bạn Là Khách Của Ai? <span className="text-[#9E3D32]">*</span>
                 </label>
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-3 gap-1.5">
                   {[
-                    { id: "both", label: "Cả Hai Bạn" },
-                    { id: "groom", label: "Nhà Trai" },
-                    { id: "bride", label: "Nhà Gái" },
+                    { id: "groom", label: "Nhà Trai", desc: "(Gửi mail Chú Rể)" },
+                    { id: "bride", label: "Nhà Gái", desc: "(Gửi mail Cô Dâu)" },
+                    { id: "both", label: "Cả Hai Bạn", desc: "(Gửi mail cả 2)" },
                   ].map((option) => (
                     <button
                       key={option.id}
@@ -127,13 +141,14 @@ export const RSVPForm: React.FC = () => {
                       onClick={() =>
                         setFormData({ ...formData, guestOf: option.id as "groom" | "bride" | "both" })
                       }
-                      className={`py-2.5 px-3 text-xs sm:text-sm font-medium rounded-sm border transition-all text-center ${
+                      className={`p-2 rounded-lg border text-center transition-all ${
                         formData.guestOf === option.id
-                          ? "bg-[#183A3A] text-[#FFF9EE] border-[#183A3A]"
+                          ? "bg-[#183A3A] text-[#FFF9EE] border-[#183A3A] shadow-xs"
                           : "bg-[#FFF9EE] text-[#5A473E] border-[#E5D4B6] hover:bg-[#FAF3E8]"
                       }`}
                     >
-                      {option.label}
+                      <div className="font-serif font-bold text-xs sm:text-sm">{option.label}</div>
+                      <div className="text-[9px] opacity-80 mt-0.5">{option.desc}</div>
                     </button>
                   ))}
                 </div>
@@ -141,14 +156,14 @@ export const RSVPForm: React.FC = () => {
 
               {/* Dự định tham dự */}
               <div>
-                <label className="block text-xs uppercase tracking-wider text-[#6B5549] font-semibold mb-2">
-                  Dự Định Tham Dự
+                <label className="block text-[11px] uppercase tracking-wider text-[#6B5549] font-bold mb-1.5">
+                  Dự Định Của Bạn
                 </label>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <button
                     type="button"
                     onClick={() => setFormData({ ...formData, attendance: "attending" })}
-                    className={`py-2.5 px-3 text-xs sm:text-sm font-medium rounded-sm border flex items-center justify-center gap-2 transition-all ${
+                    className={`py-2 px-3 rounded-lg border flex items-center justify-center gap-1.5 font-medium transition-all ${
                       formData.attendance === "attending"
                         ? "bg-[#9E3D32] text-[#FFF9EE] border-[#9E3D32]"
                         : "bg-[#FFF9EE] text-[#5A473E] border-[#E5D4B6] hover:bg-[#FAF3E8]"
@@ -161,14 +176,14 @@ export const RSVPForm: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setFormData({ ...formData, attendance: "declined" })}
-                    className={`py-2.5 px-3 text-xs sm:text-sm font-medium rounded-sm border flex items-center justify-center gap-2 transition-all ${
+                    className={`py-2 px-3 rounded-lg border flex items-center justify-center gap-1.5 font-medium transition-all ${
                       formData.attendance === "declined"
                         ? "bg-[#78928A] text-[#FFF9EE] border-[#78928A]"
                         : "bg-[#FFF9EE] text-[#5A473E] border-[#E5D4B6] hover:bg-[#FAF3E8]"
                     }`}
                   >
                     <Heart className="w-4 h-4" />
-                    <span>Rất tiếc vắng mặt & Gửi lời chúc</span>
+                    <span>Gửi lời chúc mừng</span>
                   </button>
                 </div>
               </div>
@@ -177,12 +192,12 @@ export const RSVPForm: React.FC = () => {
               <div>
                 <label
                   htmlFor="fullName"
-                  className="block text-xs uppercase tracking-wider text-[#6B5549] font-semibold mb-1.5"
+                  className="block text-[11px] uppercase tracking-wider text-[#6B5549] font-bold mb-1"
                 >
-                  Họ Và Tên <span className="text-[#9E3D32]">*</span>
+                  Họ Và Tên Của Bạn <span className="text-[#9E3D32]">*</span>
                 </label>
                 <div className="relative">
-                  <User className="w-4 h-4 text-[#78928A] absolute left-3 top-3" />
+                  <User className="w-4 h-4 text-[#78928A] absolute left-3 top-2.5" />
                   <input
                     id="fullName"
                     type="text"
@@ -193,27 +208,25 @@ export const RSVPForm: React.FC = () => {
                       if (errors.fullName) setErrors({ ...errors, fullName: undefined });
                     }}
                     placeholder="Ví dụ: Nguyễn Văn A"
-                    className={`w-full pl-9 pr-3 py-2.5 bg-[#FAF3E8] border rounded-sm text-sm text-[#183A3A] placeholder-[#8A7569] focus:outline-none focus:ring-1 focus:ring-[#183A3A] transition-all ${
+                    className={`w-full pl-9 pr-3 py-2 bg-[#FAF3E8] border rounded-lg text-xs sm:text-sm text-[#183A3A] placeholder-[#8A7569] focus:outline-none focus:ring-1 focus:ring-[#183A3A] ${
                       errors.fullName ? "border-[#9E3D32]" : "border-[#E5D4B6]"
                     }`}
                   />
                 </div>
-                {errors.fullName && (
-                  <p className="text-xs text-[#9E3D32] mt-1">{errors.fullName}</p>
-                )}
+                {errors.fullName && <p className="text-[11px] text-[#9E3D32] mt-0.5">{errors.fullName}</p>}
               </div>
 
-              {/* Số điện thoại & Số người đi cùng */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* SĐT & Số người */}
+              <div className="grid grid-cols-2 gap-2">
                 <div>
                   <label
                     htmlFor="phone"
-                    className="block text-xs uppercase tracking-wider text-[#6B5549] font-semibold mb-1.5"
+                    className="block text-[11px] uppercase tracking-wider text-[#6B5549] font-bold mb-1"
                   >
                     Số Điện Thoại <span className="text-[#9E3D32]">*</span>
                   </label>
                   <div className="relative">
-                    <Phone className="w-4 h-4 text-[#78928A] absolute left-3 top-3" />
+                    <Phone className="w-4 h-4 text-[#78928A] absolute left-3 top-2.5" />
                     <input
                       id="phone"
                       type="tel"
@@ -224,25 +237,23 @@ export const RSVPForm: React.FC = () => {
                         if (errors.phone) setErrors({ ...errors, phone: undefined });
                       }}
                       placeholder="0912 345 678"
-                      className={`w-full pl-9 pr-3 py-2.5 bg-[#FAF3E8] border rounded-sm text-sm text-[#183A3A] placeholder-[#8A7569] focus:outline-none focus:ring-1 focus:ring-[#183A3A] transition-all ${
+                      className={`w-full pl-9 pr-3 py-2 bg-[#FAF3E8] border rounded-lg text-xs sm:text-sm text-[#183A3A] placeholder-[#8A7569] focus:outline-none focus:ring-1 focus:ring-[#183A3A] ${
                         errors.phone ? "border-[#9E3D32]" : "border-[#E5D4B6]"
                       }`}
                     />
                   </div>
-                  {errors.phone && (
-                    <p className="text-xs text-[#9E3D32] mt-1">{errors.phone}</p>
-                  )}
+                  {errors.phone && <p className="text-[11px] text-[#9E3D32] mt-0.5">{errors.phone}</p>}
                 </div>
 
                 <div>
                   <label
                     htmlFor="guestCount"
-                    className="block text-xs uppercase tracking-wider text-[#6B5549] font-semibold mb-1.5"
+                    className="block text-[11px] uppercase tracking-wider text-[#6B5549] font-bold mb-1"
                   >
                     Số Khách Tham Dự
                   </label>
                   <div className="relative">
-                    <Users className="w-4 h-4 text-[#78928A] absolute left-3 top-3" />
+                    <Users className="w-4 h-4 text-[#78928A] absolute left-3 top-2.5" />
                     <select
                       id="guestCount"
                       value={formData.guestCount}
@@ -250,10 +261,10 @@ export const RSVPForm: React.FC = () => {
                       onChange={(e) =>
                         setFormData({ ...formData, guestCount: Number(e.target.value) })
                       }
-                      className="w-full pl-9 pr-3 py-2.5 bg-[#FAF3E8] border border-[#E5D4B6] rounded-sm text-sm text-[#183A3A] focus:outline-none focus:ring-1 focus:ring-[#183A3A] transition-all disabled:opacity-50"
+                      className="w-full pl-9 pr-3 py-2 bg-[#FAF3E8] border border-[#E5D4B6] rounded-lg text-xs sm:text-sm text-[#183A3A] focus:outline-none focus:ring-1 focus:ring-[#183A3A]"
                     >
                       <option value={1}>1 người (Mình tôi)</option>
-                      <option value={2}>2 người (Cùng người thương)</option>
+                      <option value={2}>2 người (+ Người thương)</option>
                       <option value={3}>3 người</option>
                       <option value={4}>4 người (Gia đình)</option>
                     </select>
@@ -261,41 +272,38 @@ export const RSVPForm: React.FC = () => {
                 </div>
               </div>
 
-              {/* Lời nhắn gửi riêng */}
+              {/* Lời nhắn gửi */}
               <div>
                 <label
                   htmlFor="dietaryOrNote"
-                  className="block text-xs uppercase tracking-wider text-[#6B5549] font-semibold mb-1.5"
+                  className="block text-[11px] uppercase tracking-wider text-[#6B5549] font-bold mb-1"
                 >
-                  Lời Nhắn Cho Dâu Rể (Hoặc Ghi Chú Ăn Uống)
+                  Lời Nhắn Cho Dâu Rể / Ghi Chú Ăn Uống
                 </label>
                 <div className="relative">
-                  <MessageSquare className="w-4 h-4 text-[#78928A] absolute left-3 top-3" />
+                  <MessageSquare className="w-4 h-4 text-[#78928A] absolute left-3 top-2.5" />
                   <textarea
                     id="dietaryOrNote"
-                    rows={3}
+                    rows={2}
                     value={formData.dietaryOrNote}
-                    onChange={(e) =>
-                      setFormData({ ...formData, dietaryOrNote: e.target.value })
-                    }
-                    placeholder="Ví dụ: Ăn chay, nhắn gửi lời chúc đặc biệt..."
-                    className="w-full pl-9 pr-3 py-2.5 bg-[#FAF3E8] border border-[#E5D4B6] rounded-sm text-sm text-[#183A3A] placeholder-[#8A7569] focus:outline-none focus:ring-1 focus:ring-[#183A3A] transition-all resize-none"
+                    onChange={(e) => setFormData({ ...formData, dietaryOrNote: e.target.value })}
+                    placeholder="Gửi lời chúc riêng hoặc ăn chay..."
+                    className="w-full pl-9 pr-3 py-2 bg-[#FAF3E8] border border-[#E5D4B6] rounded-lg text-xs sm:text-sm text-[#183A3A] placeholder-[#8A7569] focus:outline-none focus:ring-1 focus:ring-[#183A3A] resize-none"
                   />
                 </div>
               </div>
 
-              {/* Nút gửi form */}
               <div className="pt-2">
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full flex items-center justify-center gap-2 py-3.5 px-6 rounded-full bg-[#183A3A] hover:bg-[#2B5757] text-[#FFF9EE] font-serif text-base tracking-wide shadow-md hover:shadow-lg active:scale-98 transition-all disabled:opacity-70"
+                  className="w-full flex items-center justify-center gap-2 py-3 px-6 rounded-full bg-[#183A3A] hover:bg-[#2B5757] text-[#FFF9EE] font-serif text-sm font-semibold tracking-wide shadow-md transition-all active:scale-98 disabled:opacity-70"
                 >
                   {isSubmitting ? (
-                    <span>Đang gửi xác nhận...</span>
+                    <span>Đang gửi xác nhận & gửi mail...</span>
                   ) : (
                     <>
-                      <Send className="w-4 h-4 text-[#F4E8D2]" />
+                      <Send className="w-4 h-4 text-[#D4AF37]" />
                       <span>Gửi Xác Nhận Tham Dự</span>
                     </>
                   )}

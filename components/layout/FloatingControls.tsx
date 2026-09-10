@@ -1,28 +1,19 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
-import { Volume2, VolumeX, Share2, Send, ArrowUp } from "lucide-react";
+import React, { useState, useRef } from "react";
+import { Menu, Map, CheckCircle2, Volume2, VolumeX, X, ArrowUp } from "lucide-react";
 import { useWeddingData } from "@/context/WeddingDataContext";
 import { useToast } from "@/components/ui/Toast";
 
 export const FloatingControls: React.FC = () => {
   const [isPlaying, setIsPlaying] = useState(false);
-  const [showScrollTop, setShowScrollTop] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const { showToast } = useToast();
   const { data } = useWeddingData();
 
-  useEffect(() => {
-    const handleScroll = () => {
-      setShowScrollTop(window.scrollY > 400);
-    };
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
   const toggleMusic = () => {
     if (!audioRef.current) return;
-
     if (isPlaying) {
       audioRef.current.pause();
       setIsPlaying(false);
@@ -40,101 +31,118 @@ export const FloatingControls: React.FC = () => {
     }
   };
 
-  const handleShare = async () => {
-    const shareData = {
-      title: `Thiệp Cưới • ${data.groom.shortName} & ${data.bride.shortName}`,
-      text: `${data.welcomeQuote} — Kính mời bạn tới chung vui cùng chúng mình vào ${data.weddingDateFormatted}!`,
-      url: window.location.href,
-    };
-
-    if (navigator.share) {
-      try {
-        await navigator.share(shareData);
-      } catch {
-        // User cancelled share
-      }
-    } else {
-      try {
-        await navigator.clipboard.writeText(window.location.href);
-        showToast("Đã sao chép liên kết thiệp cưới!", "success");
-      } catch {
-        showToast("Không thể sao chép liên kết", "info");
-      }
-    }
-  };
-
-  const scrollToRSVP = () => {
-    const element = document.getElementById("rsvp");
+  const scrollToSection = (id: string) => {
+    setIsMenuOpen(false);
+    const element = document.getElementById(id);
     if (element) {
       element.scrollIntoView({ behavior: "smooth" });
     }
   };
 
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
   return (
     <>
-      <audio
-        ref={audioRef}
-        src={data.musicUrl}
-        preload="none"
-        loop
-        aria-hidden="true"
-      />
+      <audio ref={audioRef} src={data.musicUrl} preload="none" loop aria-hidden="true" />
 
-      {/* Floating Action Buttons */}
-      <div className="fixed bottom-5 right-4 z-40 flex flex-col items-end gap-2.5">
-        {/* Nút lên đầu trang */}
-        {showScrollTop && (
-          <button
-            type="button"
-            onClick={scrollToTop}
-            aria-label="Cuộn lên đầu trang"
-            className="w-10 h-10 rounded-full bg-[#FFF9EE] text-[#183A3A] border border-[#E5D4B6] shadow-md flex items-center justify-center hover:bg-[#F4E8D2] active:scale-95 transition-all"
-          >
-            <ArrowUp className="w-4 h-4" />
-          </button>
-        )}
+      {/* Menu Drawer Popup khi bấm nút Menu */}
+      {isMenuOpen && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 z-50 bg-[#183A3A]/80 backdrop-blur-xs flex items-end sm:items-center justify-center p-4 animate-in fade-in"
+        >
+          <div className="bg-[#FFF9EE] border-2 border-[#E5D4B6] w-full max-w-sm rounded-2xl p-6 shadow-2xl relative text-center">
+            <button
+              type="button"
+              onClick={() => setIsMenuOpen(false)}
+              className="absolute top-4 right-4 p-1 rounded-full text-[#8A7569] hover:bg-[#FAF3E8]"
+            >
+              <X className="w-5 h-5" />
+            </button>
 
-        {/* Nút chia sẻ thiệp */}
+            <div className="text-xs uppercase tracking-[0.25em] text-[#9E3D32] font-semibold mb-1">
+              MỤC LỤC THIỆP CƯỚI
+            </div>
+            <h3 className="font-serif text-lg font-bold text-[#183A3A] mb-4">
+              {data.groom.shortName} & {data.bride.shortName}
+            </h3>
+
+            <div className="space-y-2 text-sm font-serif">
+              {[
+                { id: "hero", label: "Mở Thiệp Báo Hỷ" },
+                { id: "letter", label: "Lời Ngỏ Gia Đình" },
+                { id: "story", label: "Câu Chuyện Chúng Tôi" },
+                { id: "details", label: "Thông Tin Hôn Lễ" },
+                { id: "rsvp", label: "Xác Nhận Tham Dự (RSVP)" },
+                { id: "gallery", label: "Album Ảnh Cưới" },
+                { id: "wishes", label: "Sổ Lưu Bút Lời Chúc" },
+                { id: "gift", label: "Hộp Mừng Cưới" },
+              ].map((item) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => scrollToSection(item.id)}
+                  className="w-full py-2 px-3 rounded-lg hover:bg-[#FAF3E8] text-[#3A2D26] hover:text-[#9E3D32] transition-colors font-medium text-center"
+                >
+                  {item.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* THANH ĐIỀU HƯỚNG ĐÁY (BOTTOM DOCK BAR) - THEO ẢNH MẪU */}
+      <nav
+        aria-label="Thanh điều hướng nhanh"
+        className="fixed bottom-3 left-1/2 -translate-x-1/2 z-40 w-[92%] max-w-[380px] bg-[#FFF9EE]/95 backdrop-blur-md border-2 border-[#EADBCE] rounded-full px-5 py-2 shadow-xl flex items-center justify-around ring-1 ring-[#D4AF37]/30"
+      >
+        {/* Nút Menu */}
         <button
           type="button"
-          onClick={handleShare}
-          aria-label="Chia sẻ thiệp cưới"
-          title="Chia sẻ thiệp cưới"
-          className="w-11 h-11 rounded-full bg-[#FFF9EE] text-[#183A3A] border border-[#E5D4B6] shadow-md flex items-center justify-center hover:bg-[#F4E8D2] active:scale-95 transition-all"
+          onClick={() => setIsMenuOpen(true)}
+          className="flex flex-col items-center gap-0.5 text-[#183A3A] hover:text-[#9E3D32] transition-colors group"
         >
-          <Share2 className="w-4 h-4" />
+          <Menu className="w-5 h-5 group-hover:scale-110 transition-transform text-[#183A3A]" />
+          <span className="text-[10px] uppercase tracking-wider font-semibold">Menu</span>
         </button>
 
-        {/* Nút bật/tắt nhạc nền (mặc định tắt) */}
+        {/* Nút Map (Chỉ đường / Bản đồ) */}
+        <button
+          type="button"
+          onClick={() => scrollToSection("details")}
+          className="flex flex-col items-center gap-0.5 text-[#183A3A] hover:text-[#9E3D32] transition-colors group"
+        >
+          <Map className="w-5 h-5 group-hover:scale-110 transition-transform text-[#183A3A]" />
+          <span className="text-[10px] uppercase tracking-wider font-semibold">Map</span>
+        </button>
+
+        {/* Nút RSVP (Xác nhận tham dự) */}
+        <button
+          type="button"
+          onClick={() => scrollToSection("rsvp")}
+          className="flex flex-col items-center gap-0.5 text-[#9E3D32] hover:text-[#BD4B3F] transition-colors group"
+        >
+          <CheckCircle2 className="w-5 h-5 group-hover:scale-110 transition-transform text-[#9E3D32]" />
+          <span className="text-[10px] uppercase tracking-wider font-bold text-[#9E3D32]">RSVP</span>
+        </button>
+
+        {/* Nút Nhạc Nền */}
         <button
           type="button"
           onClick={toggleMusic}
-          aria-label={isPlaying ? "Tắt nhạc nền" : "Bật khúc nhạc chúc phúc"}
-          title={isPlaying ? "Tắt nhạc nền" : "Bật khúc nhạc chúc phúc"}
-          className={`w-11 h-11 rounded-full shadow-md flex items-center justify-center transition-all active:scale-95 ${
-            isPlaying
-              ? "bg-[#9E3D32] text-[#FFF9EE] animate-spin-slow ring-2 ring-[#9E3D32]/30"
-              : "bg-[#FFF9EE] text-[#183A3A] border border-[#E5D4B6] hover:bg-[#F4E8D2]"
+          className={`flex flex-col items-center gap-0.5 transition-colors group ${
+            isPlaying ? "text-[#D4AF37]" : "text-[#78928A]"
           }`}
-          style={{ animationDuration: "10s" }}
+          title={isPlaying ? "Tắt nhạc" : "Bật nhạc"}
         >
-          {isPlaying ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
+          {isPlaying ? (
+            <Volume2 className="w-5 h-5 animate-pulse text-[#D4AF37]" />
+          ) : (
+            <VolumeX className="w-5 h-5 text-[#78928A]" />
+          )}
+          <span className="text-[10px] uppercase tracking-wider font-semibold">Nhạc</span>
         </button>
-
-        {/* Nút Xác nhận tham dự nổi bật */}
-        <button
-          type="button"
-          onClick={scrollToRSVP}
-          className="flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-[#183A3A] text-[#FFF9EE] font-serif text-sm font-medium shadow-lg hover:bg-[#2B5757] active:scale-95 transition-all border border-[#78928A]/40"
-        >
-          <Send className="w-3.5 h-3.5 text-[#F4E8D2]" />
-          <span>Gửi Lời Chúc / RSVP</span>
-        </button>
-      </div>
+      </nav>
     </>
   );
 };

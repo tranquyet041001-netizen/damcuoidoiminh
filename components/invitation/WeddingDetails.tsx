@@ -1,12 +1,10 @@
 "use client";
 
 import React from "react";
-import { Calendar, Clock, MapPin, Navigation, CalendarPlus } from "lucide-react";
+import { Navigation, CalendarPlus } from "lucide-react";
 import { useWeddingData } from "@/context/WeddingDataContext";
 import { WeddingEvent } from "@/types/wedding";
-import { SectionTitle } from "@/components/ui/SectionTitle";
-import { PaperCard } from "@/components/ui/PaperTexture";
-import { RedSealStamp } from "@/components/ui/VietnamesePattern";
+import { VietnameseLotus, DongSonSun } from "@/components/ui/VietnamesePattern";
 import { useToast } from "@/components/ui/Toast";
 
 export const WeddingDetails: React.FC = () => {
@@ -14,9 +12,7 @@ export const WeddingDetails: React.FC = () => {
   const { data: weddingData } = useWeddingData();
 
   const handleAddToCalendar = (event: WeddingEvent) => {
-    // Generate .ics calendar file content
     const startDate = event.isoDate.replace(/[-:]/g, "").split("+")[0] + "Z";
-    // 3 hours duration
     const icsContent = [
       "BEGIN:VCALENDAR",
       "VERSION:2.0",
@@ -35,101 +31,89 @@ export const WeddingDetails: React.FC = () => {
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.setAttribute("download", `dam-cuoi-${event.id}.ics`);
+    link.setAttribute("download", `hon-le-${event.id}.ics`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
-
-    showToast("Đã tải lịch nhắc nhở (.ics)!", "success");
+    showToast("Đã tải file lịch (.ics)!", "success");
   };
 
   return (
-    <section id="details" className="py-12 sm:py-16 px-4">
-      <div className="max-w-xl mx-auto">
-        <SectionTitle
-          subtitle="Thời Gian & Địa Điểm"
-          title="Thông Tin Hôn Lễ"
-          description="Rất mong được đón tiếp quý vị trong niềm hân hoan của hai gia đình."
-          variant="lotus"
-        />
+    <section id="details" className="py-12 px-4 bg-[#FAF3E8]">
+      <div className="max-w-md mx-auto">
+        {/* Tiêu đề theo ảnh mẫu */}
+        <div className="text-center mb-8">
+          <h2 className="text-xl sm:text-2xl font-serif font-bold tracking-wider uppercase text-[#183A3A]">
+            THÔNG TIN HÔN LỄ
+          </h2>
+          <div className="w-12 h-0.5 bg-[#D4AF37] mx-auto mt-2" />
+        </div>
 
-        <div className="space-y-8">
+        {/* Các thẻ sự kiện bo tròn với hoa văn hoa sen và trống đồng */}
+        <div className="space-y-4">
           {weddingData.events.map((event, idx) => (
-            <PaperCard key={event.id} className="relative overflow-hidden">
-              {/* Con dấu son nhỏ góc card */}
-              <div className="absolute top-4 right-4 hidden sm:block opacity-90">
-                <RedSealStamp
-                  size={42}
-                  text={idx === 0 ? "THÀNH HÔN" : "TIỆC CƯỚI"}
-                  className="bg-[#9E3D32]"
-                />
+            <div
+              key={event.id}
+              className="relative bg-[#FFF9EE] border-2 border-[#EADBCE] rounded-2xl p-5 shadow-md overflow-hidden transition-all hover:border-[#D4AF37]/60"
+            >
+              {/* Hoa văn Trống Đồng in chìm mờ ở góc phải theo ảnh mẫu */}
+              <div className="absolute -right-8 -bottom-8 pointer-events-none opacity-20">
+                <DongSonSun size={130} color="#D4AF37" opacity={0.6} />
               </div>
 
-              <div className="pr-0 sm:pr-14">
-                <span className="text-xs uppercase tracking-widest text-[#9E3D32] font-semibold">
-                  {event.subtitle || "Sự Kiện"}
+              <div className="flex items-center gap-4 relative z-10">
+                {/* Minh họa hoa sen (sự kiện 1) hoặc trống đồng (sự kiện 2) ở góc trái */}
+                <div className="w-14 h-14 rounded-xl bg-[#FAF3E8] border border-[#D4AF37]/50 flex items-center justify-center flex-shrink-0 shadow-2xs">
+                  {idx === 0 ? (
+                    <VietnameseLotus size={36} color="#D4AF37" opacity={0.9} />
+                  ) : (
+                    <DongSonSun size={40} color="#D4AF37" opacity={0.85} />
+                  )}
+                </div>
+
+                {/* Thông tin chính */}
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-serif font-bold text-base sm:text-lg text-[#183A3A] tracking-wide uppercase">
+                    {event.title}
+                  </h3>
+                  <div className="text-xs text-[#9E3D32] font-semibold mt-0.5">
+                    Thời gian: {event.time} — {event.date}
+                  </div>
+                  <div className="text-xs text-[#5A473E] truncate mt-0.5">
+                    Địa điểm: <strong>{event.venue}</strong>
+                  </div>
+                </div>
+              </div>
+
+              {/* Địa chỉ chi tiết và nút tác vụ */}
+              <div className="mt-3 pt-3 border-t border-[#EADBCE]/80 flex items-center justify-between text-xs">
+                <span className="text-[11px] text-[#78928A] truncate max-w-[200px]">
+                  {event.address}
                 </span>
-                <h3 className="text-xl sm:text-2xl font-serif font-semibold text-[#183A3A] mt-1 mb-4">
-                  {event.title}
-                </h3>
-              </div>
 
-              <div className="space-y-3.5 my-6 text-sm sm:text-base text-[#3A2D26]">
-                <div className="flex items-start gap-3">
-                  <Calendar className="w-5 h-5 text-[#9E3D32] shrink-0 mt-0.5" />
-                  <div>
-                    <div className="font-medium text-[#183A3A]">{event.date}</div>
-                    <div className="text-xs text-[#78928A]">({weddingData.lunarDateFormatted})</div>
-                  </div>
-                </div>
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  <a
+                    href={event.mapUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#183A3A] hover:bg-[#2B5757] text-[#FFF9EE] text-[11px] font-medium transition-all shadow-2xs"
+                  >
+                    <Navigation className="w-3 h-3 text-[#D4AF37]" />
+                    <span>Chỉ đường</span>
+                  </a>
 
-                <div className="flex items-start gap-3">
-                  <Clock className="w-5 h-5 text-[#9E3D32] shrink-0 mt-0.5" />
-                  <div>
-                    <span className="font-semibold text-[#183A3A]">{event.time}</span>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3">
-                  <MapPin className="w-5 h-5 text-[#9E3D32] shrink-0 mt-0.5" />
-                  <div>
-                    <div className="font-semibold text-[#183A3A]">{event.venue}</div>
-                    <div className="text-xs sm:text-sm text-[#5A473E] mt-0.5 leading-relaxed">
-                      {event.address}
-                    </div>
-                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleAddToCalendar(event)}
+                    className="p-1 rounded-full text-[#9E3D32] hover:bg-[#FAF3E8]"
+                    title="Thêm vào lịch"
+                  >
+                    <CalendarPlus className="w-4 h-4" />
+                  </button>
                 </div>
               </div>
-
-              {event.notes && (
-                <div className="p-3 bg-[#FAF3E8] rounded-xs border border-[#EADBCE] text-xs sm:text-sm text-[#6B5549] italic mb-6">
-                  {event.notes}
-                </div>
-              )}
-
-              {/* Nút tác vụ: Chỉ đường & Thêm vào lịch */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-                <a
-                  href={event.mapUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-full bg-[#183A3A] hover:bg-[#2B5757] text-[#FFF9EE] text-sm font-medium transition-all shadow-xs hover:shadow-md active:scale-95"
-                >
-                  <Navigation className="w-4 h-4 text-[#F4E8D2]" />
-                  <span>Chỉ Đường (Google Maps)</span>
-                </a>
-
-                <button
-                  type="button"
-                  onClick={() => handleAddToCalendar(event)}
-                  className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-full bg-[#FFF9EE] hover:bg-[#FAF3E8] text-[#183A3A] border border-[#183A3A]/30 text-sm font-medium transition-all shadow-xs hover:shadow-md active:scale-95"
-                >
-                  <CalendarPlus className="w-4 h-4 text-[#9E3D32]" />
-                  <span>Thêm Vào Lịch (.ics)</span>
-                </button>
-              </div>
-            </PaperCard>
+            </div>
           ))}
         </div>
       </div>

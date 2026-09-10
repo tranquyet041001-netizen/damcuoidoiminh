@@ -7,7 +7,8 @@ export const weddingData: WeddingData = {
     roleTitle: "Chú Rể",
     parents: "Quý nam của Ông Trần Quốc Toàn & Bà Phạm Thị Lan",
     avatarUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=800&auto=format&fit=crop",
-    bio: "Một người trầm lặng, yêu những nét văn hóa xưa và luôn tìm thấy sự bình yên bên An."
+    bio: "Một người trầm lặng, yêu những nét văn hóa xưa và luôn tìm thấy sự bình yên bên An.",
+    email: "quangminh.wedding@gmail.com",
   },
   bride: {
     fullName: "Nguyễn Thục An",
@@ -15,7 +16,12 @@ export const weddingData: WeddingData = {
     roleTitle: "Cô Dâu",
     parents: "Ái nữ của Ông Nguyễn Văn Nam & Bà Lê Thị Mai",
     avatarUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=800&auto=format&fit=crop",
-    bio: "Thích gốm, mê trà mạn và dành trọn niềm tin cho hành trình trăm năm cùng Minh."
+    bio: "Thích gốm, mê trà mạn và dành trọn niềm tin cho hành trình trăm năm cùng Minh.",
+    email: "thucan.wedding@gmail.com",
+  },
+  contactEmails: {
+    groom: "quangminh.wedding@gmail.com",
+    bride: "thucan.wedding@gmail.com",
   },
   weddingDate: "2027-01-24T10:30:00+07:00",
   weddingDateFormatted: "Chủ Nhật, 24 Tháng 01 Năm 2027",
