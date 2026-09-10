@@ -1,16 +1,18 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import {
   Heart,
   Calendar,
   Clock,
-  MapPin,
+  Sparkles,
   Camera,
   CreditCard,
   Users,
+  Smartphone,
+  Monitor,
   Save,
   RotateCcw,
   Download,
@@ -20,26 +22,68 @@ import {
   CheckCircle2,
   FileSpreadsheet,
   ArrowLeft,
-  Sparkles,
-  HelpCircle,
+  Upload,
+  Link as LinkIcon,
+  Loader2,
+  Music,
+  MapPin,
 } from "lucide-react";
 import { WeddingDataProvider, useWeddingData } from "@/context/WeddingDataContext";
 import { ToastProvider, useToast } from "@/components/ui/Toast";
-import { RSVPSubmission, WishSubmission, WeddingEvent, StoryMilestone, GalleryItem } from "@/types/wedding";
+import { WeddingInvitationView } from "@/components/invitation/WeddingInvitationView";
+import { processAndUploadImage } from "@/utils/imageUpload";
+import {
+  RSVPSubmission,
+  WishSubmission,
+  WeddingEvent,
+  StoryMilestone,
+  GalleryItem,
+} from "@/types/wedding";
 
-function AdminContent() {
-  const { data, updateData, saveChanges, resetToDefault, exportAsCode, isModified } = useWeddingData();
+function StudioContent() {
+  const { data, updateData, saveChanges, resetToDefault, exportAsCode, isModified } =
+    useWeddingData();
   const { showToast } = useToast();
 
   const [activeTab, setActiveTab] = useState<
     "couple" | "time" | "events" | "story" | "gallery" | "bank" | "rsvps"
   >("couple");
+  const [previewDevice, setPreviewDevice] = useState<"desktop" | "mobile">("mobile");
+  const [autoSaveStatus, setAutoSaveStatus] = useState<"saved" | "saving">("saved");
 
-  // Local state for RSVPs and Wishes management
+  // Local state for RSVPs and Wishes
   const [rsvps, setRsvps] = useState<RSVPSubmission[]>([]);
   const [wishes, setWishes] = useState<WishSubmission[]>([]);
   const [loadingGuests, setLoadingGuests] = useState(false);
 
+  // Uploading state
+  const [uploadingGroomAvatar, setUploadingGroomAvatar] = useState(false);
+  const [uploadingBrideAvatar, setUploadingBrideAvatar] = useState(false);
+  const [uploadingStoryIdx, setUploadingStoryIdx] = useState<number | null>(null);
+  const [uploadingGallery, setUploadingGallery] = useState(false);
+
+  const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Debounced auto-save whenever data changes
+  useEffect(() => {
+    setAutoSaveStatus("saving");
+    if (autoSaveTimerRef.current) {
+      clearTimeout(autoSaveTimerRef.current);
+    }
+
+    autoSaveTimerRef.current = setTimeout(() => {
+      saveChanges();
+      setAutoSaveStatus("saved");
+    }, 600);
+
+    return () => {
+      if (autoSaveTimerRef.current) {
+        clearTimeout(autoSaveTimerRef.current);
+      }
+    };
+  }, [data, saveChanges]);
+
+  // Fetch RSVP and Wishes when switching to 'rsvps' tab
   useEffect(() => {
     if (activeTab === "rsvps") {
       fetchGuestsData();
@@ -49,10 +93,7 @@ function AdminContent() {
   const fetchGuestsData = async () => {
     setLoadingGuests(true);
     try {
-      const [rsvpRes, wishRes] = await Promise.all([
-        fetch("/api/rsvp"),
-        fetch("/api/wishes"),
-      ]);
+      const [rsvpRes, wishRes] = await Promise.all([fetch("/api/rsvp"), fetch("/api/wishes")]);
       const rsvpJson = await rsvpRes.json();
       const wishJson = await wishRes.json();
       if (rsvpJson.success && Array.isArray(rsvpJson.data)) {
@@ -68,9 +109,85 @@ function AdminContent() {
     }
   };
 
-  const handleSave = () => {
-    saveChanges();
-    showToast("Đã lưu mọi thay đổi vào bộ nhớ trình duyệt!", "success");
+  // Upload handlers
+  const handleUploadGroomAvatar = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      setUploadingGroomAvatar(true);
+      const url = await processAndUploadImage(file, { maxWidth: 600, maxHeight: 600 });
+      updateData((prev) => ({ ...prev, groom: { ...prev.groom, avatarUrl: url } }));
+      showToast("Đã cập nhật ảnh chú rể thành công!", "success");
+    } catch (err: any) {
+      alert(err.message || "Lỗi tải ảnh");
+    } finally {
+      setUploadingGroomAvatar(false);
+      e.target.value = "";
+    }
+  };
+
+  const handleUploadBrideAvatar = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      setUploadingBrideAvatar(true);
+      const url = await processAndUploadImage(file, { maxWidth: 600, maxHeight: 600 });
+      updateData((prev) => ({ ...prev, bride: { ...prev.bride, avatarUrl: url } }));
+      showToast("Đã cập nhật ảnh cô dâu thành công!", "success");
+    } catch (err: any) {
+      alert(err.message || "Lỗi tải ảnh");
+    } finally {
+      setUploadingBrideAvatar(false);
+      e.target.value = "";
+    }
+  };
+
+  const handleUploadStoryImage = async (idx: number, e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      setUploadingStoryIdx(idx);
+      const url = await processAndUploadImage(file, { maxWidth: 1000, maxHeight: 1000 });
+      const newStory = [...data.story];
+      newStory[idx].imageUrl = url;
+      updateData({ story: newStory });
+      showToast("Đã cập nhật ảnh mốc kỷ niệm!", "success");
+    } catch (err: any) {
+      alert(err.message || "Lỗi tải ảnh");
+    } finally {
+      setUploadingStoryIdx(null);
+      e.target.value = "";
+    }
+  };
+
+  const handleBatchUploadGallery = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+    try {
+      setUploadingGallery(true);
+      const newItems: GalleryItem[] = [];
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const url = await processAndUploadImage(file, { maxWidth: 1200, maxHeight: 1200 });
+        const nameClean = file.name.replace(/\.[^/.]+$/, "").replace(/[-_]+/g, " ");
+        newItems.push({
+          id: `gal-${Date.now()}-${i}`,
+          url,
+          title: nameClean || `Ảnh cưới #${data.gallery.length + i + 1}`,
+          caption: "Khoảnh khắc hạnh phúc trọn vẹn",
+        });
+      }
+      updateData((prev) => ({
+        ...prev,
+        gallery: [...prev.gallery, ...newItems],
+      }));
+      showToast(`Đã thêm ${newItems.length} ảnh mới từ máy tính!`, "success");
+    } catch (err: any) {
+      alert(err.message || "Lỗi tải ảnh");
+    } finally {
+      setUploadingGallery(false);
+      e.target.value = "";
+    }
   };
 
   const handleReset = () => {
@@ -91,7 +208,6 @@ function AdminContent() {
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
-
     showToast("Đã tải xuống file data/wedding.ts mới!", "success");
   };
 
@@ -100,8 +216,15 @@ function AdminContent() {
       showToast("Chưa có phản hồi nào để xuất", "info");
       return;
     }
-
-    const headers = ["Họ và tên", "Số điện thoại", "Khách của", "Tham dự", "Số người", "Lời nhắn / Ghi chú", "Thời gian"];
+    const headers = [
+      "Họ và tên",
+      "Số điện thoại",
+      "Khách của",
+      "Tham dự",
+      "Số người",
+      "Lời nhắn / Ghi chú",
+      "Thời gian",
+    ];
     const rows = rsvps.map((r) => [
       `"${r.fullName}"`,
       `"${r.phone}"`,
@@ -122,659 +245,634 @@ function AdminContent() {
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
-
-    showToast("Đã xuất danh sách khách mời ra file Excel (CSV)!", "success");
+    showToast("Đã xuất danh sách khách mời ra file CSV!", "success");
   };
 
   return (
-    <div className="min-h-screen bg-[#FAF3E8] text-[#3A2D26]">
-      {/* Top Navbar */}
-      <header className="sticky top-0 z-30 bg-[#FFF9EE] border-b border-[#E5D4B6] px-4 py-3 shadow-xs">
-        <div className="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <Link
-              href="/"
-              className="flex items-center gap-1.5 text-xs sm:text-sm text-[#183A3A] font-medium hover:text-[#9E3D32] transition-colors"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              <span>Về Thiệp Cưới</span>
-            </Link>
-            <span className="text-[#E5D4B6]">|</span>
-            <h1 className="font-serif font-bold text-base sm:text-lg text-[#183A3A] flex items-center gap-1.5">
-              <span>Chỉnh Sửa Thiệp Cưới</span>
-              {isModified && (
-                <span className="text-[10px] uppercase font-sans tracking-wider px-2 py-0.5 rounded-full bg-[#9E3D32]/10 text-[#9E3D32] border border-[#9E3D32]/30">
-                  Đã chỉnh sửa
-                </span>
-              )}
-            </h1>
-          </div>
+    <div className="min-h-screen bg-[#111625] text-zinc-100 flex flex-col font-sans">
+      {/* Studio Top Navigation Bar */}
+      <header className="h-16 bg-[#161d31] border-b border-zinc-800 px-4 flex items-center justify-between z-30 flex-shrink-0">
+        <div className="flex items-center gap-3">
+          <Link
+            href="/"
+            className="flex items-center gap-1.5 text-xs text-zinc-400 hover:text-zinc-100 transition-colors p-1.5 rounded-lg hover:bg-zinc-800"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span className="hidden sm:inline">Về Thiệp</span>
+          </Link>
+
+          <span className="text-zinc-700 hidden sm:inline">|</span>
 
           <div className="flex items-center gap-2">
+            <h1 className="font-serif font-bold text-base text-[#F4E8D2] tracking-wide flex items-center gap-2">
+              <span>Wedding Studio</span>
+              <span className="text-[10px] font-sans font-medium uppercase px-2 py-0.5 rounded-full bg-[#9E3D32]/20 text-[#BD4B3F] border border-[#9E3D32]/40">
+                Việt Cổ
+              </span>
+            </h1>
+          </div>
+        </div>
+
+        {/* Center: Auto-Save Status & Device Switcher */}
+        <div className="flex items-center gap-3">
+          {/* Auto-save badge */}
+          <div className="flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full bg-zinc-900/80 border border-zinc-800">
+            {autoSaveStatus === "saving" ? (
+              <>
+                <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
+                <span className="text-amber-400">Đang lưu...</span>
+              </>
+            ) : (
+              <>
+                <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                <span className="text-emerald-400 hidden sm:inline">Đã tự động lưu</span>
+              </>
+            )}
+          </div>
+
+          {/* Device Switcher */}
+          <div className="flex items-center bg-zinc-900 p-1 rounded-xl border border-zinc-800">
             <button
               type="button"
-              onClick={handleReset}
-              title="Khôi phục mặc định ban đầu"
-              className="flex items-center gap-1 px-3 py-1.5 rounded-sm bg-[#FFF9EE] hover:bg-[#FAF3E8] text-[#8A7569] border border-[#E5D4B6] text-xs font-medium transition-all"
+              onClick={() => setPreviewDevice("mobile")}
+              className={`p-1.5 rounded-lg text-xs transition-all ${
+                previewDevice === "mobile"
+                  ? "bg-[#9E3D32] text-white shadow-xs"
+                  : "text-zinc-400 hover:text-zinc-200"
+              }`}
+              title="Khung điện thoại"
             >
-              <RotateCcw className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Khôi Phục</span>
+              <Smartphone className="w-4 h-4" />
             </button>
-
             <button
               type="button"
-              onClick={handleExportCode}
-              title="Tải về file data/wedding.ts để deploy Vercel"
-              className="flex items-center gap-1 px-3 py-1.5 rounded-sm bg-[#FAF3E8] hover:bg-[#EADBCE] text-[#183A3A] border border-[#183A3A]/20 text-xs font-medium transition-all"
+              onClick={() => setPreviewDevice("desktop")}
+              className={`p-1.5 rounded-lg text-xs transition-all ${
+                previewDevice === "desktop"
+                  ? "bg-[#9E3D32] text-white shadow-xs"
+                  : "text-zinc-400 hover:text-zinc-200"
+              }`}
+              title="Khung máy tính"
             >
-              <Download className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Xuất wedding.ts</span>
-            </button>
-
-            <Link
-              href="/"
-              target="_blank"
-              title="Mở trang thiệp cưới trong tab mới"
-              className="flex items-center gap-1 px-3 py-1.5 rounded-sm bg-[#FFF9EE] hover:bg-[#FAF3E8] text-[#183A3A] border border-[#183A3A]/30 text-xs font-medium transition-all"
-            >
-              <ExternalLink className="w-3.5 h-3.5 text-[#78928A]" />
-              <span>Xem Thiệp</span>
-            </Link>
-
-            <button
-              type="button"
-              onClick={handleSave}
-              className="flex items-center gap-1.5 px-4 py-1.5 rounded-sm bg-[#9E3D32] hover:bg-[#BD4B3F] text-[#FFF9EE] text-xs font-semibold shadow-xs transition-all active:scale-95"
-            >
-              <Save className="w-3.5 h-3.5" />
-              <span>Lưu Lại</span>
+              <Monitor className="w-4 h-4" />
             </button>
           </div>
+        </div>
+
+        {/* Right Action Buttons */}
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={handleReset}
+            title="Khôi phục dữ liệu mặc định ban đầu"
+            className="p-2 sm:px-3 sm:py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 text-xs border border-zinc-800 flex items-center gap-1.5 transition-colors"
+          >
+            <RotateCcw className="w-3.5 h-3.5" />
+            <span className="hidden md:inline">Khôi Phục</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={handleExportCode}
+            title="Tải về file data/wedding.ts để deploy Vercel"
+            className="p-2 sm:px-3 sm:py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-zinc-300 text-xs border border-zinc-800 flex items-center gap-1.5 transition-colors"
+          >
+            <Download className="w-3.5 h-3.5 text-[#F4E8D2]" />
+            <span className="hidden md:inline">Xuất wedding.ts</span>
+          </button>
+
+          <Link
+            href="/"
+            target="_blank"
+            className="px-3.5 py-1.5 rounded-full bg-[#183A3A] hover:bg-[#2B5757] text-[#FFF9EE] text-xs font-semibold shadow-md flex items-center gap-1.5 transition-all border border-[#78928A]/40"
+          >
+            <ExternalLink className="w-3.5 h-3.5 text-[#F4E8D2]" />
+            <span>Xem Thiệp</span>
+          </Link>
         </div>
       </header>
 
-      {/* Main Admin Container */}
-      <div className="max-w-6xl mx-auto px-4 py-6">
-        {/* Navigation Tabs */}
-        <div className="flex items-center gap-1 overflow-x-auto pb-3 mb-6 border-b border-[#E5D4B6] no-scrollbar">
-          {[
-            { id: "couple", label: "Dâu & Rể", icon: Heart },
-            { id: "time", label: "Thời Gian & Lời Ngỏ", icon: Calendar },
-            { id: "events", label: "Sự Kiện Cưới", icon: Clock },
-            { id: "story", label: "Chuyện Tình Yêu", icon: Sparkles },
-            { id: "gallery", label: "Album Ảnh Cưới", icon: Camera },
-            { id: "bank", label: "Tài Khoản & QR", icon: CreditCard },
-            { id: "rsvps", label: "Khách Mời & Lời Chúc", icon: Users },
-          ].map((tab) => {
-            const Icon = tab.icon;
-            const isActive = activeTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => setActiveTab(tab.id as any)}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-sm text-xs sm:text-sm font-serif font-medium whitespace-nowrap transition-all ${
-                  isActive
-                    ? "bg-[#183A3A] text-[#FFF9EE] shadow-xs"
-                    : "bg-[#FFF9EE] text-[#6B5549] hover:bg-[#F4E8D2] border border-[#E5D4B6]"
-                }`}
-              >
-                <Icon className={`w-4 h-4 ${isActive ? "text-[#F4E8D2]" : "text-[#78928A]"}`} />
-                <span>{tab.label}</span>
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Tab 1: Cô Dâu & Chú Rể */}
-        {activeTab === "couple" && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Chú Rể */}
-            <div className="bg-[#FFF9EE] border border-[#E5D4B6] p-6 rounded-sm space-y-4">
-              <div className="flex items-center justify-between pb-3 border-b border-[#EADBCE]">
-                <h2 className="font-serif text-lg font-bold text-[#183A3A]">Thông Tin Chú Rể</h2>
-                <span className="text-xs uppercase tracking-wider text-[#9E3D32] font-semibold">Nhà Trai</span>
-              </div>
-
-              <div>
-                <label className="block text-xs uppercase tracking-wider text-[#6B5549] font-medium mb-1">
-                  Họ Và Tên Đầy Đủ
-                </label>
-                <input
-                  type="text"
-                  value={data.groom.fullName}
-                  onChange={(e) =>
-                    updateData((prev) => ({
-                      ...prev,
-                      groom: { ...prev.groom, fullName: e.target.value },
-                    }))
-                  }
-                  className="w-full px-3 py-2 bg-[#FAF3E8] border border-[#E5D4B6] rounded-sm text-sm"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs uppercase tracking-wider text-[#6B5549] font-medium mb-1">
-                  Tên Thân Mật (Hiển thị tiêu đề)
-                </label>
-                <input
-                  type="text"
-                  value={data.groom.shortName}
-                  onChange={(e) =>
-                    updateData((prev) => ({
-                      ...prev,
-                      groom: { ...prev.groom, shortName: e.target.value },
-                    }))
-                  }
-                  className="w-full px-3 py-2 bg-[#FAF3E8] border border-[#E5D4B6] rounded-sm text-sm"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs uppercase tracking-wider text-[#6B5549] font-medium mb-1">
-                  Phụ Mẫu Chú Rể
-                </label>
-                <input
-                  type="text"
-                  value={data.groom.parents}
-                  onChange={(e) =>
-                    updateData((prev) => ({
-                      ...prev,
-                      groom: { ...prev.groom, parents: e.target.value },
-                    }))
-                  }
-                  placeholder="Quý nam của Ông... & Bà..."
-                  className="w-full px-3 py-2 bg-[#FAF3E8] border border-[#E5D4B6] rounded-sm text-sm"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs uppercase tracking-wider text-[#6B5549] font-medium mb-1">
-                  Đường Dẫn Ảnh Chú Rể (URL)
-                </label>
-                <input
-                  type="url"
-                  value={data.groom.avatarUrl}
-                  onChange={(e) =>
-                    updateData((prev) => ({
-                      ...prev,
-                      groom: { ...prev.groom, avatarUrl: e.target.value },
-                    }))
-                  }
-                  className="w-full px-3 py-2 bg-[#FAF3E8] border border-[#E5D4B6] rounded-sm text-sm mb-2"
-                />
-                {data.groom.avatarUrl && (
-                  <div className="relative w-16 h-16 rounded-full overflow-hidden border border-[#E5D4B6]">
-                    <Image src={data.groom.avatarUrl} alt="Chú rể" fill className="object-cover" />
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Cô Dâu */}
-            <div className="bg-[#FFF9EE] border border-[#E5D4B6] p-6 rounded-sm space-y-4">
-              <div className="flex items-center justify-between pb-3 border-b border-[#EADBCE]">
-                <h2 className="font-serif text-lg font-bold text-[#183A3A]">Thông Tin Cô Dâu</h2>
-                <span className="text-xs uppercase tracking-wider text-[#9E3D32] font-semibold">Nhà Gái</span>
-              </div>
-
-              <div>
-                <label className="block text-xs uppercase tracking-wider text-[#6B5549] font-medium mb-1">
-                  Họ Và Tên Đầy Đủ
-                </label>
-                <input
-                  type="text"
-                  value={data.bride.fullName}
-                  onChange={(e) =>
-                    updateData((prev) => ({
-                      ...prev,
-                      bride: { ...prev.bride, fullName: e.target.value },
-                    }))
-                  }
-                  className="w-full px-3 py-2 bg-[#FAF3E8] border border-[#E5D4B6] rounded-sm text-sm"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs uppercase tracking-wider text-[#6B5549] font-medium mb-1">
-                  Tên Thân Mật (Hiển thị tiêu đề)
-                </label>
-                <input
-                  type="text"
-                  value={data.bride.shortName}
-                  onChange={(e) =>
-                    updateData((prev) => ({
-                      ...prev,
-                      bride: { ...prev.bride, shortName: e.target.value },
-                    }))
-                  }
-                  className="w-full px-3 py-2 bg-[#FAF3E8] border border-[#E5D4B6] rounded-sm text-sm"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs uppercase tracking-wider text-[#6B5549] font-medium mb-1">
-                  Phụ Mẫu Cô Dâu
-                </label>
-                <input
-                  type="text"
-                  value={data.bride.parents}
-                  onChange={(e) =>
-                    updateData((prev) => ({
-                      ...prev,
-                      bride: { ...prev.bride, parents: e.target.value },
-                    }))
-                  }
-                  placeholder="Ái nữ của Ông... & Bà..."
-                  className="w-full px-3 py-2 bg-[#FAF3E8] border border-[#E5D4B6] rounded-sm text-sm"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs uppercase tracking-wider text-[#6B5549] font-medium mb-1">
-                  Đường Dẫn Ảnh Cô Dâu (URL)
-                </label>
-                <input
-                  type="url"
-                  value={data.bride.avatarUrl}
-                  onChange={(e) =>
-                    updateData((prev) => ({
-                      ...prev,
-                      bride: { ...prev.bride, avatarUrl: e.target.value },
-                    }))
-                  }
-                  className="w-full px-3 py-2 bg-[#FAF3E8] border border-[#E5D4B6] rounded-sm text-sm mb-2"
-                />
-                {data.bride.avatarUrl && (
-                  <div className="relative w-16 h-16 rounded-full overflow-hidden border border-[#E5D4B6]">
-                    <Image src={data.bride.avatarUrl} alt="Cô dâu" fill className="object-cover" />
-                  </div>
-                )}
-              </div>
-            </div>
+      {/* Main Studio Body (Split Editor & Live Preview) */}
+      <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
+        {/* Left Side: Customization Controls & Tabs */}
+        <div className="w-full lg:w-[480px] xl:w-[540px] bg-[#161d31] border-r border-zinc-800 flex flex-col h-[calc(100vh-64px)] overflow-y-auto">
+          {/* Editor Tabs Navigation */}
+          <div className="p-2 border-b border-zinc-800 grid grid-cols-7 gap-1 sticky top-0 bg-[#161d31] z-20">
+            {[
+              { id: "couple", label: "Dâu & Rể", icon: Heart },
+              { id: "time", label: "Thời Gian", icon: Calendar },
+              { id: "events", label: "Sự Kiện", icon: Clock },
+              { id: "story", label: "Chuyện Mình", icon: Sparkles },
+              { id: "gallery", label: "Ảnh Cưới", icon: Camera },
+              { id: "bank", label: "Mừng Cưới", icon: CreditCard },
+              { id: "rsvps", label: "Khách Mời", icon: Users },
+            ].map((tab) => {
+              const Icon = tab.icon;
+              const isActive = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setActiveTab(tab.id as any)}
+                  className={`py-2 px-1 rounded-xl text-[10px] sm:text-[11px] font-medium flex flex-col items-center gap-1 transition-all ${
+                    isActive
+                      ? "bg-[#9E3D32]/20 text-[#F4E8D2] border border-[#9E3D32]/50 shadow-xs"
+                      : "text-zinc-400 hover:bg-zinc-800/60"
+                  }`}
+                >
+                  <Icon className={`w-4 h-4 ${isActive ? "text-[#BD4B3F]" : "text-zinc-400"}`} />
+                  <span className="truncate">{tab.label}</span>
+                </button>
+              );
+            })}
           </div>
-        )}
 
-        {/* Tab 2: Thời Gian & Lời Ngỏ */}
-        {activeTab === "time" && (
-          <div className="bg-[#FFF9EE] border border-[#E5D4B6] p-6 rounded-sm space-y-6">
-            <h2 className="font-serif text-lg font-bold text-[#183A3A] pb-3 border-b border-[#EADBCE]">
-              Thời Gian Cưới & Lời Ngỏ Chúc Phúc
-            </h2>
+          {/* Form Content Area */}
+          <div className="p-5 space-y-6">
+            {/* Tab 1: Dâu & Rể */}
+            {activeTab === "couple" && (
+              <div className="space-y-6 animate-in fade-in duration-300">
+                {/* Chú Rể */}
+                <div className="bg-[#1c243c] border border-zinc-800 p-4 rounded-xl space-y-3">
+                  <div className="flex items-center justify-between pb-2 border-b border-zinc-800">
+                    <h3 className="font-serif font-bold text-sm text-[#F4E8D2]">Thông Tin Chú Rể</h3>
+                    <span className="text-[11px] text-[#BD4B3F] uppercase font-semibold">Nhà Trai</span>
+                  </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <label className="block text-xs uppercase tracking-wider text-[#6B5549] font-medium mb-1">
-                  Ngày Hôn Lễ (Dương Lịch)
-                </label>
-                <input
-                  type="text"
-                  value={data.weddingDateFormatted}
-                  onChange={(e) =>
-                    updateData({ weddingDateFormatted: e.target.value })
-                  }
-                  placeholder="Chủ Nhật, 24 Tháng 01 Năm 2027"
-                  className="w-full px-3 py-2 bg-[#FAF3E8] border border-[#E5D4B6] rounded-sm text-sm"
-                />
+                  <div className="grid grid-cols-2 gap-2.5">
+                    <div>
+                      <label className="text-zinc-400 text-xs block mb-1">Họ Tên Đầy Đủ</label>
+                      <input
+                        type="text"
+                        value={data.groom.fullName}
+                        onChange={(e) =>
+                          updateData((prev) => ({
+                            ...prev,
+                            groom: { ...prev.groom, fullName: e.target.value },
+                          }))
+                        }
+                        className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-1.5 text-xs text-zinc-100 focus:outline-none focus:border-[#BD4B3F]"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-zinc-400 text-xs block mb-1">Tên Gọi Ngắn</label>
+                      <input
+                        type="text"
+                        value={data.groom.shortName}
+                        onChange={(e) =>
+                          updateData((prev) => ({
+                            ...prev,
+                            groom: { ...prev.groom, shortName: e.target.value },
+                          }))
+                        }
+                        className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-1.5 text-xs text-zinc-100 focus:outline-none focus:border-[#BD4B3F]"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-zinc-400 text-xs block mb-1">Phụ Mẫu Chú Rể</label>
+                    <input
+                      type="text"
+                      value={data.groom.parents}
+                      onChange={(e) =>
+                        updateData((prev) => ({
+                          ...prev,
+                          groom: { ...prev.groom, parents: e.target.value },
+                        }))
+                      }
+                      className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-1.5 text-xs text-zinc-100 focus:outline-none focus:border-[#BD4B3F]"
+                    />
+                  </div>
+
+                  {/* Ảnh Chú rể */}
+                  <div>
+                    <label className="text-zinc-400 text-xs block mb-1">Ảnh Chú Rể</label>
+                    <div className="flex items-center gap-3">
+                      <div className="relative w-12 h-12 rounded-full overflow-hidden border border-zinc-700 bg-zinc-900 flex-shrink-0">
+                        {data.groom.avatarUrl ? (
+                          <Image src={data.groom.avatarUrl} alt="Chú rể" fill className="object-cover" />
+                        ) : null}
+                        {uploadingGroomAvatar && (
+                          <div className="absolute inset-0 bg-black/75 flex items-center justify-center text-white">
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="flex-1 flex gap-2">
+                        <label className="flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-xs font-medium text-zinc-300 border border-zinc-700 cursor-pointer transition-colors">
+                          <Upload className="w-3.5 h-3.5 text-[#BD4B3F]" />
+                          <span>Tải ảnh từ máy</span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleUploadGroomAvatar}
+                            className="hidden"
+                          />
+                        </label>
+
+                        <input
+                          type="url"
+                          value={data.groom.avatarUrl}
+                          onChange={(e) =>
+                            updateData((prev) => ({
+                              ...prev,
+                              groom: { ...prev.groom, avatarUrl: e.target.value },
+                            }))
+                          }
+                          placeholder="Hoặc dán URL ảnh..."
+                          className="flex-1 bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-1.5 text-xs text-zinc-100 focus:outline-none focus:border-[#BD4B3F]"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Cô Dâu */}
+                <div className="bg-[#1c243c] border border-zinc-800 p-4 rounded-xl space-y-3">
+                  <div className="flex items-center justify-between pb-2 border-b border-zinc-800">
+                    <h3 className="font-serif font-bold text-sm text-[#F4E8D2]">Thông Tin Cô Dâu</h3>
+                    <span className="text-[11px] text-[#BD4B3F] uppercase font-semibold">Nhà Gái</span>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2.5">
+                    <div>
+                      <label className="text-zinc-400 text-xs block mb-1">Họ Tên Đầy Đủ</label>
+                      <input
+                        type="text"
+                        value={data.bride.fullName}
+                        onChange={(e) =>
+                          updateData((prev) => ({
+                            ...prev,
+                            bride: { ...prev.bride, fullName: e.target.value },
+                          }))
+                        }
+                        className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-1.5 text-xs text-zinc-100 focus:outline-none focus:border-[#BD4B3F]"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-zinc-400 text-xs block mb-1">Tên Gọi Ngắn</label>
+                      <input
+                        type="text"
+                        value={data.bride.shortName}
+                        onChange={(e) =>
+                          updateData((prev) => ({
+                            ...prev,
+                            bride: { ...prev.bride, shortName: e.target.value },
+                          }))
+                        }
+                        className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-1.5 text-xs text-zinc-100 focus:outline-none focus:border-[#BD4B3F]"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-zinc-400 text-xs block mb-1">Phụ Mẫu Cô Dâu</label>
+                    <input
+                      type="text"
+                      value={data.bride.parents}
+                      onChange={(e) =>
+                        updateData((prev) => ({
+                          ...prev,
+                          bride: { ...prev.bride, parents: e.target.value },
+                        }))
+                      }
+                      className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-1.5 text-xs text-zinc-100 focus:outline-none focus:border-[#BD4B3F]"
+                    />
+                  </div>
+
+                  {/* Ảnh Cô dâu */}
+                  <div>
+                    <label className="text-zinc-400 text-xs block mb-1">Ảnh Cô Dâu</label>
+                    <div className="flex items-center gap-3">
+                      <div className="relative w-12 h-12 rounded-full overflow-hidden border border-zinc-700 bg-zinc-900 flex-shrink-0">
+                        {data.bride.avatarUrl ? (
+                          <Image src={data.bride.avatarUrl} alt="Cô dâu" fill className="object-cover" />
+                        ) : null}
+                        {uploadingBrideAvatar && (
+                          <div className="absolute inset-0 bg-black/75 flex items-center justify-center text-white">
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="flex-1 flex gap-2">
+                        <label className="flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-xs font-medium text-zinc-300 border border-zinc-700 cursor-pointer transition-colors">
+                          <Upload className="w-3.5 h-3.5 text-[#BD4B3F]" />
+                          <span>Tải ảnh từ máy</span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleUploadBrideAvatar}
+                            className="hidden"
+                          />
+                        </label>
+
+                        <input
+                          type="url"
+                          value={data.bride.avatarUrl}
+                          onChange={(e) =>
+                            updateData((prev) => ({
+                              ...prev,
+                              bride: { ...prev.bride, avatarUrl: e.target.value },
+                            }))
+                          }
+                          placeholder="Hoặc dán URL ảnh..."
+                          className="flex-1 bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-1.5 text-xs text-zinc-100 focus:outline-none focus:border-[#BD4B3F]"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
+            )}
 
-              <div>
-                <label className="block text-xs uppercase tracking-wider text-[#6B5549] font-medium mb-1">
-                  Ngày Âm Lịch
-                </label>
-                <input
-                  type="text"
-                  value={data.lunarDateFormatted}
-                  onChange={(e) =>
-                    updateData({ lunarDateFormatted: e.target.value })
-                  }
-                  placeholder="Nhằm ngày 17 tháng Chạp năm Bính Ngọ"
-                  className="w-full px-3 py-2 bg-[#FAF3E8] border border-[#E5D4B6] rounded-sm text-sm"
-                />
-              </div>
+            {/* Tab 2: Thời Gian & Lời Ngỏ */}
+            {activeTab === "time" && (
+              <div className="bg-[#1c243c] border border-zinc-800 p-4 rounded-xl space-y-4 animate-in fade-in duration-300">
+                <h3 className="font-serif font-bold text-sm text-[#F4E8D2] pb-2 border-b border-zinc-800">
+                  Thời Gian Hôn Lễ & Bức Thư Ngỏ
+                </h3>
 
-              <div>
-                <label className="block text-xs uppercase tracking-wider text-[#6B5549] font-medium mb-1">
-                  Chuỗi ISO Cho Đếm Ngược
-                </label>
-                <input
-                  type="text"
-                  value={data.weddingDate}
-                  onChange={(e) => updateData({ weddingDate: e.target.value })}
-                  placeholder="2027-01-24T10:30:00+07:00"
-                  className="w-full px-3 py-2 bg-[#FAF3E8] border border-[#E5D4B6] rounded-sm text-sm"
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-[#EADBCE]">
-              <div>
-                <label className="block text-xs uppercase tracking-wider text-[#6B5549] font-medium mb-1">
-                  Câu Châm Ngôn (Quote Trang Chủ)
-                </label>
-                <input
-                  type="text"
-                  value={data.welcomeQuote}
-                  onChange={(e) => updateData({ welcomeQuote: e.target.value })}
-                  className="w-full px-3 py-2 bg-[#FAF3E8] border border-[#E5D4B6] rounded-sm text-sm"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs uppercase tracking-wider text-[#6B5549] font-medium mb-1">
-                  Link Nhạc Nền (.mp3)
-                </label>
-                <input
-                  type="url"
-                  value={data.musicUrl}
-                  onChange={(e) => updateData({ musicUrl: e.target.value })}
-                  className="w-full px-3 py-2 bg-[#FAF3E8] border border-[#E5D4B6] rounded-sm text-sm"
-                />
-              </div>
-            </div>
-
-            <div className="pt-4 border-t border-[#EADBCE] space-y-3">
-              <label className="block text-xs uppercase tracking-wider text-[#6B5549] font-medium">
-                Nội Dung Bức Thư Ngỏ
-              </label>
-              {data.openingLetter.content.map((para, idx) => (
-                <div key={idx} className="flex gap-2">
-                  <textarea
-                    rows={2}
-                    value={para}
-                    onChange={(e) => {
-                      const newContent = [...data.openingLetter.content];
-                      newContent[idx] = e.target.value;
-                      updateData((prev) => ({
-                        ...prev,
-                        openingLetter: { ...prev.openingLetter, content: newContent },
-                      }));
-                    }}
-                    className="flex-1 px-3 py-2 bg-[#FAF3E8] border border-[#E5D4B6] rounded-sm text-sm resize-none"
+                <div>
+                  <label className="text-zinc-400 text-xs block mb-1">Ngày Cưới (Dương Lịch)</label>
+                  <input
+                    type="text"
+                    value={data.weddingDateFormatted}
+                    onChange={(e) => updateData({ weddingDateFormatted: e.target.value })}
+                    className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-1.5 text-xs text-zinc-100"
                   />
+                </div>
+
+                <div>
+                  <label className="text-zinc-400 text-xs block mb-1">Ngày Âm Lịch</label>
+                  <input
+                    type="text"
+                    value={data.lunarDateFormatted}
+                    onChange={(e) => updateData({ lunarDateFormatted: e.target.value })}
+                    className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-1.5 text-xs text-zinc-100"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-zinc-400 text-xs block mb-1">
+                    Chuỗi ISO Cho Đồng Hồ Đếm Ngược
+                  </label>
+                  <input
+                    type="text"
+                    value={data.weddingDate}
+                    onChange={(e) => updateData({ weddingDate: e.target.value })}
+                    className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-1.5 text-xs font-mono text-zinc-300"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-zinc-400 text-xs block mb-1">Câu Châm Ngôn Trang Chủ</label>
+                  <input
+                    type="text"
+                    value={data.welcomeQuote}
+                    onChange={(e) => updateData({ welcomeQuote: e.target.value })}
+                    className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-1.5 text-xs text-zinc-100"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-zinc-400 text-xs block mb-1">Link Nhạc Nền (.mp3)</label>
+                  <div className="flex items-center gap-2">
+                    <Music className="w-4 h-4 text-[#BD4B3F]" />
+                    <input
+                      type="url"
+                      value={data.musicUrl}
+                      onChange={(e) => updateData({ musicUrl: e.target.value })}
+                      className="flex-1 bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-1.5 text-xs text-zinc-100"
+                    />
+                  </div>
+                </div>
+
+                {/* Đoạn thư ngỏ */}
+                <div className="pt-3 border-t border-zinc-800 space-y-2">
+                  <label className="text-zinc-400 text-xs block font-medium">Bức Thư Ngỏ</label>
+                  {data.openingLetter.content.map((para, idx) => (
+                    <div key={idx} className="flex gap-2 items-start">
+                      <textarea
+                        rows={2}
+                        value={para}
+                        onChange={(e) => {
+                          const newContent = [...data.openingLetter.content];
+                          newContent[idx] = e.target.value;
+                          updateData((prev) => ({
+                            ...prev,
+                            openingLetter: { ...prev.openingLetter, content: newContent },
+                          }));
+                        }}
+                        className="flex-1 bg-zinc-900 border border-zinc-700 rounded-lg p-2 text-xs text-zinc-200 resize-none"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const newContent = data.openingLetter.content.filter((_, i) => i !== idx);
+                          updateData((prev) => ({
+                            ...prev,
+                            openingLetter: { ...prev.openingLetter, content: newContent },
+                          }));
+                        }}
+                        className="p-1.5 text-zinc-500 hover:text-rose-400"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
+
                   <button
                     type="button"
                     onClick={() => {
-                      const newContent = data.openingLetter.content.filter((_, i) => i !== idx);
                       updateData((prev) => ({
                         ...prev,
-                        openingLetter: { ...prev.openingLetter, content: newContent },
+                        openingLetter: {
+                          ...prev.openingLetter,
+                          content: [...prev.openingLetter.content, "Đoạn tâm sự mới..."],
+                        },
                       }));
                     }}
-                    className="p-2 text-[#9E3D32] hover:bg-[#FAF3E8] rounded-sm self-start"
+                    className="flex items-center gap-1 text-xs text-[#BD4B3F] hover:underline pt-1"
                   >
-                    <Trash2 className="w-4 h-4" />
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>Thêm đoạn thư ngỏ</span>
                   </button>
                 </div>
-              ))}
-              <button
-                type="button"
-                onClick={() => {
-                  updateData((prev) => ({
-                    ...prev,
-                    openingLetter: {
-                      ...prev.openingLetter,
-                      content: [...prev.openingLetter.content, "Đoạn thư ngỏ mới..."],
-                    },
-                  }));
-                }}
-                className="flex items-center gap-1.5 text-xs text-[#183A3A] font-semibold hover:underline mt-2"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                <span>Thêm đoạn thư ngỏ</span>
-              </button>
-            </div>
-          </div>
-        )}
+              </div>
+            )}
 
-        {/* Tab 3: Sự Kiện Cưới */}
-        {activeTab === "events" && (
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <h2 className="font-serif text-lg font-bold text-[#183A3A]">
-                Danh Sách Sự Kiện (Lễ & Tiệc)
-              </h2>
-              <button
-                type="button"
-                onClick={() => {
-                  const newEvent: WeddingEvent = {
-                    id: `event-${Date.now()}`,
-                    title: "Sự Kiện Mới",
-                    subtitle: "Lễ Cưới",
-                    date: data.weddingDateFormatted,
-                    isoDate: data.weddingDate,
-                    time: "11:00",
-                    venue: "Tên địa điểm",
-                    address: "Địa chỉ đầy đủ",
-                    mapUrl: "https://maps.google.com",
-                  };
-                  updateData((prev) => ({
-                    ...prev,
-                    events: [...prev.events, newEvent],
-                  }));
-                }}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-sm bg-[#183A3A] text-[#FFF9EE] text-xs font-medium"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                <span>Thêm Sự Kiện</span>
-              </button>
-            </div>
+            {/* Tab 3: Sự Kiện Cưới */}
+            {activeTab === "events" && (
+              <div className="space-y-4 animate-in fade-in duration-300">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-serif font-bold text-sm text-[#F4E8D2]">
+                    Sự Kiện Cưới ({data.events.length})
+                  </h3>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const newEvt: WeddingEvent = {
+                        id: `evt-${Date.now()}`,
+                        title: "Lễ Cưới Mới",
+                        subtitle: "Nghi lễ",
+                        date: data.weddingDateFormatted,
+                        isoDate: data.weddingDate,
+                        time: "10:30",
+                        venue: "Tên nơi tổ chức",
+                        address: "Địa chỉ chi tiết",
+                        mapUrl: "https://maps.google.com",
+                      };
+                      updateData((prev) => ({ ...prev, events: [...prev.events, newEvt] }));
+                    }}
+                    className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#9E3D32] hover:bg-[#BD4B3F] text-white text-xs font-medium"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>Thêm sự kiện</span>
+                  </button>
+                </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {data.events.map((evt, idx) => (
-                <div key={evt.id} className="bg-[#FFF9EE] border border-[#E5D4B6] p-5 rounded-sm space-y-3 relative">
-                  <div className="flex items-center justify-between pb-2 border-b border-[#EADBCE]">
-                    <span className="font-serif font-bold text-base text-[#183A3A]">
-                      Sự kiện #{idx + 1}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        updateData((prev) => ({
-                          ...prev,
-                          events: prev.events.filter((e) => e.id !== evt.id),
-                        }));
-                      }}
-                      className="text-[#9E3D32] hover:opacity-80 p-1"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
+                {data.events.map((evt, idx) => (
+                  <div key={evt.id} className="bg-[#1c243c] border border-zinc-800 p-4 rounded-xl space-y-2.5">
+                    <div className="flex items-center justify-between pb-1.5 border-b border-zinc-800">
+                      <span className="text-xs font-serif font-bold text-[#F4E8D2]">Sự kiện #{idx + 1}</span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          updateData((prev) => ({
+                            ...prev,
+                            events: prev.events.filter((e) => e.id !== evt.id),
+                          }));
+                        }}
+                        className="text-zinc-500 hover:text-rose-400 p-1"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
 
-                  <div className="grid grid-cols-2 gap-2">
-                    <div>
-                      <label className="block text-[11px] uppercase tracking-wider text-[#6B5549] font-medium mb-1">
-                        Tiêu Đề
-                      </label>
+                    <div className="grid grid-cols-2 gap-2">
                       <input
                         type="text"
                         value={evt.title}
+                        placeholder="Tiêu đề (Lễ Thành Hôn)"
                         onChange={(e) => {
-                          const newEvents = [...data.events];
-                          newEvents[idx].title = e.target.value;
-                          updateData({ events: newEvents });
+                          const evts = [...data.events];
+                          evts[idx].title = e.target.value;
+                          updateData({ events: evts });
                         }}
-                        className="w-full px-2.5 py-1.5 bg-[#FAF3E8] border border-[#E5D4B6] rounded-sm text-sm"
+                        className="bg-zinc-900 border border-zinc-700 rounded-lg px-2.5 py-1.5 text-xs"
                       />
-                    </div>
-                    <div>
-                      <label className="block text-[11px] uppercase tracking-wider text-[#6B5549] font-medium mb-1">
-                        Phụ Đề
-                      </label>
-                      <input
-                        type="text"
-                        value={evt.subtitle || ""}
-                        onChange={(e) => {
-                          const newEvents = [...data.events];
-                          newEvents[idx].subtitle = e.target.value;
-                          updateData({ events: newEvents });
-                        }}
-                        className="w-full px-2.5 py-1.5 bg-[#FAF3E8] border border-[#E5D4B6] rounded-sm text-sm"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-2">
-                    <div>
-                      <label className="block text-[11px] uppercase tracking-wider text-[#6B5549] font-medium mb-1">
-                        Giờ
-                      </label>
                       <input
                         type="text"
                         value={evt.time}
+                        placeholder="Giờ (10:30)"
                         onChange={(e) => {
-                          const newEvents = [...data.events];
-                          newEvents[idx].time = e.target.value;
-                          updateData({ events: newEvents });
+                          const evts = [...data.events];
+                          evts[idx].time = e.target.value;
+                          updateData({ events: evts });
                         }}
-                        className="w-full px-2.5 py-1.5 bg-[#FAF3E8] border border-[#E5D4B6] rounded-sm text-sm"
+                        className="bg-zinc-900 border border-zinc-700 rounded-lg px-2.5 py-1.5 text-xs"
                       />
                     </div>
-                    <div>
-                      <label className="block text-[11px] uppercase tracking-wider text-[#6B5549] font-medium mb-1">
-                        Ngày
-                      </label>
-                      <input
-                        type="text"
-                        value={evt.date}
-                        onChange={(e) => {
-                          const newEvents = [...data.events];
-                          newEvents[idx].date = e.target.value;
-                          updateData({ events: newEvents });
-                        }}
-                        className="w-full px-2.5 py-1.5 bg-[#FAF3E8] border border-[#E5D4B6] rounded-sm text-sm"
-                      />
-                    </div>
-                  </div>
 
-                  <div>
-                    <label className="block text-[11px] uppercase tracking-wider text-[#6B5549] font-medium mb-1">
-                      Tên Địa Điểm
-                    </label>
                     <input
                       type="text"
                       value={evt.venue}
+                      placeholder="Tên địa điểm / Nhà hàng"
                       onChange={(e) => {
-                        const newEvents = [...data.events];
-                        newEvents[idx].venue = e.target.value;
-                        updateData({ events: newEvents });
+                        const evts = [...data.events];
+                        evts[idx].venue = e.target.value;
+                        updateData({ events: evts });
                       }}
-                      className="w-full px-2.5 py-1.5 bg-[#FAF3E8] border border-[#E5D4B6] rounded-sm text-sm"
+                      className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-2.5 py-1.5 text-xs"
                     />
-                  </div>
 
-                  <div>
-                    <label className="block text-[11px] uppercase tracking-wider text-[#6B5549] font-medium mb-1">
-                      Địa Chỉ Chi Tiết
-                    </label>
                     <input
                       type="text"
                       value={evt.address}
+                      placeholder="Địa chỉ cụ thể"
                       onChange={(e) => {
-                        const newEvents = [...data.events];
-                        newEvents[idx].address = e.target.value;
-                        updateData({ events: newEvents });
+                        const evts = [...data.events];
+                        evts[idx].address = e.target.value;
+                        updateData({ events: evts });
                       }}
-                      className="w-full px-2.5 py-1.5 bg-[#FAF3E8] border border-[#E5D4B6] rounded-sm text-sm"
+                      className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-2.5 py-1.5 text-xs"
                     />
-                  </div>
 
-                  <div>
-                    <label className="block text-[11px] uppercase tracking-wider text-[#6B5549] font-medium mb-1">
-                      Đường Dẫn Google Maps
-                    </label>
                     <input
                       type="url"
                       value={evt.mapUrl}
+                      placeholder="Đường dẫn Google Maps"
                       onChange={(e) => {
-                        const newEvents = [...data.events];
-                        newEvents[idx].mapUrl = e.target.value;
-                        updateData({ events: newEvents });
+                        const evts = [...data.events];
+                        evts[idx].mapUrl = e.target.value;
+                        updateData({ events: evts });
                       }}
-                      className="w-full px-2.5 py-1.5 bg-[#FAF3E8] border border-[#E5D4B6] rounded-sm text-sm"
+                      className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-2.5 py-1.5 text-xs font-mono text-zinc-400"
                     />
                   </div>
+                ))}
+              </div>
+            )}
+
+            {/* Tab 4: Chuyện Mình */}
+            {activeTab === "story" && (
+              <div className="space-y-4 animate-in fade-in duration-300">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-serif font-bold text-sm text-[#F4E8D2]">
+                    Cột Mốc Kỷ Niệm ({data.story.length})
+                  </h3>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const newMilestone: StoryMilestone = {
+                        yearOrDate: "Năm mới",
+                        title: "Kỷ Niệm Mới",
+                        description: "Kể về một kỷ niệm đáng nhớ của hai người...",
+                        imageUrl:
+                          "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?q=80&w=800&auto=format&fit=crop",
+                        location: "Địa điểm",
+                      };
+                      updateData((prev) => ({ ...prev, story: [...prev.story, newMilestone] }));
+                    }}
+                    className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#9E3D32] hover:bg-[#BD4B3F] text-white text-xs font-medium"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>Thêm mốc kỷ niệm</span>
+                  </button>
                 </div>
-              ))}
-            </div>
-          </div>
-        )}
 
-        {/* Tab 4: Chuyện Tình Yêu */}
-        {activeTab === "story" && (
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <h2 className="font-serif text-lg font-bold text-[#183A3A]">
-                Cột Mốc Chuyện Tình Yêu (Timeline)
-              </h2>
-              <button
-                type="button"
-                onClick={() => {
-                  const newStory: StoryMilestone = {
-                    yearOrDate: "Mốc mới",
-                    title: "Kỷ Niệm Mới",
-                    description: "Chia sẻ câu chuyện kỷ niệm ngọt ngào của hai bạn...",
-                    imageUrl: "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?q=80&w=800&auto=format&fit=crop",
-                    location: "Địa điểm",
-                  };
-                  updateData((prev) => ({
-                    ...prev,
-                    story: [...prev.story, newStory],
-                  }));
-                }}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-sm bg-[#183A3A] text-[#FFF9EE] text-xs font-medium"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                <span>Thêm Cột Mốc</span>
-              </button>
-            </div>
-
-            <div className="space-y-4">
-              {data.story.map((item, idx) => (
-                <div key={idx} className="bg-[#FFF9EE] border border-[#E5D4B6] p-5 rounded-sm grid grid-cols-1 md:grid-cols-4 gap-4 items-start">
-                  <div className="md:col-span-1 space-y-2">
-                    <div className="relative w-full h-32 rounded-sm overflow-hidden border border-[#E5D4B6]">
-                      <Image src={item.imageUrl} alt={item.title} fill className="object-cover" />
-                    </div>
-                    <input
-                      type="url"
-                      value={item.imageUrl}
-                      placeholder="Link ảnh"
-                      onChange={(e) => {
-                        const newStory = [...data.story];
-                        newStory[idx].imageUrl = e.target.value;
-                        updateData({ story: newStory });
-                      }}
-                      className="w-full px-2 py-1 bg-[#FAF3E8] border border-[#E5D4B6] rounded-sm text-xs"
-                    />
-                  </div>
-
-                  <div className="md:col-span-3 space-y-2">
-                    <div className="flex items-center justify-between">
-                      <div className="flex gap-2 flex-1 mr-2">
+                {data.story.map((item, idx) => (
+                  <div key={idx} className="bg-[#1c243c] border border-zinc-800 p-4 rounded-xl space-y-3">
+                    <div className="flex items-center justify-between pb-1.5 border-b border-zinc-800">
+                      <div className="flex items-center gap-2">
                         <input
                           type="text"
                           value={item.yearOrDate}
                           onChange={(e) => {
-                            const newStory = [...data.story];
-                            newStory[idx].yearOrDate = e.target.value;
-                            updateData({ story: newStory });
+                            const story = [...data.story];
+                            story[idx].yearOrDate = e.target.value;
+                            updateData({ story });
                           }}
-                          placeholder="Mốc thời gian"
-                          className="w-32 px-2.5 py-1.5 bg-[#FAF3E8] border border-[#E5D4B6] rounded-sm text-xs font-bold text-[#9E3D32]"
+                          className="w-24 bg-zinc-900 border border-zinc-700 rounded-lg px-2 py-1 text-xs font-bold text-[#BD4B3F]"
                         />
                         <input
                           type="text"
                           value={item.location || ""}
-                          onChange={(e) => {
-                            const newStory = [...data.story];
-                            newStory[idx].location = e.target.value;
-                            updateData({ story: newStory });
-                          }}
                           placeholder="Địa điểm"
-                          className="w-36 px-2.5 py-1.5 bg-[#FAF3E8] border border-[#E5D4B6] rounded-sm text-xs"
+                          onChange={(e) => {
+                            const story = [...data.story];
+                            story[idx].location = e.target.value;
+                            updateData({ story });
+                          }}
+                          className="w-28 bg-zinc-900 border border-zinc-700 rounded-lg px-2 py-1 text-xs text-zinc-300"
                         />
                       </div>
+
                       <button
                         type="button"
                         onClick={() => {
@@ -783,368 +881,392 @@ function AdminContent() {
                             story: prev.story.filter((_, i) => i !== idx),
                           }));
                         }}
-                        className="text-[#9E3D32] hover:opacity-80 p-1"
+                        className="text-zinc-500 hover:text-rose-400 p-1"
                       >
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </div>
 
                     <input
                       type="text"
                       value={item.title}
+                      placeholder="Tiêu đề mốc kỷ niệm"
                       onChange={(e) => {
-                        const newStory = [...data.story];
-                        newStory[idx].title = e.target.value;
-                        updateData({ story: newStory });
+                        const story = [...data.story];
+                        story[idx].title = e.target.value;
+                        updateData({ story });
                       }}
-                      placeholder="Tiêu đề kỷ niệm"
-                      className="w-full px-2.5 py-1.5 bg-[#FAF3E8] border border-[#E5D4B6] rounded-sm text-sm font-serif font-semibold text-[#183A3A]"
+                      className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-zinc-100"
                     />
 
                     <textarea
                       rows={2}
                       value={item.description}
+                      placeholder="Nội dung kỷ niệm..."
                       onChange={(e) => {
-                        const newStory = [...data.story];
-                        newStory[idx].description = e.target.value;
-                        updateData({ story: newStory });
+                        const story = [...data.story];
+                        story[idx].description = e.target.value;
+                        updateData({ story });
                       }}
-                      placeholder="Mô tả kỷ niệm..."
-                      className="w-full px-2.5 py-1.5 bg-[#FAF3E8] border border-[#E5D4B6] rounded-sm text-sm resize-none"
+                      className="w-full bg-zinc-900 border border-zinc-700 rounded-lg p-2 text-xs text-zinc-200 resize-none"
                     />
+
+                    {/* Ảnh mốc kỷ niệm */}
+                    <div className="flex items-center gap-3">
+                      <div className="relative w-16 h-12 rounded-lg overflow-hidden border border-zinc-700 bg-zinc-900 flex-shrink-0">
+                        <Image src={item.imageUrl} alt={item.title} fill className="object-cover" />
+                        {uploadingStoryIdx === idx && (
+                          <div className="absolute inset-0 bg-black/75 flex items-center justify-center text-white">
+                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="flex-1 flex gap-2">
+                        <label className="flex items-center justify-center gap-1 px-2.5 py-1 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-[11px] font-medium text-zinc-300 border border-zinc-700 cursor-pointer">
+                          <Upload className="w-3 h-3 text-[#BD4B3F]" />
+                          <span>Tải ảnh</span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => handleUploadStoryImage(idx, e)}
+                            className="hidden"
+                          />
+                        </label>
+                        <input
+                          type="url"
+                          value={item.imageUrl}
+                          onChange={(e) => {
+                            const story = [...data.story];
+                            story[idx].imageUrl = e.target.value;
+                            updateData({ story });
+                          }}
+                          placeholder="Hoặc dán URL..."
+                          className="flex-1 bg-zinc-900 border border-zinc-700 rounded-lg px-2.5 py-1 text-xs"
+                        />
+                      </div>
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+                ))}
+              </div>
+            )}
 
-        {/* Tab 5: Album Ảnh Cưới */}
-        {activeTab === "gallery" && (
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <h2 className="font-serif text-lg font-bold text-[#183A3A]">
-                Album Ảnh Cưới ({data.gallery.length} ảnh)
-              </h2>
-              <button
-                type="button"
-                onClick={() => {
-                  const newItem: GalleryItem = {
-                    id: `gal-${Date.now()}`,
-                    url: "https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=1000&auto=format&fit=crop",
-                    title: "Ảnh cưới mới",
-                    caption: "Khoảnh khắc hạnh phúc",
-                  };
-                  updateData((prev) => ({
-                    ...prev,
-                    gallery: [...prev.gallery, newItem],
-                  }));
-                }}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-sm bg-[#183A3A] text-[#FFF9EE] text-xs font-medium"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                <span>Thêm Ảnh</span>
-              </button>
-            </div>
+            {/* Tab 5: Album Ảnh Cưới */}
+            {activeTab === "gallery" && (
+              <div className="space-y-4 animate-in fade-in duration-300">
+                <div className="flex items-center justify-between flex-wrap gap-2">
+                  <h3 className="font-serif font-bold text-sm text-[#F4E8D2]">
+                    Album Ảnh Cưới ({data.gallery.length})
+                  </h3>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-              {data.gallery.map((item, idx) => (
-                <div key={item.id} className="bg-[#FFF9EE] border border-[#E5D4B6] p-3 rounded-sm space-y-2 relative">
-                  <div className="relative aspect-4/3 w-full rounded-xs overflow-hidden border border-[#EADBCE]">
-                    <Image src={item.url} alt={item.title} fill className="object-cover" />
-                  </div>
-
-                  <input
-                    type="url"
-                    value={item.url}
-                    onChange={(e) => {
-                      const newGallery = [...data.gallery];
-                      newGallery[idx].url = e.target.value;
-                      updateData({ gallery: newGallery });
-                    }}
-                    placeholder="Đường dẫn ảnh (URL)"
-                    className="w-full px-2 py-1 bg-[#FAF3E8] border border-[#E5D4B6] rounded-sm text-xs"
-                  />
-
-                  <div className="flex items-center justify-between gap-2">
-                    <input
-                      type="text"
-                      value={item.title}
-                      onChange={(e) => {
-                        const newGallery = [...data.gallery];
-                        newGallery[idx].title = e.target.value;
-                        updateData({ gallery: newGallery });
-                      }}
-                      placeholder="Tiêu đề ảnh"
-                      className="flex-1 px-2 py-1 bg-[#FAF3E8] border border-[#E5D4B6] rounded-sm text-xs font-medium"
-                    />
+                  <div className="flex items-center gap-2">
+                    {/* Batch Upload from Computer */}
+                    <label className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#9E3D32] hover:bg-[#BD4B3F] text-white text-xs font-medium cursor-pointer shadow-xs transition-all">
+                      {uploadingGallery ? (
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      ) : (
+                        <Upload className="w-3.5 h-3.5" />
+                      )}
+                      <span>Chọn nhiều ảnh từ máy</span>
+                      <input
+                        type="file"
+                        multiple
+                        accept="image/*"
+                        disabled={uploadingGallery}
+                        onChange={handleBatchUploadGallery}
+                        className="hidden"
+                      />
+                    </label>
 
                     <button
                       type="button"
                       onClick={() => {
-                        updateData((prev) => ({
-                          ...prev,
-                          gallery: prev.gallery.filter((g) => g.id !== item.id),
-                        }));
+                        const newPhoto: GalleryItem = {
+                          id: `gal-${Date.now()}`,
+                          url:
+                            "https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=1000&auto=format&fit=crop",
+                          title: "Ảnh cưới mới",
+                          caption: "Khoảnh khắc tuyệt đẹp",
+                        };
+                        updateData((prev) => ({ ...prev, gallery: [...prev.gallery, newPhoto] }));
                       }}
-                      className="text-[#9E3D32] hover:opacity-80 p-1"
+                      className="p-1.5 rounded-lg bg-zinc-900 border border-zinc-700 hover:bg-zinc-800 text-xs"
+                      title="Thêm ảnh bằng URL"
                     >
-                      <Trash2 className="w-4 h-4" />
+                      <Plus className="w-4 h-4 text-zinc-300" />
                     </button>
                   </div>
-
-                  <input
-                    type="text"
-                    value={item.caption || ""}
-                    onChange={(e) => {
-                      const newGallery = [...data.gallery];
-                      newGallery[idx].caption = e.target.value;
-                      updateData({ gallery: newGallery });
-                    }}
-                    placeholder="Chú thích ảnh..."
-                    className="w-full px-2 py-1 bg-[#FAF3E8] border border-[#E5D4B6] rounded-sm text-[11px] text-[#6B5549] italic"
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Tab 6: Tài Khoản Mừng Cưới & QR */}
-        {activeTab === "bank" && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {data.bankAccounts.map((acc, idx) => (
-              <div key={idx} className="bg-[#FFF9EE] border border-[#E5D4B6] p-6 rounded-sm space-y-4">
-                <div className="flex items-center justify-between pb-3 border-b border-[#EADBCE]">
-                  <h2 className="font-serif text-lg font-bold text-[#183A3A]">{acc.label}</h2>
-                  <span className="text-xs uppercase tracking-wider text-[#9E3D32] font-semibold">
-                    {acc.ownerType === "groom" ? "Chú Rể" : "Cô Dâu"}
-                  </span>
                 </div>
 
-                <div>
-                  <label className="block text-xs uppercase tracking-wider text-[#6B5549] font-medium mb-1">
-                    Tên Ngân Hàng
-                  </label>
-                  <input
-                    type="text"
-                    value={acc.bankName}
-                    onChange={(e) => {
-                      const newAccounts = [...data.bankAccounts];
-                      newAccounts[idx].bankName = e.target.value;
-                      updateData({ bankAccounts: newAccounts });
-                    }}
-                    className="w-full px-3 py-2 bg-[#FAF3E8] border border-[#E5D4B6] rounded-sm text-sm"
-                  />
-                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  {data.gallery.map((item, idx) => (
+                    <div key={item.id} className="bg-[#1c243c] border border-zinc-800 p-2.5 rounded-xl space-y-2 relative group">
+                      <div className="relative aspect-4/3 w-full rounded-lg overflow-hidden border border-zinc-700 bg-zinc-900">
+                        <Image src={item.url} alt={item.title} fill className="object-cover" />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            updateData((prev) => ({
+                              ...prev,
+                              gallery: prev.gallery.filter((g) => g.id !== item.id),
+                            }));
+                          }}
+                          className="absolute top-1.5 right-1.5 p-1 rounded-full bg-black/70 text-rose-400 opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
 
-                <div>
-                  <label className="block text-xs uppercase tracking-wider text-[#6B5549] font-medium mb-1">
-                    Số Tài Khoản
-                  </label>
-                  <input
-                    type="text"
-                    value={acc.accountNumber}
-                    onChange={(e) => {
-                      const newAccounts = [...data.bankAccounts];
-                      newAccounts[idx].accountNumber = e.target.value;
-                      // Cập nhật URL VietQR tự động nếu dùng link VietQR
-                      if (newAccounts[idx].qrImageUrl.includes("api.vietqr.io")) {
-                        newAccounts[idx].qrImageUrl = `https://api.vietqr.io/image/970436-${e.target.value}-compact.jpg?accountName=${encodeURIComponent(
-                          newAccounts[idx].accountHolder
-                        )}&amount=0`;
-                      }
-                      updateData({ bankAccounts: newAccounts });
-                    }}
-                    className="w-full px-3 py-2 bg-[#FAF3E8] border border-[#E5D4B6] rounded-sm text-sm font-mono font-bold text-[#9E3D32]"
-                  />
-                </div>
+                      <input
+                        type="text"
+                        value={item.title}
+                        placeholder="Tiêu đề ảnh"
+                        onChange={(e) => {
+                          const gallery = [...data.gallery];
+                          gallery[idx].title = e.target.value;
+                          updateData({ gallery });
+                        }}
+                        className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-2 py-1 text-xs"
+                      />
 
-                <div>
-                  <label className="block text-xs uppercase tracking-wider text-[#6B5549] font-medium mb-1">
-                    Chủ Tài Khoản (In hoa)
-                  </label>
-                  <input
-                    type="text"
-                    value={acc.accountHolder}
-                    onChange={(e) => {
-                      const newAccounts = [...data.bankAccounts];
-                      newAccounts[idx].accountHolder = e.target.value.toUpperCase();
-                      updateData({ bankAccounts: newAccounts });
-                    }}
-                    className="w-full px-3 py-2 bg-[#FAF3E8] border border-[#E5D4B6] rounded-sm text-sm uppercase"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs uppercase tracking-wider text-[#6B5549] font-medium mb-1">
-                    Link Ảnh Mã QR
-                  </label>
-                  <input
-                    type="url"
-                    value={acc.qrImageUrl}
-                    onChange={(e) => {
-                      const newAccounts = [...data.bankAccounts];
-                      newAccounts[idx].qrImageUrl = e.target.value;
-                      updateData({ bankAccounts: newAccounts });
-                    }}
-                    className="w-full px-3 py-2 bg-[#FAF3E8] border border-[#E5D4B6] rounded-sm text-xs mb-2"
-                  />
-                  {acc.qrImageUrl && (
-                    <div className="relative w-32 h-32 bg-white p-2 rounded-sm border border-[#E5D4B6]">
-                      <Image src={acc.qrImageUrl} alt="QR Code" fill className="object-contain p-1" />
+                      <input
+                        type="url"
+                        value={item.url}
+                        placeholder="Link URL ảnh"
+                        onChange={(e) => {
+                          const gallery = [...data.gallery];
+                          gallery[idx].url = e.target.value;
+                          updateData({ gallery });
+                        }}
+                        className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-2 py-0.5 text-[11px] text-zinc-400 font-mono"
+                      />
                     </div>
-                  )}
-                </div>
-
-                <div>
-                  <label className="block text-xs uppercase tracking-wider text-[#6B5549] font-medium mb-1">
-                    Ghi Chú Chuyển Khoản
-                  </label>
-                  <input
-                    type="text"
-                    value={acc.customNote || ""}
-                    onChange={(e) => {
-                      const newAccounts = [...data.bankAccounts];
-                      newAccounts[idx].customNote = e.target.value;
-                      updateData({ bankAccounts: newAccounts });
-                    }}
-                    placeholder="Mừng cưới..."
-                    className="w-full px-3 py-2 bg-[#FAF3E8] border border-[#E5D4B6] rounded-sm text-xs"
-                  />
+                  ))}
                 </div>
               </div>
-            ))}
-          </div>
-        )}
+            )}
 
-        {/* Tab 7: Quản Lý Khách Mời & Lời Chúc (RSVP & Wishes) */}
-        {activeTab === "rsvps" && (
-          <div className="space-y-6">
-            {/* Header thống kê */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              <div className="bg-[#FFF9EE] border border-[#E5D4B6] p-4 rounded-sm">
-                <div className="text-xs uppercase tracking-wider text-[#78928A] font-semibold">Tổng Phản Hồi</div>
-                <div className="font-serif text-2xl font-bold text-[#183A3A] mt-1">{rsvps.length}</div>
-              </div>
+            {/* Tab 6: Mừng Cưới & QR */}
+            {activeTab === "bank" && (
+              <div className="space-y-4 animate-in fade-in duration-300">
+                <h3 className="font-serif font-bold text-sm text-[#F4E8D2] pb-1 border-b border-zinc-800">
+                  Tài Khoản Mừng Cưới & Mã QR
+                </h3>
 
-              <div className="bg-[#FFF9EE] border border-[#E5D4B6] p-4 rounded-sm">
-                <div className="text-xs uppercase tracking-wider text-[#9E3D32] font-semibold">Chắc Chắn Đến</div>
-                <div className="font-serif text-2xl font-bold text-[#9E3D32] mt-1">
-                  {rsvps.filter((r) => r.attendance === "attending").length}
-                </div>
-              </div>
-
-              <div className="bg-[#FFF9EE] border border-[#E5D4B6] p-4 rounded-sm">
-                <div className="text-xs uppercase tracking-wider text-[#183A3A] font-semibold">Tổng Số Khách Dự</div>
-                <div className="font-serif text-2xl font-bold text-[#183A3A] mt-1">
-                  {rsvps
-                    .filter((r) => r.attendance === "attending")
-                    .reduce((sum, r) => sum + (r.guestCount || 1), 0)}
-                </div>
-              </div>
-
-              <div className="bg-[#FFF9EE] border border-[#E5D4B6] p-4 rounded-sm">
-                <div className="text-xs uppercase tracking-wider text-[#8A7569] font-semibold">Lời Chúc Đã Nhận</div>
-                <div className="font-serif text-2xl font-bold text-[#183A3A] mt-1">{wishes.length}</div>
-              </div>
-            </div>
-
-            {/* Bảng danh sách khách mời */}
-            <div className="bg-[#FFF9EE] border border-[#E5D4B6] rounded-sm p-5 space-y-4">
-              <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-[#EADBCE]">
-                <h2 className="font-serif text-lg font-bold text-[#183A3A] flex items-center gap-2">
-                  <span>Danh Sách Khách Phản Hồi</span>
-                  <span className="text-xs font-sans text-[#78928A] font-normal">({rsvps.length} lượt)</span>
-                </h2>
-
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={fetchGuestsData}
-                    className="px-3 py-1.5 rounded-sm bg-[#FAF3E8] hover:bg-[#EADBCE] text-[#183A3A] text-xs font-medium border border-[#E5D4B6]"
-                  >
-                    Làm mới
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={exportRsvpsToCSV}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-sm bg-[#183A3A] hover:bg-[#2B5757] text-[#FFF9EE] text-xs font-medium shadow-xs"
-                  >
-                    <FileSpreadsheet className="w-3.5 h-3.5 text-[#F4E8D2]" />
-                    <span>Xuất Excel (CSV)</span>
-                  </button>
-                </div>
-              </div>
-
-              {loadingGuests ? (
-                <div className="py-8 text-center text-sm text-[#8A7569]">Đang tải dữ liệu...</div>
-              ) : rsvps.length === 0 ? (
-                <div className="py-8 text-center text-sm text-[#8A7569]">Chưa có khách nào gửi phản hồi RSVP.</div>
-              ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left text-xs sm:text-sm">
-                    <thead>
-                      <tr className="border-b border-[#EADBCE] text-[#78928A] uppercase tracking-wider text-[11px]">
-                        <th className="pb-2 font-semibold">Khách</th>
-                        <th className="pb-2 font-semibold">SĐT</th>
-                        <th className="pb-2 font-semibold">Khách của</th>
-                        <th className="pb-2 font-semibold">Tình trạng</th>
-                        <th className="pb-2 font-semibold">Số lượng</th>
-                        <th className="pb-2 font-semibold">Ghi chú</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-[#EADBCE]/60 text-[#3A2D26]">
-                      {rsvps.map((r, i) => (
-                        <tr key={i} className="hover:bg-[#FAF3E8]/50">
-                          <td className="py-2.5 font-medium">{r.fullName}</td>
-                          <td className="py-2.5 font-mono text-xs">{r.phone}</td>
-                          <td className="py-2.5">
-                            <span className="px-2 py-0.5 rounded-xs text-[11px] bg-[#FAF3E8] border border-[#E5D4B6]">
-                              {r.guestOf === "groom" ? "Nhà Trai" : r.guestOf === "bride" ? "Nhà Gái" : "Cả Hai"}
-                            </span>
-                          </td>
-                          <td className="py-2.5">
-                            {r.attendance === "attending" ? (
-                              <span className="text-green-700 font-medium flex items-center gap-1">
-                                <CheckCircle2 className="w-3.5 h-3.5" />
-                                <span>Tham dự</span>
-                              </span>
-                            ) : (
-                              <span className="text-[#8A7569]">Vắng mặt</span>
-                            )}
-                          </td>
-                          <td className="py-2.5 font-semibold text-center sm:text-left">{r.guestCount} người</td>
-                          <td className="py-2.5 text-xs text-[#6B5549] max-w-xs truncate">{r.dietaryOrNote || "—"}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </div>
-
-            {/* Danh sách lời chúc */}
-            <div className="bg-[#FFF9EE] border border-[#E5D4B6] rounded-sm p-5 space-y-4">
-              <h2 className="font-serif text-lg font-bold text-[#183A3A] pb-3 border-b border-[#EADBCE]">
-                Sổ Lưu Bút & Lời Chúc ({wishes.length})
-              </h2>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-96 overflow-y-auto">
-                {wishes.map((w) => (
-                  <div key={w.id} className="p-3 bg-[#FAF3E8] border border-[#E5D4B6] rounded-sm text-xs space-y-1">
-                    <div className="flex items-center justify-between">
-                      <span className="font-bold text-[#183A3A]">{w.name}</span>
-                      <span className="text-[#78928A]">{w.relationship}</span>
+                {data.bankAccounts.map((acc, idx) => (
+                  <div key={idx} className="bg-[#1c243c] border border-zinc-800 p-4 rounded-xl space-y-3">
+                    <div className="flex items-center justify-between pb-1.5 border-b border-zinc-800">
+                      <span className="font-serif font-bold text-xs text-[#F4E8D2]">
+                        {acc.ownerType === "groom" ? "Tài khoản Chú Rể" : "Tài khoản Cô Dâu"}
+                      </span>
+                      <span className="text-[11px] text-[#BD4B3F] uppercase font-semibold">
+                        {acc.ownerType === "groom" ? "Quang Minh" : "Thục An"}
+                      </span>
                     </div>
-                    <p className="italic text-[#5A473E]">&ldquo;{w.content}&rdquo;</p>
+
+                    <div>
+                      <label className="text-zinc-400 text-xs block mb-1">Tên Ngân Hàng</label>
+                      <input
+                        type="text"
+                        value={acc.bankName}
+                        onChange={(e) => {
+                          const accs = [...data.bankAccounts];
+                          accs[idx].bankName = e.target.value;
+                          updateData({ bankAccounts: accs });
+                        }}
+                        className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-1.5 text-xs text-zinc-100"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <label className="text-zinc-400 text-xs block mb-1">Số Tài Khoản</label>
+                        <input
+                          type="text"
+                          value={acc.accountNumber}
+                          onChange={(e) => {
+                            const accs = [...data.bankAccounts];
+                            accs[idx].accountNumber = e.target.value;
+                            if (accs[idx].qrImageUrl.includes("api.vietqr.io")) {
+                              accs[idx].qrImageUrl = `https://api.vietqr.io/image/970436-${e.target.value}-compact.jpg?accountName=${encodeURIComponent(
+                                accs[idx].accountHolder
+                              )}&amount=0`;
+                            }
+                            updateData({ bankAccounts: accs });
+                          }}
+                          className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-1.5 text-xs font-mono font-bold text-[#BD4B3F]"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="text-zinc-400 text-xs block mb-1">Chủ Tài Khoản</label>
+                        <input
+                          type="text"
+                          value={acc.accountHolder}
+                          onChange={(e) => {
+                            const accs = [...data.bankAccounts];
+                            accs[idx].accountHolder = e.target.value.toUpperCase();
+                            updateData({ bankAccounts: accs });
+                          }}
+                          className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-1.5 text-xs uppercase text-zinc-100"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Mã QR */}
+                    <div>
+                      <label className="text-zinc-400 text-xs block mb-1">Mã QR Thanh Toán</label>
+                      <div className="flex items-center gap-3">
+                        <div className="relative w-16 h-16 bg-white p-1 rounded-lg border border-zinc-700 flex-shrink-0">
+                          {acc.qrImageUrl && (
+                            <Image src={acc.qrImageUrl} alt="QR code" fill className="object-contain p-1" />
+                          )}
+                        </div>
+
+                        <div className="flex-1 space-y-1.5">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const accs = [...data.bankAccounts];
+                              accs[idx].qrImageUrl = `https://api.vietqr.io/image/970436-${acc.accountNumber}-compact.jpg?accountName=${encodeURIComponent(
+                                acc.accountHolder
+                              )}&amount=0`;
+                              updateData({ bankAccounts: accs });
+                              showToast("Đã tự động tạo mã VietQR theo STK!", "success");
+                            }}
+                            className="text-[11px] text-[#BD4B3F] hover:underline block"
+                          >
+                            ⚡ Tạo tự động bằng VietQR
+                          </button>
+                          <input
+                            type="url"
+                            value={acc.qrImageUrl}
+                            onChange={(e) => {
+                              const accs = [...data.bankAccounts];
+                              accs[idx].qrImageUrl = e.target.value;
+                              updateData({ bankAccounts: accs });
+                            }}
+                            placeholder="Hoặc dán URL ảnh QR..."
+                            className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-2.5 py-1 text-[11px] font-mono"
+                          />
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 ))}
               </div>
-            </div>
+            )}
+
+            {/* Tab 7: Khách Mời & Lời Chúc */}
+            {activeTab === "rsvps" && (
+              <div className="space-y-4 animate-in fade-in duration-300">
+                <div className="grid grid-cols-3 gap-2">
+                  <div className="bg-[#1c243c] border border-zinc-800 p-3 rounded-xl text-center">
+                    <div className="text-[10px] uppercase text-zinc-400">Phản Hồi</div>
+                    <div className="font-bold text-lg text-[#F4E8D2]">{rsvps.length}</div>
+                  </div>
+                  <div className="bg-[#1c243c] border border-zinc-800 p-3 rounded-xl text-center">
+                    <div className="text-[10px] uppercase text-emerald-400">Tham Dự</div>
+                    <div className="font-bold text-lg text-emerald-400">
+                      {rsvps.filter((r) => r.attendance === "attending").length}
+                    </div>
+                  </div>
+                  <div className="bg-[#1c243c] border border-zinc-800 p-3 rounded-xl text-center">
+                    <div className="text-[10px] uppercase text-zinc-400">Tổng Khách</div>
+                    <div className="font-bold text-lg text-[#BD4B3F]">
+                      {rsvps
+                        .filter((r) => r.attendance === "attending")
+                        .reduce((sum, r) => sum + (r.guestCount || 1), 0)}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between pt-1">
+                  <h4 className="font-serif font-bold text-xs text-[#F4E8D2]">Danh Sách Khách</h4>
+                  <button
+                    type="button"
+                    onClick={exportRsvpsToCSV}
+                    className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#183A3A] hover:bg-[#2B5757] text-[#FFF9EE] text-xs font-medium"
+                  >
+                    <FileSpreadsheet className="w-3.5 h-3.5 text-[#F4E8D2]" />
+                    <span>Xuất CSV / Excel</span>
+                  </button>
+                </div>
+
+                <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
+                  {loadingGuests ? (
+                    <div className="text-center py-6 text-xs text-zinc-500">Đang tải...</div>
+                  ) : rsvps.length === 0 ? (
+                    <div className="text-center py-6 text-xs text-zinc-500 bg-[#1c243c] rounded-xl p-4">
+                      Chưa có phản hồi nào.
+                    </div>
+                  ) : (
+                    rsvps.map((r, i) => (
+                      <div key={i} className="p-3 bg-[#1c243c] border border-zinc-800 rounded-xl text-xs space-y-1">
+                        <div className="flex items-center justify-between">
+                          <span className="font-semibold text-zinc-100">{r.fullName}</span>
+                          <span className="font-mono text-[11px] text-zinc-400">{r.phone}</span>
+                        </div>
+                        <div className="flex items-center justify-between text-[11px] text-zinc-400">
+                          <span>
+                            {r.guestOf === "groom" ? "Nhà Trai" : r.guestOf === "bride" ? "Nhà Gái" : "Cả Hai"} •{" "}
+                            <strong className="text-zinc-200">{r.guestCount} người</strong>
+                          </span>
+                          <span className={r.attendance === "attending" ? "text-emerald-400" : "text-zinc-500"}>
+                            {r.attendance === "attending" ? "Sẽ tham dự" : "Vắng mặt"}
+                          </span>
+                        </div>
+                        {r.dietaryOrNote && (
+                          <p className="text-[11px] text-zinc-400 italic pt-1 border-t border-zinc-800/80">
+                            &ldquo;{r.dietaryOrNote}&rdquo;
+                          </p>
+                        )}
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            )}
           </div>
-        )}
+        </div>
+
+        {/* Right Side: Real-time Live Interactive Preview Container */}
+        <div className="flex-1 bg-[#090d18] p-4 sm:p-6 flex items-center justify-center overflow-hidden relative">
+          {previewDevice === "mobile" ? (
+            /* Khung điện thoại thông minh (Phone Mockup Frame) */
+            <div className="w-[375px] h-[720px] rounded-[48px] border-[10px] border-zinc-800 shadow-2xl overflow-hidden relative bg-[#FAF3E8] flex flex-col ring-1 ring-zinc-700/50">
+              {/* Phone Notch */}
+              <div className="h-6 bg-zinc-800 w-36 mx-auto rounded-b-2xl z-50 flex-shrink-0 flex items-center justify-center">
+                <div className="w-10 h-1 rounded-full bg-zinc-700" />
+              </div>
+
+              {/* Phone Scrollable Screen Content */}
+              <div className="flex-1 overflow-y-auto no-scrollbar">
+                <WeddingInvitationView isPreview={true} />
+              </div>
+            </div>
+          ) : (
+            /* Khung máy tính (Desktop Browser Frame) */
+            <div className="w-full h-full max-h-[820px] rounded-2xl border border-zinc-800 shadow-2xl overflow-hidden flex flex-col bg-[#FAF3E8] ring-1 ring-zinc-700/50">
+              {/* Browser Window Bar */}
+              <div className="h-8 bg-zinc-900 border-b border-zinc-800 px-4 flex items-center gap-2 z-30 flex-shrink-0">
+                <div className="flex items-center gap-1.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-rose-500/80" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-amber-500/80" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/80" />
+                </div>
+                <div className="flex-1 max-w-sm mx-auto bg-zinc-800 rounded-md py-0.5 px-3 text-[11px] text-zinc-400 font-mono text-center truncate">
+                  https://an-minh.vn/wedding-invitation
+                </div>
+              </div>
+
+              {/* Desktop Scrollable Screen Content */}
+              <div className="flex-1 overflow-y-auto">
+                <WeddingInvitationView isPreview={true} />
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -1154,7 +1276,7 @@ export default function AdminPage() {
   return (
     <WeddingDataProvider>
       <ToastProvider>
-        <AdminContent />
+        <StudioContent />
       </ToastProvider>
     </WeddingDataProvider>
   );
