@@ -178,7 +178,7 @@ export const RSVPForm: React.FC = () => {
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
                     placeholder="Ví dụ: Nguyễn Văn An"
-                    className="w-full px-4 py-2.5 rounded-xl bg-[#FDFAF5] border border-[#E8D5CF] text-sm text-[#354D2E] placeholder-[#8C6A58]/60 focus:outline-none focus:ring-2 focus:ring-[#4A6741]/20 focus:border-[#4A6741] transition-all font-sans"
+                    className="w-full px-4 py-2.5 rounded-xl bg-[#FDFAF5] border border-[#E8D5CF] text-base sm:text-sm text-[#354D2E] placeholder-[#8C6A58]/60 focus:outline-none focus:ring-2 focus:ring-[#4A6741]/20 focus:border-[#4A6741] transition-all font-sans"
                   />
                 </div>
 
@@ -194,7 +194,7 @@ export const RSVPForm: React.FC = () => {
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     placeholder="0912 345 678"
-                    className="w-full px-4 py-2.5 rounded-xl bg-[#FDFAF5] border border-[#E8D5CF] text-sm text-[#354D2E] placeholder-[#8C6A58]/60 focus:outline-none focus:ring-2 focus:ring-[#4A6741]/20 focus:border-[#4A6741] transition-all font-sans"
+                    className="w-full px-4 py-2.5 rounded-xl bg-[#FDFAF5] border border-[#E8D5CF] text-base sm:text-sm text-[#354D2E] placeholder-[#8C6A58]/60 focus:outline-none focus:ring-2 focus:ring-[#4A6741]/20 focus:border-[#4A6741] transition-all font-sans"
                   />
                 </div>
 
@@ -266,7 +266,7 @@ export const RSVPForm: React.FC = () => {
                       value={dietaryOrNote}
                       onChange={(e) => setDietaryOrNote(e.target.value)}
                       placeholder="Ví dụ: Ăn chay, dị ứng hải sản, gửi lời chúc..."
-                      className="w-full px-4 py-2 rounded-xl bg-[#FDFAF5] border border-[#E8D5CF] text-sm text-[#354D2E] placeholder-[#8C6A58]/60 focus:outline-none focus:ring-2 focus:ring-[#4A6741]/20 focus:border-[#4A6741] transition-all font-sans resize-none"
+                      className="w-full px-4 py-2 rounded-xl bg-[#FDFAF5] border border-[#E8D5CF] text-base sm:text-sm text-[#354D2E] placeholder-[#8C6A58]/60 focus:outline-none focus:ring-2 focus:ring-[#4A6741]/20 focus:border-[#4A6741] transition-all font-sans resize-none"
                     />
                   </div>
                 )}

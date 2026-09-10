@@ -3,6 +3,7 @@
 import React, { useRef, useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { WeddingData } from "@/types/wedding";
+import { BotanicalCorner } from "@/components/ui/VietnamesePattern";
 
 interface CinematicOpeningVideoProps {
   weddingData: WeddingData;
@@ -102,6 +103,20 @@ export const CinematicOpeningVideo: React.FC<CinematicOpeningVideoProps> = ({
         backgroundColor: "#EBEBEB", // Màu ngà tự nhiên hòa quyện tuyệt đối với viền video
       }}
     >
+      {/* ── 4 GÓC HOA VĂN HOÀNG GIA CỔ PHONG TRÊN TOÀN MÀN HÌNH (DESKTOP & MOBILE) ── */}
+      <div className="absolute top-2 sm:top-4 left-2 sm:left-4 opacity-35 pointer-events-none z-10">
+        <BotanicalCorner size={56} color="#8B1A1E" position="top-left" />
+      </div>
+      <div className="absolute top-2 sm:top-4 right-2 sm:right-4 opacity-35 pointer-events-none z-10">
+        <BotanicalCorner size={56} color="#8B1A1E" position="top-right" />
+      </div>
+      <div className="absolute bottom-2 sm:bottom-4 left-2 sm:left-4 opacity-35 pointer-events-none z-10">
+        <BotanicalCorner size={56} color="#8B1A1E" position="bottom-left" />
+      </div>
+      <div className="absolute bottom-2 sm:bottom-4 right-2 sm:right-4 opacity-35 pointer-events-none z-10">
+        <BotanicalCorner size={56} color="#8B1A1E" position="bottom-right" />
+      </div>
+
       {/* ── KHUNG HÌNH 16:9 CHUẨN XÁC KHÔNG BỊ CẮT XÉN RỒNG - PHƯỢNG TRÊN CẢ DESKTOP & MOBILE ── */}
       <div className="relative w-full aspect-video max-h-[100dvh] max-w-[1920px] flex items-center justify-center overflow-hidden">
         {/* VIDEO GỐC RỒNG - PHƯỢNG NGUYÊN BẢN */}
@@ -159,8 +174,8 @@ export const CinematicOpeningVideo: React.FC<CinematicOpeningVideoProps> = ({
           )}
         </AnimatePresence>
 
-        {/* ── 4.1s → 5.3s: TYPOGRAPHY CỔ PHONG VIỆT KHẮC VÀO KHOẢNG TRỜI GIỮA RỒNG VÀ PHƯỢNG ── */}
-        <div className="absolute top-[11%] sm:top-[12%] md:top-[13%] left-0 right-0 flex flex-col items-center justify-center text-center px-4 pointer-events-none z-20">
+        {/* ── 4.1s → 6.0s: TYPOGRAPHY CỔ PHONG & THẺ BÀI SƠN SON THIẾP VÀNG KHẮC VÀO KHOẢNG TRỜI GIỮA RỒNG VÀ PHƯỢNG ── */}
+        <div className="absolute top-[8%] sm:top-[10%] md:top-[12%] left-0 right-0 flex flex-col items-center justify-center text-center px-4 z-20 pointer-events-none">
           <AnimatePresence>
             {showTypography && (
               <motion.div
@@ -241,52 +256,52 @@ export const CinematicOpeningVideo: React.FC<CinematicOpeningVideoProps> = ({
               </motion.div>
             )}
           </AnimatePresence>
-        </div>
 
-        {/* ── 5.2s → 6.0s: THẺ BÀI SƠN SON THIẾP VÀNG "MỞ THIỆP" (CEREMONIAL INVITATION SEAL) ── */}
-        <div className="absolute top-[28%] sm:top-[29%] md:top-[30%] left-0 right-0 flex justify-center z-30 pointer-events-auto">
-          <AnimatePresence>
-            {showSeal && !isTransitioning && (
-              <motion.button
-                key="ceremonial-seal-button"
-                onClick={handleOpenClick}
-                initial={{ opacity: 0, y: 8, scale: 0.96 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className="group relative inline-flex items-center gap-2 sm:gap-2.5 px-5 py-1.5 sm:px-6 sm:py-2 rounded-full cursor-pointer transition-all duration-400 select-none overflow-hidden shadow-lg"
-                style={{
-                  background: "radial-gradient(ellipse at 50% 30%, #9F171B 0%, #7F1D1D 65%, #590B0E 100%)",
-                  border: "1px solid rgba(212, 175, 55, 0.75)",
-                  boxShadow:
-                    "0 4px 16px rgba(127, 29, 29, 0.35), 0 0 10px rgba(212, 175, 55, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.3), inset 0 -1px 2px rgba(0, 0, 0, 0.4)",
-                }}
-              >
-                {/* Viền chỉ vàng kép tinh xảo */}
-                <div className="absolute inset-1 rounded-full border border-dashed border-[#FDE68A]/40 pointer-events-none" />
-
-                {/* Vệt sáng ánh vàng lướt nhẹ qua thẻ bài khi hover */}
-                <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-[#FFF8D6]/25 to-transparent pointer-events-none" />
-
-                {/* Điểm xuyết hoa văn cát tường nhỏ */}
-                <span className="relative z-10 text-[#FDE68A] text-[9px] sm:text-[10px] opacity-80">❖</span>
-
-                {/* Chữ "MỞ THIỆP" màu ngà son quý phái */}
-                <span
-                  className="relative z-10 font-serif text-[11px] sm:text-xs md:text-sm font-medium tracking-[0.3em] text-[#FFFDF7] uppercase"
+          {/* ── 5.2s → 6.0s: THẺ BÀI SƠN SON THIẾP VÀNG "MỞ THIỆP" ── */}
+          <div className="mt-3 sm:mt-4 md:mt-5 pointer-events-auto">
+            <AnimatePresence>
+              {showSeal && !isTransitioning && (
+                <motion.button
+                  key="ceremonial-seal-button"
+                  onClick={handleOpenClick}
+                  initial={{ opacity: 0, y: 8, scale: 0.96 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                  className="group relative inline-flex items-center gap-2 sm:gap-2.5 px-5 py-1.5 sm:px-6 sm:py-2 rounded-full cursor-pointer transition-all duration-400 select-none overflow-hidden shadow-lg"
                   style={{
-                    textShadow: "0 1px 2px rgba(0, 0, 0, 0.5), 0 0 8px rgba(253, 230, 138, 0.4)",
+                    background: "radial-gradient(ellipse at 50% 30%, #9F171B 0%, #7F1D1D 65%, #590B0E 100%)",
+                    border: "1px solid rgba(212, 175, 55, 0.75)",
+                    boxShadow:
+                      "0 4px 16px rgba(127, 29, 29, 0.35), 0 0 10px rgba(212, 175, 55, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.3), inset 0 -1px 2px rgba(0, 0, 0, 0.4)",
                   }}
                 >
-                  MỞ THIỆP
-                </span>
+                  {/* Viền chỉ vàng kép tinh xảo */}
+                  <div className="absolute inset-1 rounded-full border border-dashed border-[#FDE68A]/40 pointer-events-none" />
 
-                <span className="relative z-10 text-[#FDE68A] text-[9px] sm:text-[10px] opacity-80">❖</span>
-              </motion.button>
-            )}
-          </AnimatePresence>
+                  {/* Vệt sáng ánh vàng lướt nhẹ qua thẻ bài khi hover */}
+                  <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-[#FFF8D6]/25 to-transparent pointer-events-none" />
+
+                  {/* Điểm xuyết hoa văn cát tường nhỏ */}
+                  <span className="relative z-10 text-[#FDE68A] text-[9px] sm:text-[10px] opacity-80">❖</span>
+
+                  {/* Chữ "MỞ THIỆP" màu ngà son quý phái */}
+                  <span
+                    className="relative z-10 font-serif text-[11px] sm:text-xs md:text-sm font-medium tracking-[0.3em] text-[#FFFDF7] uppercase"
+                    style={{
+                      textShadow: "0 1px 2px rgba(0, 0, 0, 0.5), 0 0 8px rgba(253, 230, 138, 0.4)",
+                    }}
+                  >
+                    MỞ THIỆP
+                  </span>
+
+                  <span className="relative z-10 text-[#FDE68A] text-[9px] sm:text-[10px] opacity-80">❖</span>
+                </motion.button>
+              )}
+            </AnimatePresence>
+          </div>
         </div>
 
         {/* ── LÀN ÁNH SÁNG KHI CLICK "MỞ THIỆP" (CINEMATIC GOLDEN LIGHT SWEEP) ── */}

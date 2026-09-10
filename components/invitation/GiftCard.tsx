@@ -32,15 +32,15 @@ export const GiftCard: React.FC = () => {
   };
 
   return (
-    <section id="gift" className="py-16 px-4 bg-ivory-texture relative overflow-hidden">
-      <div className="max-w-xl mx-auto relative z-10">
+    <section id="gift" className="py-16 sm:py-20 px-4 bg-ivory-texture relative overflow-hidden">
+      <div className="max-w-xl md:max-w-3xl lg:max-w-4xl mx-auto relative z-10">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-10"
+          className="text-center mb-10 sm:mb-12"
         >
           <div className="inline-flex items-center justify-center mb-2">
             <VietnameseLotus size={36} color="#4A6741" opacity={0.85} />
@@ -48,13 +48,13 @@ export const GiftCard: React.FC = () => {
           <p className="text-[11px] uppercase tracking-[0.3em] text-[#C4715A] font-sans font-semibold mb-1">
             Hộp Mừng Cưới
           </p>
-          <h2 className="font-serif text-2xl sm:text-3xl font-bold text-[#354D2E] tracking-wide">
+          <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl font-bold text-[#354D2E] tracking-wide">
             Mừng Cưới Chúc Phúc
           </h2>
           <div className="flex items-center justify-center my-3">
             <BotanicalBranch size={52} color="#C9A84C" opacity={0.7} />
           </div>
-          <p className="text-xs sm:text-sm text-[#8C6A58] italic font-serif max-w-sm mx-auto">
+          <p className="text-xs sm:text-sm text-[#8C6A58] italic font-serif max-w-md mx-auto leading-relaxed">
             Sự hiện diện của quý khách là món quà trọn vẹn nhất. Nếu muốn gửi lời chúc mừng từ xa, quý khách có thể chuyển qua tài khoản bên dưới.
           </p>
         </motion.div>
@@ -68,12 +68,12 @@ export const GiftCard: React.FC = () => {
           className="rounded-3xl p-6 sm:p-9 bg-[#FFFDF9] border border-[#E8D5CF] shadow-xs text-center"
         >
           {/* Tabs đổi Chú Rể / Cô Dâu */}
-          <div className="flex justify-center mb-6">
+          <div className="flex justify-center mb-8">
             <div className="inline-flex p-1 bg-[#F0F5EE] border border-[#A8BCA1]/30 rounded-full">
               <button
                 type="button"
                 onClick={() => setActiveTab("groom")}
-                className={`px-5 py-2 rounded-full text-xs sm:text-sm font-serif font-semibold transition-all ${
+                className={`px-5 sm:px-6 py-2 rounded-full text-xs sm:text-sm font-serif font-semibold transition-all cursor-pointer ${
                   activeTab === "groom"
                     ? "bg-[#4A6741] text-[#FDFAF5] shadow-xs"
                     : "text-[#5C4033] hover:text-[#354D2E]"
@@ -85,7 +85,7 @@ export const GiftCard: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setActiveTab("bride")}
-                className={`px-5 py-2 rounded-full text-xs sm:text-sm font-serif font-semibold transition-all ${
+                className={`px-5 sm:px-6 py-2 rounded-full text-xs sm:text-sm font-serif font-semibold transition-all cursor-pointer ${
                   activeTab === "bride"
                     ? "bg-[#C4715A] text-[#FDFAF5] shadow-xs"
                     : "text-[#5C4033] hover:text-[#354D2E]"
@@ -96,41 +96,47 @@ export const GiftCard: React.FC = () => {
             </div>
           </div>
 
-          {/* Chi tiết tài khoản */}
-          <div className="flex flex-col items-center">
-            {/* Mã QR viền vàng mật thanh lịch */}
-            <div className="relative w-48 h-48 sm:w-56 sm:h-56 bg-white p-3 rounded-2xl border-2 border-[#C9A84C]/40 shadow-xs mb-6">
-              <Image
-                src={currentAccount.qrImageUrl}
-                alt={`Mã QR ${currentAccount.label}`}
-                fill
-                className="object-contain p-2"
-                sizes="250px"
-              />
+          {/* Chi tiết tài khoản - Bố cục 2 Cột trên Desktop, 1 Cột trên Mobile */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 items-center">
+            {/* Cột 1: Mã QR viền vàng mật thanh lịch */}
+            <div className="flex flex-col items-center justify-center">
+              <div className="relative w-48 h-48 sm:w-56 sm:h-56 bg-white p-3 rounded-2xl border-2 border-[#C9A84C]/40 shadow-xs">
+                <Image
+                  src={currentAccount.qrImageUrl}
+                  alt={`Mã QR ${currentAccount.label}`}
+                  fill
+                  className="object-contain p-2"
+                  sizes="250px"
+                />
+              </div>
+              <span className="text-[11px] text-[#8C6A58] uppercase tracking-wider font-sans mt-3">
+                Quét mã VietQR tiện lợi
+              </span>
             </div>
 
-            <div className="space-y-3 max-w-sm w-full text-left bg-[#FDFAF5] p-5 rounded-2xl border border-[#E8D5CF]">
+            {/* Cột 2: Thông tin chi tiết ngân hàng & nút sao chép */}
+            <div className="space-y-3.5 w-full text-left bg-[#FDFAF5] p-5 sm:p-6 rounded-2xl border border-[#E8D5CF]">
               <div>
                 <div className="text-[10px] uppercase tracking-wider text-[#8C6A58] font-sans font-bold">
                   Ngân Hàng
                 </div>
-                <div className="font-serif font-bold text-sm sm:text-base text-[#354D2E]">
+                <div className="font-serif font-bold text-sm sm:text-base text-[#354D2E] mt-0.5">
                   {currentAccount.bankName}
                 </div>
               </div>
 
-              <div className="pt-2 border-t border-[#E8D5CF]">
+              <div className="pt-2.5 border-t border-[#E8D5CF]">
                 <div className="text-[10px] uppercase tracking-wider text-[#8C6A58] font-sans font-bold">
                   Số Tài Khoản
                 </div>
-                <div className="flex items-center justify-between mt-1">
+                <div className="flex items-center justify-between mt-1 gap-2">
                   <span className="font-mono text-base sm:text-lg font-bold text-[#C4715A] tracking-wider">
                     {currentAccount.accountNumber}
                   </span>
                   <button
                     type="button"
                     onClick={() => handleCopy(currentAccount.accountNumber)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#FFFDF9] hover:bg-[#F0F5EE] text-[#4A6741] border border-[#A8BCA1]/40 text-xs font-serif font-semibold transition-all active:scale-95"
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#FFFDF9] hover:bg-[#F0F5EE] text-[#4A6741] border border-[#A8BCA1]/40 text-xs font-serif font-semibold transition-all active:scale-95 cursor-pointer shrink-0"
                   >
                     {copiedAccount === currentAccount.accountNumber ? (
                       <>
@@ -147,17 +153,17 @@ export const GiftCard: React.FC = () => {
                 </div>
               </div>
 
-              <div className="pt-2 border-t border-[#E8D5CF]">
+              <div className="pt-2.5 border-t border-[#E8D5CF]">
                 <div className="text-[10px] uppercase tracking-wider text-[#8C6A58] font-sans font-bold">
                   Chủ Tài Khoản
                 </div>
-                <div className="font-bold text-xs sm:text-sm text-[#354D2E] uppercase tracking-wide">
+                <div className="font-bold text-xs sm:text-sm text-[#354D2E] uppercase tracking-wide mt-0.5">
                   {currentAccount.accountHolder}
                 </div>
               </div>
 
               {currentAccount.customNote && (
-                <div className="pt-2 text-[11px] text-[#8C6A58] italic font-serif">
+                <div className="pt-2.5 border-t border-[#E8D5CF] text-[11px] text-[#8C6A58] italic font-serif">
                   Nội dung chuyển khoản gợi ý: &ldquo;{currentAccount.customNote}&rdquo;
                 </div>
               )}

@@ -80,7 +80,7 @@ export const HeroInvitation: React.FC<HeroInvitationProps> = ({
         <BotanicalCorner size={72} color="#4A6741" position="bottom-right" />
       </div>
 
-      <div className="w-full max-w-lg mx-auto relative z-10">
+      <div className="w-full max-w-lg md:max-w-xl lg:max-w-2xl mx-auto relative z-10">
         <AnimatePresence mode="wait">
           {!isEnvelopeOpen ? (
             /* ─── TRẠNG THÁI BÌA THIỆP (CLOSED ENVELOPE) ─── */
@@ -133,7 +133,7 @@ export const HeroInvitation: React.FC<HeroInvitationProps> = ({
 
               {/* Tên dâu rể thư pháp lãng mạn */}
               <div className="my-4 space-y-1">
-                <h1 className="font-calligraphy text-4xl sm:text-5xl text-[#354D2E] leading-tight">
+                <h1 className="font-calligraphy text-4xl sm:text-5xl md:text-6xl text-[#354D2E] leading-tight">
                   {weddingData.groom.shortName}
                 </h1>
                 <div className="flex items-center justify-center gap-3">
@@ -141,7 +141,7 @@ export const HeroInvitation: React.FC<HeroInvitationProps> = ({
                   <span className="font-serif italic text-2xl text-[#C4715A]">&amp;</span>
                   <div className="h-[1px] w-12 bg-gradient-to-l from-transparent to-[#C9A84C]" />
                 </div>
-                <h1 className="font-calligraphy text-4xl sm:text-5xl text-[#354D2E] leading-tight">
+                <h1 className="font-calligraphy text-4xl sm:text-5xl md:text-6xl text-[#354D2E] leading-tight">
                   {weddingData.bride.shortName}
                 </h1>
               </div>
@@ -188,7 +188,7 @@ export const HeroInvitation: React.FC<HeroInvitationProps> = ({
               initial={{ opacity: 0, y: 35, scale: 0.96 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               transition={{ duration: 0.7, ease: "easeOut" }}
-              className="relative rounded-3xl p-6 sm:p-10 text-center shadow-2xl border border-[#E8D5CF] bg-[#FDFAF5]"
+              className="relative rounded-3xl p-6 sm:p-10 md:p-12 text-center shadow-2xl border border-[#E8D5CF] bg-[#FDFAF5]"
               style={{
                 boxShadow: "0 25px 50px -12px rgba(74, 103, 65, 0.15)",
               }}
@@ -207,27 +207,27 @@ export const HeroInvitation: React.FC<HeroInvitationProps> = ({
 
               {/* Tên cặp đôi */}
               <div className="my-2">
-                <h2 className="font-calligraphy text-3xl sm:text-4xl text-[#354D2E]">
+                <h2 className="font-calligraphy text-3xl sm:text-4xl md:text-5xl text-[#354D2E]">
                   {weddingData.groom.shortName} &amp; {weddingData.bride.shortName}
                 </h2>
               </div>
 
               {/* Cặp ảnh chân dung dâu rể */}
-              <div className="flex items-center justify-center gap-4 sm:gap-6 my-6">
+              <div className="flex items-center justify-center gap-4 sm:gap-8 my-6">
                 {/* Chú Rể */}
                 <div className="flex flex-col items-center">
-                  <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-full p-1 bg-gradient-to-tr from-[#C9A84C] to-[#A8BCA1] shadow-md">
+                  <div className="relative w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-full p-1 bg-gradient-to-tr from-[#C9A84C] to-[#A8BCA1] shadow-md">
                     <div className="relative w-full h-full rounded-full overflow-hidden">
                       <Image
                         src={weddingData.groom.avatarUrl}
                         alt={weddingData.groom.fullName}
                         fill
                         className="object-cover"
-                        sizes="96px"
+                        sizes="(max-width: 640px) 96px, 120px"
                       />
                     </div>
                   </div>
-                  <span className="font-serif font-medium text-xs sm:text-sm text-[#354D2E] mt-2">
+                  <span className="font-serif font-medium text-xs sm:text-sm md:text-base text-[#354D2E] mt-2">
                     {weddingData.groom.shortName}
                   </span>
                   <span className="text-[10px] uppercase tracking-wider text-[#8C6A58]">
@@ -237,24 +237,24 @@ export const HeroInvitation: React.FC<HeroInvitationProps> = ({
 
                 {/* Trái tim kết nối */}
                 <div className="flex flex-col items-center justify-center">
-                  <Heart className="w-5 h-5 text-[#C4715A] fill-[#C4715A]/20 animate-heartbeat" />
+                  <Heart className="w-5 h-5 md:w-6 md:h-6 text-[#C4715A] fill-[#C4715A]/20 animate-heartbeat" />
                   <span className="text-[10px] text-[#C9A84C] font-serif italic mt-1">Duyên</span>
                 </div>
 
                 {/* Cô Dâu */}
                 <div className="flex flex-col items-center">
-                  <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-full p-1 bg-gradient-to-tr from-[#C4715A] to-[#E8D5CF] shadow-md">
+                  <div className="relative w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-full p-1 bg-gradient-to-tr from-[#C4715A] to-[#E8D5CF] shadow-md">
                     <div className="relative w-full h-full rounded-full overflow-hidden">
                       <Image
                         src={weddingData.bride.avatarUrl}
                         alt={weddingData.bride.fullName}
                         fill
                         className="object-cover"
-                        sizes="96px"
+                        sizes="(max-width: 640px) 96px, 120px"
                       />
                     </div>
                   </div>
-                  <span className="font-serif font-medium text-xs sm:text-sm text-[#354D2E] mt-2">
+                  <span className="font-serif font-medium text-xs sm:text-sm md:text-base text-[#354D2E] mt-2">
                     {weddingData.bride.shortName}
                   </span>
                   <span className="text-[10px] uppercase tracking-wider text-[#8C6A58]">

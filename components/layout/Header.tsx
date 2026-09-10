@@ -54,7 +54,7 @@ export const Header: React.FC<HeaderProps> = ({
           />
         )}
 
-        <div className="max-w-xl mx-auto px-4 flex items-center justify-between">
+        <div className="max-w-xl md:max-w-5xl lg:max-w-6xl mx-auto px-4 sm:px-6 flex items-center justify-between">
           <a
             href="#hero"
             className="flex items-center gap-2 text-[#354D2E] hover:opacity-85 transition-opacity"

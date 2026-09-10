@@ -136,7 +136,7 @@ export const WishBook: React.FC = () => {
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                       placeholder="Ví dụ: Thuỳ Trang"
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-[#FDFAF5] border border-[#E8D5CF] text-sm text-[#354D2E] placeholder-[#8C6A58]/60 focus:outline-none focus:ring-2 focus:ring-[#4A6741]/20 focus:border-[#4A6741] font-sans"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-[#FDFAF5] border border-[#E8D5CF] text-base sm:text-sm text-[#354D2E] placeholder-[#8C6A58]/60 focus:outline-none focus:ring-2 focus:ring-[#4A6741]/20 focus:border-[#4A6741] font-sans"
                     />
                   </div>
                   <div>
@@ -149,7 +149,7 @@ export const WishBook: React.FC = () => {
                       value={relationship}
                       onChange={(e) => setRelationship(e.target.value)}
                       placeholder="Bạn cấp 3, Đồng nghiệp..."
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-[#FDFAF5] border border-[#E8D5CF] text-sm text-[#354D2E] placeholder-[#8C6A58]/60 focus:outline-none focus:ring-2 focus:ring-[#4A6741]/20 focus:border-[#4A6741] font-sans"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-[#FDFAF5] border border-[#E8D5CF] text-base sm:text-sm text-[#354D2E] placeholder-[#8C6A58]/60 focus:outline-none focus:ring-2 focus:ring-[#4A6741]/20 focus:border-[#4A6741] font-sans"
                     />
                   </div>
                 </div>
@@ -165,7 +165,7 @@ export const WishBook: React.FC = () => {
                     value={content}
                     onChange={(e) => setContent(e.target.value)}
                     placeholder="Chúc hai bạn trăm năm hạnh phúc, đầu bạc răng long..."
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#FDFAF5] border border-[#E8D5CF] text-sm text-[#354D2E] placeholder-[#8C6A58]/60 focus:outline-none focus:ring-2 focus:ring-[#4A6741]/20 focus:border-[#4A6741] font-sans resize-none"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#FDFAF5] border border-[#E8D5CF] text-base sm:text-sm text-[#354D2E] placeholder-[#8C6A58]/60 focus:outline-none focus:ring-2 focus:ring-[#4A6741]/20 focus:border-[#4A6741] font-sans resize-none"
                   />
                 </div>
 

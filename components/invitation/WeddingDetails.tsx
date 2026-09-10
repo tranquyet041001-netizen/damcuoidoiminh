@@ -18,15 +18,15 @@ export const WeddingDetails: React.FC = () => {
   };
 
   return (
-    <section id="details" className="py-16 px-4 bg-ivory-texture relative overflow-hidden">
-      <div className="max-w-xl mx-auto relative z-10">
+    <section id="details" className="py-16 sm:py-20 px-4 bg-ivory-texture relative overflow-hidden">
+      <div className="max-w-xl md:max-w-4xl lg:max-w-5xl mx-auto relative z-10">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-10"
+          className="text-center mb-10 sm:mb-12"
         >
           <div className="inline-flex items-center justify-center mb-2">
             <VietnameseLotus size={36} color="#4A6741" opacity={0.85} />
@@ -34,19 +34,19 @@ export const WeddingDetails: React.FC = () => {
           <p className="text-[11px] uppercase tracking-[0.3em] text-[#C4715A] font-sans font-semibold mb-1">
             Chương Trình Hôn Lễ
           </p>
-          <h2 className="font-serif text-2xl sm:text-3xl font-bold text-[#354D2E] tracking-wide">
+          <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl font-bold text-[#354D2E] tracking-wide">
             Thông Tin Tiệc Cưới
           </h2>
           <div className="flex items-center justify-center my-3">
             <BotanicalBranch size={52} color="#C9A84C" opacity={0.7} />
           </div>
-          <p className="text-xs sm:text-sm text-[#8C6A58] italic font-serif max-w-sm mx-auto">
+          <p className="text-xs sm:text-sm text-[#8C6A58] italic font-serif max-w-md mx-auto leading-relaxed">
             Sự hiện diện và chúc phúc của quý khách là niềm vinh hạnh lớn nhất của gia đình chúng tôi.
           </p>
         </motion.div>
 
-        {/* Cards danh sách sự kiện */}
-        <div className="space-y-6">
+        {/* Cards danh sách sự kiện - 2 Cột trên Desktop, 1 Cột trên Điện thoại */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
           {weddingData.events.map((event, index) => (
             <motion.div
               key={event.id || index}
@@ -54,7 +54,7 @@ export const WeddingDetails: React.FC = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: index * 0.1 }}
-              className="rounded-3xl p-6 sm:p-8 bg-[#FFFDF9] border border-[#E8D5CF] shadow-xs relative overflow-hidden"
+              className="rounded-3xl p-6 sm:p-8 bg-[#FFFDF9] border border-[#E8D5CF] shadow-xs relative overflow-hidden flex flex-col justify-between hover:shadow-md transition-shadow"
               style={{
                 boxShadow: "0 12px 32px -8px rgba(74, 103, 65, 0.08)",
               }}

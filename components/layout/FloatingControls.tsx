@@ -72,7 +72,10 @@ export const FloatingControls: React.FC<FloatingControlsProps> = ({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 12, scale: 0.96 }}
             transition={{ duration: 0.25 }}
-            className="fixed bottom-19 left-1/2 -translate-x-1/2 z-40 w-[92%] max-w-[350px] px-3.5 py-2 rounded-full bg-[#FFFDF9]/95 backdrop-blur-md border border-[#C9A84C]/50 shadow-lg flex items-center justify-between gap-2"
+            className="fixed left-1/2 -translate-x-1/2 z-40 w-[92%] max-w-[350px] px-3.5 py-2 rounded-full bg-[#FFFDF9]/95 backdrop-blur-md border border-[#C9A84C]/50 shadow-lg flex items-center justify-between gap-2"
+            style={{
+              bottom: "calc(4.85rem + env(safe-area-inset-bottom, 0px))",
+            }}
           >
             {/* Đĩa xoay / Hoa sen & Tên bài hát */}
             <div className="flex items-center gap-2.5 min-w-0 flex-1">
@@ -263,7 +266,10 @@ export const FloatingControls: React.FC<FloatingControlsProps> = ({
       {/* ── THANH ĐIỀU HƯỚNG DƯỚI (BOTTOM DOCK BAR) ── */}
       <nav
         aria-label="Điều hướng nhanh"
-        className="fixed bottom-3.5 left-1/2 -translate-x-1/2 z-40 w-[92%] max-w-[360px]"
+        className="fixed left-1/2 -translate-x-1/2 z-40 w-[92%] max-w-[360px]"
+        style={{
+          bottom: "calc(0.875rem + env(safe-area-inset-bottom, 0px))",
+        }}
       >
         <div className="flex items-center justify-around px-2 py-2 rounded-full bg-[#FFFDF9]/92 backdrop-blur-md border border-[#E8D5CF] shadow-lg">
           {/* Menu */}

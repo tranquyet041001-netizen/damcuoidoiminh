@@ -14,15 +14,15 @@ export const OpeningLetter: React.FC = () => {
   const { data: weddingData } = useWeddingData();
 
   return (
-    <section id="letter" className="py-16 px-4 bg-ivory-texture relative overflow-hidden">
-      <div className="max-w-xl mx-auto relative z-10">
+    <section id="letter" className="py-16 sm:py-20 px-4 bg-ivory-texture relative overflow-hidden">
+      <div className="max-w-xl md:max-w-2xl lg:max-w-3xl mx-auto relative z-10">
         {/* Header section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-8"
+          className="text-center mb-8 sm:mb-10"
         >
           <div className="inline-flex items-center justify-center mb-3">
             <VietnameseLotus size={38} color="#4A6741" opacity={0.9} />
@@ -30,7 +30,7 @@ export const OpeningLetter: React.FC = () => {
           <p className="text-[11px] uppercase tracking-[0.3em] text-[#C4715A] font-sans font-semibold mb-1">
             Thiệp Hồng Báo Hỷ
           </p>
-          <h2 className="font-serif text-2xl sm:text-3xl font-bold text-[#354D2E] tracking-wide">
+          <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl font-bold text-[#354D2E] tracking-wide">
             {weddingData.openingLetter.title || "Lời Ngỏ Yêu Thương"}
           </h2>
           <div className="flex items-center justify-center my-3">
@@ -44,7 +44,7 @@ export const OpeningLetter: React.FC = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.7, delay: 0.1 }}
-          className="rounded-3xl p-6 sm:p-9 bg-[#FFFDF9] border border-[#E8D5CF] shadow-sm relative"
+          className="rounded-3xl p-6 sm:p-10 md:p-12 bg-[#FFFDF9] border border-[#E8D5CF] shadow-sm relative"
           style={{
             boxShadow: "0 10px 30px -5px rgba(74, 103, 65, 0.08)",
           }}
