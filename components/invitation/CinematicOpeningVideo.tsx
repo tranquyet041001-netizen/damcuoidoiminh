@@ -2,7 +2,6 @@
 
 import React, { useRef, useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Sparkles } from "lucide-react";
 import { WeddingData } from "@/types/wedding";
 
 interface CinematicOpeningVideoProps {
@@ -21,16 +20,19 @@ export const CinematicOpeningVideo: React.FC<CinematicOpeningVideoProps> = ({
 
   // Mốc thời gian chính xác (giây)
   const [currentTime, setCurrentTime] = useState<number>(0);
-  const [videoLoaded, setVideoLoaded] = useState<boolean>(false);
   const [isTransitioning, setIsTransitioning] = useState<boolean>(false);
   const [hasEnded, setHasEnded] = useState<boolean>(false);
 
-  // Các giai đoạn timeline
-  const showPulse = currentTime >= 3.8 && currentTime < 5.0;
-  const showTypography = currentTime >= 4.1;
-  const showButton = currentTime >= 5.2;
+  // Giai đoạn hiển thị theo đúng yêu cầu:
+  // 0.0s → 3.8s: Chỉ có video và vi hạt bụi vàng
+  // 3.8s → 4.1s: Xung ánh sáng vàng kim tinh tế ở khoảng trời trung tâm
+  // 4.1s → 5.3s: Khắc chữ "LỄ THÀNH HÔN" & Tên Dâu Rể vào không gian
+  // 5.2s → 6.0s: Xuất hiện thẻ bài son thiếp vàng "MỞ THIỆP"
+  const showPulse = currentTime >= 3.75 && currentTime < 4.8;
+  const showTypography = currentTime >= 4.0;
+  const showSeal = currentTime >= 5.15;
 
-  // Lắng nghe timeline video với độ mượt cao
+  // Lắng nghe timeline video với độ mượt 60fps
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
@@ -41,7 +43,7 @@ export const CinematicOpeningVideo: React.FC<CinematicOpeningVideoProps> = ({
         const t = video.currentTime;
         setCurrentTime(t);
 
-        // Giữ frame cuối tại 5.95s - không để giật về frame đầu
+        // Giữ frame cuối tại 5.95s - tuyệt đối không giật về frame đầu
         if (t >= 5.92 && !video.paused) {
           video.pause();
           setHasEnded(true);
@@ -57,7 +59,7 @@ export const CinematicOpeningVideo: React.FC<CinematicOpeningVideoProps> = ({
     };
   }, []);
 
-  // Tự động play video ngay khi sẵn sàng
+  // Tự động play video với thuộc tính muted playsInline chuẩn mobile & desktop
   useEffect(() => {
     const video = videoRef.current;
     if (video) {
@@ -66,7 +68,7 @@ export const CinematicOpeningVideo: React.FC<CinematicOpeningVideoProps> = ({
       const playPromise = video.play();
       if (playPromise !== undefined) {
         playPromise.catch(() => {
-          // Trình duyệt chặn autoplay thì fallback
+          // Trình duyệt tự quản lý nếu có hạn chế
         });
       }
     }
@@ -77,19 +79,18 @@ export const CinematicOpeningVideo: React.FC<CinematicOpeningVideoProps> = ({
     if (isTransitioning) return;
     setIsTransitioning(true);
 
-    // Kịch bản chuyển cảnh 1.2s:
-    // 1. Nút fade out
-    // 2. Vệt sáng vàng kim quét qua
-    // 3. Toàn cảnh zoom nhẹ và fade out
-    // 4. Mở khóa wedding website
+    // 1. Thẻ bài mở thiệp mờ dần
+    // 2. Vệt sáng quét qua không gian
+    // 3. Toàn cảnh phóng lớn nhẹ và fade out
+    // 4. Mở khóa toàn bộ thiệp cưới chính
     setTimeout(() => {
       onOpenInvitation();
-    }, 1200);
+    }, 1250);
   }, [isTransitioning, onOpenInvitation]);
 
-  // Thông tin cô dâu và chú rể
-  const brideName = weddingData.bride.shortName || weddingData.bride.fullName;
-  const groomName = weddingData.groom.shortName || weddingData.groom.fullName;
+  // Thông tin tên cô dâu và chú rể chính xác từng ký tự tiếng Việt
+  const brideName = weddingData.bride.fullName || weddingData.bride.shortName;
+  const groomName = weddingData.groom.fullName || weddingData.groom.shortName;
 
   return (
     <div
@@ -98,11 +99,12 @@ export const CinematicOpeningVideo: React.FC<CinematicOpeningVideoProps> = ({
         isTransitioning ? "opacity-0 scale-105 pointer-events-none" : "opacity-100 scale-100"
       }`}
       style={{
-        backgroundColor: "#EBEBEB", // Màu ngà tự nhiên chuẩn màu viền video
+        backgroundColor: "#EBEBEB", // Màu ngà tự nhiên hòa quyện tuyệt đối với viền video
       }}
     >
-      {/* ── 1. KHUNG CHỨA VIDEO CHÍNH (GIỮ NGUYÊN 100% ARTWORK & NỀN TRẮNG/NGÀ) ── */}
-      <div className="relative w-full h-full max-w-[1920px] max-h-[1080px] flex items-center justify-center">
+      {/* ── KHUNG HÌNH 16:9 CHUẨN XÁC KHÔNG BỊ CẮT XÉN RỒNG - PHƯỢNG TRÊN CẢ DESKTOP & MOBILE ── */}
+      <div className="relative w-full aspect-video max-h-[100dvh] max-w-[1920px] flex items-center justify-center overflow-hidden">
+        {/* VIDEO GỐC RỒNG - PHƯỢNG NGUYÊN BẢN */}
         <video
           ref={videoRef}
           src="/videos/longphung.mp4"
@@ -110,84 +112,106 @@ export const CinematicOpeningVideo: React.FC<CinematicOpeningVideoProps> = ({
           muted
           autoPlay
           preload="auto"
-          onLoadedData={() => setVideoLoaded(true)}
-          className="w-full h-full object-contain md:object-cover pointer-events-none"
-          style={{
-            objectPosition: "center center",
-          }}
+          className="w-full h-full object-contain pointer-events-none"
         />
 
-        {/* ── 2. FLOATING SUBTLE GOLD PARTICLES (BỤI VÀNG CỔ PHONG SIÊU NHẸ) ── */}
+        {/* ── BỤI VÀNG CỔ PHONG SIÊU NHẸ (SUBTLE ATMOSPHERIC STARDUST) ── */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          <div className="particle-gold particle-1" />
-          <div className="particle-gold particle-2" />
-          <div className="particle-gold particle-3" />
-          <div className="particle-gold particle-4" />
-          <div className="particle-gold particle-5" />
-          <div className="particle-gold particle-6" />
+          <div className="antique-particle particle-a" />
+          <div className="antique-particle particle-b" />
+          <div className="antique-particle particle-c" />
+          <div className="antique-particle particle-d" />
+          <div className="antique-particle particle-e" />
         </div>
 
-        {/* ── 3. TIMELINE 3.8s → 4.1s: SUBTLE GOLDEN LIGHT PULSE Ở KHOẢNG TRỜI GIỮA RỒNG VÀ PHƯỢNG ── */}
+        {/* ── 3.8s → 4.1s: XUNG ÁNH SÁNG VÀNG KIM TINH TẾ (GOLDEN LIGHT REVEAL PULSE) ── */}
         <AnimatePresence>
           {showPulse && (
             <motion.div
-              key="golden-light-pulse"
-              initial={{ opacity: 0, scale: 0.6 }}
-              animate={{ opacity: [0, 0.45, 0], scale: [0.6, 1.3, 1.6] }}
-              transition={{ duration: 1.1, ease: "easeOut" }}
-              className="absolute top-[16%] md:top-[18%] left-1/2 -translate-x-1/2 w-48 h-48 sm:w-64 sm:h-64 rounded-full pointer-events-none"
+              key="ceremonial-golden-pulse"
+              initial={{ opacity: 0, scale: 0.7 }}
+              animate={{ opacity: [0, 0.55, 0], scale: [0.7, 1.35, 1.7] }}
+              transition={{ duration: 1.2, ease: "easeOut" }}
+              className="absolute top-[17%] left-1/2 -translate-x-1/2 w-52 h-52 sm:w-80 sm:h-80 rounded-full pointer-events-none"
               style={{
-                background: "radial-gradient(circle, rgba(245, 215, 120, 0.65) 0%, rgba(212, 175, 55, 0.25) 45%, transparent 70%)",
-                filter: "blur(20px)",
+                background:
+                  "radial-gradient(circle, rgba(254, 230, 138, 0.7) 0%, rgba(212, 175, 55, 0.3) 40%, transparent 70%)",
+                filter: "blur(24px)",
               }}
             />
           )}
         </AnimatePresence>
 
-        {/* ── 4. TIMELINE 4.1s → 5.3s: TYPOGRAPHY KHẮC VÀO KHOẢNG TRỜI GIỮA RỒNG VÀ PHƯỢNG ── */}
-        <div className="absolute top-[12%] sm:top-[14%] md:top-[16%] left-0 right-0 flex flex-col items-center justify-center text-center px-4 pointer-events-none z-20">
+        {/* ── HÀO QUANG NỀN DỊU DÀNG GIÚP CHỮ HÒA QUYỆN VÀO MÂY TRỜI (ATMOSPHERIC INTEGRATION) ── */}
+        <AnimatePresence>
+          {showTypography && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0.85 }}
+              transition={{ duration: 1.5 }}
+              className="absolute top-[10%] left-1/2 -translate-x-1/2 w-72 sm:w-[480px] md:w-[620px] h-36 sm:h-52 rounded-full pointer-events-none"
+              style={{
+                background:
+                  "radial-gradient(ellipse at center, rgba(255, 253, 247, 0.75) 0%, rgba(254, 243, 199, 0.45) 45%, transparent 75%)",
+                filter: "blur(18px)",
+              }}
+            />
+          )}
+        </AnimatePresence>
+
+        {/* ── 4.1s → 5.3s: TYPOGRAPHY CỔ PHONG VIỆT KHẮC VÀO KHOẢNG TRỜI GIỮA RỒNG VÀ PHƯỢNG ── */}
+        <div className="absolute top-[11%] sm:top-[12%] md:top-[13%] left-0 right-0 flex flex-col items-center justify-center text-center px-4 pointer-events-none z-20">
           <AnimatePresence>
             {showTypography && (
               <motion.div
-                key="ceremonial-typography"
-                initial={{ opacity: 0, y: 8 }}
+                key="ceremonial-inscription"
+                initial={{ opacity: 0, y: 6 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 1.1, ease: [0.16, 1, 0.3, 1] }}
+                transition={{ duration: 1.3, ease: [0.16, 1, 0.3, 1] }}
                 className="flex flex-col items-center"
               >
-                {/* LỄ THÀNH HÔN (Trang trọng, nhỏ hơn rõ rệt, nét cổ phong) */}
-                <motion.span
+                {/* DÒNG TIÊU ĐỀ "LỄ THÀNH HÔN" (CỔ PHONG, TRANG TRỌNG, NHỎ HƠN RÕ RỆT) */}
+                <motion.div
                   initial={{ opacity: 0, letterSpacing: "0.2em" }}
-                  animate={{ opacity: 1, letterSpacing: "0.35em" }}
-                  transition={{ duration: 1.0, delay: 0.1 }}
-                  className="font-serif text-xs sm:text-sm md:text-base font-semibold uppercase tracking-[0.35em] text-[#8B1A1E] mb-1.5 sm:mb-2"
-                  style={{
-                    textShadow: "0 0 12px rgba(245, 215, 120, 0.55), 0 1px 2px rgba(255, 255, 255, 0.8)",
-                  }}
+                  animate={{ opacity: 1, letterSpacing: "0.38em" }}
+                  transition={{ duration: 1.1, delay: 0.15 }}
+                  className="flex items-center gap-2 sm:gap-3 mb-1 sm:mb-1.5"
                 >
-                  LỄ THÀNH HÔN
-                </motion.span>
+                  {/* Họa tiết hoa văn chỉ vàng hai bên */}
+                  <span className="text-[#C9A84C] text-[10px] sm:text-xs opacity-75">❖</span>
+                  <span
+                    className="font-serif text-[11px] sm:text-xs md:text-sm lg:text-base font-semibold uppercase tracking-[0.38em] text-[#8B1A1E]"
+                    style={{
+                      textShadow:
+                        "0 1px 2px rgba(255, 255, 255, 0.9), 0 0 10px rgba(245, 215, 120, 0.6), 0 2px 4px rgba(139, 26, 30, 0.25)",
+                    }}
+                  >
+                    LỄ THÀNH HÔN
+                  </span>
+                  <span className="text-[#C9A84C] text-[10px] sm:text-xs opacity-75">❖</span>
+                </motion.div>
 
-                {/* Họa tiết gạch nối chỉ vàng cổ điển */}
+                {/* ĐƯỜNG CHỈ VÀNG KIM CUNG ĐÌNH MỎNG NHẸ */}
                 <motion.div
                   initial={{ scaleX: 0, opacity: 0 }}
-                  animate={{ scaleX: 1, opacity: 0.85 }}
-                  transition={{ duration: 0.8, delay: 0.25 }}
-                  className="w-16 sm:w-24 h-[1px] bg-gradient-to-r from-transparent via-[#C9A84C] to-transparent mb-2 sm:mb-2.5"
+                  animate={{ scaleX: 1, opacity: 0.8 }}
+                  transition={{ duration: 0.9, delay: 0.3 }}
+                  className="w-20 sm:w-32 md:w-44 h-[1px] bg-gradient-to-r from-transparent via-[#C9A84C] to-transparent mb-1.5 sm:mb-2.5"
                 />
 
-                {/* TÊN CÔ DÂU & TÊN CHÚ RỂ (Thành phần lớn nhất, màu đỏ son sẫm hoàng cung) */}
+                {/* TÊN CÔ DÂU & TÊN CHÚ RỂ (THÀNH PHẦN LỚN NHẤT, NÉT SƠN SON THIẾP VÀNG HOÀNG GIA) */}
                 <motion.div
-                  initial={{ opacity: 0, scale: 0.96 }}
+                  initial={{ opacity: 0, scale: 0.97 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 1.0, delay: 0.3 }}
-                  className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 md:gap-4 font-serif"
+                  transition={{ duration: 1.2, delay: 0.35 }}
+                  className="flex flex-wrap items-center justify-center gap-2 sm:gap-3.5 md:gap-5 font-serif"
                 >
                   {/* Tên Cô Dâu */}
                   <span
-                    className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-medium tracking-wide text-[#8B1A1E]"
+                    className="text-lg sm:text-2xl md:text-3xl lg:text-4xl font-medium tracking-wide text-[#8B1A1E]"
                     style={{
-                      textShadow: "0 0 16px rgba(245, 215, 120, 0.5), 0 1px 2px rgba(255, 255, 255, 0.9)",
+                      textShadow:
+                        "0 1px 2px rgba(255, 255, 255, 0.95), 0 0 14px rgba(245, 215, 120, 0.55), 0 2px 5px rgba(139, 26, 30, 0.3)",
                     }}
                   >
                     {brideName}
@@ -195,9 +219,9 @@ export const CinematicOpeningVideo: React.FC<CinematicOpeningVideoProps> = ({
 
                   {/* Ký tự nối & */}
                   <span
-                    className="text-base sm:text-lg md:text-2xl italic font-serif text-[#C9A84C]"
+                    className="text-base sm:text-xl md:text-2xl lg:text-3xl font-serif italic text-[#C9A84C]"
                     style={{
-                      textShadow: "0 0 10px rgba(201, 168, 76, 0.6)",
+                      textShadow: "0 0 10px rgba(201, 168, 76, 0.65), 0 1px 1px rgba(255, 255, 255, 0.8)",
                     }}
                   >
                     &amp;
@@ -205,9 +229,10 @@ export const CinematicOpeningVideo: React.FC<CinematicOpeningVideoProps> = ({
 
                   {/* Tên Chú Rể */}
                   <span
-                    className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-medium tracking-wide text-[#8B1A1E]"
+                    className="text-lg sm:text-2xl md:text-3xl lg:text-4xl font-medium tracking-wide text-[#8B1A1E]"
                     style={{
-                      textShadow: "0 0 16px rgba(245, 215, 120, 0.5), 0 1px 2px rgba(255, 255, 255, 0.9)",
+                      textShadow:
+                        "0 1px 2px rgba(255, 255, 255, 0.95), 0 0 14px rgba(245, 215, 120, 0.55), 0 2px 5px rgba(139, 26, 30, 0.3)",
                     }}
                   >
                     {groomName}
@@ -218,60 +243,67 @@ export const CinematicOpeningVideo: React.FC<CinematicOpeningVideoProps> = ({
           </AnimatePresence>
         </div>
 
-        {/* ── 5. TIMELINE 5.2s → 5.8s: NÚT "MỞ THIỆP" XUẤT HIỆN THANH LỊCH ── */}
-        <div className="absolute top-[28%] sm:top-[30%] md:top-[33%] left-0 right-0 flex justify-center z-30 pointer-events-auto">
+        {/* ── 5.2s → 6.0s: THẺ BÀI SƠN SON THIẾP VÀNG "MỞ THIỆP" (CEREMONIAL INVITATION SEAL) ── */}
+        <div className="absolute top-[28%] sm:top-[29%] md:top-[30%] left-0 right-0 flex justify-center z-30 pointer-events-auto">
           <AnimatePresence>
-            {showButton && !isTransitioning && (
+            {showSeal && !isTransitioning && (
               <motion.button
-                key="open-invitation-btn"
+                key="ceremonial-seal-button"
                 onClick={handleOpenClick}
-                initial={{ opacity: 0, y: 10, scale: 0.96 }}
+                initial={{ opacity: 0, y: 8, scale: 0.96 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.95 }}
-                transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+                transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                className="group relative inline-flex items-center gap-2 px-6 py-2 sm:px-7 sm:py-2.5 rounded-full backdrop-blur-md cursor-pointer transition-all duration-300 shadow-md select-none overflow-hidden"
+                className="group relative inline-flex items-center gap-2 sm:gap-2.5 px-5 py-1.5 sm:px-6 sm:py-2 rounded-full cursor-pointer transition-all duration-400 select-none overflow-hidden shadow-lg"
                 style={{
-                  backgroundColor: "rgba(139, 26, 30, 0.88)", // Dark vermilion translucent
-                  border: "1px solid rgba(201, 168, 76, 0.65)", // Thin gold border
-                  boxShadow: "0 4px 18px rgba(139, 26, 30, 0.25), 0 0 12px rgba(201, 168, 76, 0.3)",
+                  background: "radial-gradient(ellipse at 50% 30%, #9F171B 0%, #7F1D1D 65%, #590B0E 100%)",
+                  border: "1px solid rgba(212, 175, 55, 0.75)",
+                  boxShadow:
+                    "0 4px 16px rgba(127, 29, 29, 0.35), 0 0 10px rgba(212, 175, 55, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.3), inset 0 -1px 2px rgba(0, 0, 0, 0.4)",
                 }}
               >
-                {/* Hiệu ứng ánh sáng vàng kim lướt qua viền khi hover */}
-                <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-[#FDE68A]/30 to-transparent pointer-events-none" />
+                {/* Viền chỉ vàng kép tinh xảo */}
+                <div className="absolute inset-1 rounded-full border border-dashed border-[#FDE68A]/40 pointer-events-none" />
 
-                {/* Biểu tượng ánh sao nhỏ */}
-                <Sparkles className="w-3.5 h-3.5 text-[#FDE68A] transition-transform duration-300 group-hover:rotate-45" />
+                {/* Vệt sáng ánh vàng lướt nhẹ qua thẻ bài khi hover */}
+                <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-[#FFF8D6]/25 to-transparent pointer-events-none" />
 
-                {/* Chữ MỞ THIỆP màu ngà cao cấp */}
+                {/* Điểm xuyết hoa văn cát tường nhỏ */}
+                <span className="relative z-10 text-[#FDE68A] text-[9px] sm:text-[10px] opacity-80">❖</span>
+
+                {/* Chữ "MỞ THIỆP" màu ngà son quý phái */}
                 <span
-                  className="font-serif text-xs sm:text-sm font-medium tracking-[0.25em] text-[#FFFDF7] uppercase"
+                  className="relative z-10 font-serif text-[11px] sm:text-xs md:text-sm font-medium tracking-[0.3em] text-[#FFFDF7] uppercase"
                   style={{
-                    textShadow: "0 1px 2px rgba(0, 0, 0, 0.4)",
+                    textShadow: "0 1px 2px rgba(0, 0, 0, 0.5), 0 0 8px rgba(253, 230, 138, 0.4)",
                   }}
                 >
                   MỞ THIỆP
                 </span>
+
+                <span className="relative z-10 text-[#FDE68A] text-[9px] sm:text-[10px] opacity-80">❖</span>
               </motion.button>
             )}
           </AnimatePresence>
         </div>
 
-        {/* ── 6. LÀN ÁNH SÁNG KHI CLICK "MỞ THIỆP" (LIGHT SWEEP TRANSITION) ── */}
+        {/* ── LÀN ÁNH SÁNG KHI CLICK "MỞ THIỆP" (CINEMATIC GOLDEN LIGHT SWEEP) ── */}
         <AnimatePresence>
           {isTransitioning && (
             <motion.div
               initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: [0, 0.7, 0], scale: [0.8, 1.4, 2.0] }}
-              transition={{ duration: 1.2, ease: "easeInOut" }}
+              animate={{ opacity: [0, 0.75, 0], scale: [0.8, 1.4, 2.0] }}
+              transition={{ duration: 1.25, ease: "easeInOut" }}
               className="absolute inset-0 pointer-events-none z-40 flex items-center justify-center"
             >
               <div
                 className="w-full h-full rounded-full"
                 style={{
-                  background: "radial-gradient(circle, rgba(253, 230, 138, 0.8) 0%, rgba(201, 168, 76, 0.4) 40%, transparent 75%)",
-                  filter: "blur(30px)",
+                  background:
+                    "radial-gradient(circle, rgba(254, 240, 138, 0.85) 0%, rgba(212, 175, 55, 0.45) 45%, transparent 75%)",
+                  filter: "blur(32px)",
                 }}
               />
             </motion.div>
@@ -279,56 +311,51 @@ export const CinematicOpeningVideo: React.FC<CinematicOpeningVideoProps> = ({
         </AnimatePresence>
       </div>
 
-      {/* ── CSS CHO VI HẠT BỤI VÀNG CỔ PHONG (SUBTLE FLOATING GOLD PARTICLES) ── */}
+      {/* ── ĐỊNH DẠNG CSS VI HẠT BỤI VÀNG CỔ PHONG ── */}
       <style jsx>{`
-        .particle-gold {
+        .antique-particle {
           position: absolute;
           width: 3px;
           height: 3px;
           border-radius: 50%;
-          background: rgba(212, 175, 55, 0.55);
-          box-shadow: 0 0 6px rgba(245, 215, 120, 0.6);
+          background: rgba(212, 175, 55, 0.5);
+          box-shadow: 0 0 8px rgba(245, 215, 120, 0.65);
           pointer-events: none;
         }
-        .particle-1 {
-          top: 25%;
-          left: 35%;
-          animation: floatSlow 7s ease-in-out infinite;
-        }
-        .particle-2 {
-          top: 18%;
-          left: 62%;
-          animation: floatSlow 9s ease-in-out infinite reverse;
-        }
-        .particle-3 {
-          top: 45%;
-          left: 48%;
-          animation: floatSlow 8s ease-in-out infinite 1s;
-        }
-        .particle-4 {
-          top: 30%;
-          left: 55%;
-          animation: floatSlow 10s ease-in-out infinite 2s;
-        }
-        .particle-5 {
+        .particle-a {
           top: 22%;
-          left: 42%;
-          animation: floatSlow 7.5s ease-in-out infinite 1.5s;
+          left: 38%;
+          animation: floatAntique 8s ease-in-out infinite;
         }
-        .particle-6 {
-          top: 38%;
-          left: 68%;
-          animation: floatSlow 11s ease-in-out infinite 3s;
+        .particle-b {
+          top: 17%;
+          left: 60%;
+          animation: floatAntique 10s ease-in-out infinite reverse;
         }
-        @keyframes floatSlow {
+        .particle-c {
+          top: 32%;
+          left: 45%;
+          animation: floatAntique 9s ease-in-out infinite 1s;
+        }
+        .particle-d {
+          top: 26%;
+          left: 54%;
+          animation: floatAntique 11s ease-in-out infinite 2s;
+        }
+        .particle-e {
+          top: 35%;
+          left: 63%;
+          animation: floatAntique 8.5s ease-in-out infinite 1.5s;
+        }
+        @keyframes floatAntique {
           0%,
           100% {
             transform: translate(0, 0) scale(1);
-            opacity: 0.3;
+            opacity: 0.25;
           }
           50% {
-            transform: translate(12px, -18px) scale(1.3);
-            opacity: 0.8;
+            transform: translate(10px, -15px) scale(1.25);
+            opacity: 0.75;
           }
         }
       `}</style>
