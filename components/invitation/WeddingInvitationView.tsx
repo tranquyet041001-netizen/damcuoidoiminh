@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { FloatingControls } from "@/components/layout/FloatingControls";
 import { HeroInvitation } from "@/components/invitation/HeroInvitation";
+import { DragonPhoenixEffect } from "@/components/invitation/DragonPhoenixEffect";
 import { OpeningLetter } from "@/components/invitation/OpeningLetter";
 import { CoupleStory } from "@/components/invitation/CoupleStory";
 import { WeddingDetails } from "@/components/invitation/WeddingDetails";
@@ -37,13 +38,24 @@ export const WeddingInvitationView: React.FC<WeddingInvitationViewProps> = ({
   });
 
   const isEnvelopeOpen = controlledIsOpen !== undefined ? controlledIsOpen : internalIsOpen;
+  const [playDragonPhoenix, setPlayDragonPhoenix] = useState<boolean>(false);
+  const prevOpenRef = useRef(isEnvelopeOpen);
 
   const handleOpen = () => {
     if (controlledIsOpen === undefined) {
       setInternalIsOpen(true);
     }
+    setPlayDragonPhoenix(true);
     onOpenChange?.(true);
   };
+
+  // Kích hoạt hiệu ứng Long Phụng khi thiệp chuyển từ đóng sang mở
+  useEffect(() => {
+    if (!prevOpenRef.current && isEnvelopeOpen) {
+      setPlayDragonPhoenix(true);
+    }
+    prevOpenRef.current = isEnvelopeOpen;
+  }, [isEnvelopeOpen]);
 
   // Tự động mở nếu khách truy cập bằng anchor link trực tiếp (#rsvp, #details, #gallery, #wishes)
   useEffect(() => {
@@ -76,6 +88,13 @@ export const WeddingInvitationView: React.FC<WeddingInvitationViewProps> = ({
         <HeroInvitation
           isOpen={isEnvelopeOpen}
           onOpen={handleOpen}
+          onReplayDragonPhoenix={() => setPlayDragonPhoenix(true)}
+        />
+
+        {/* Hiệu ứng Rồng bay bên trái, Phượng bay bên phải khi mở thiệp */}
+        <DragonPhoenixEffect
+          isActive={playDragonPhoenix}
+          onComplete={() => setPlayDragonPhoenix(false)}
         />
 
         {/* ── CÁC PHẦN SAU CHỈ HIỂN THỊ KHI ĐÃ ẤN "MỞ THIỆP CHÚC MỪNG" ── */}

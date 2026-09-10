@@ -17,11 +17,13 @@ import {
 interface HeroInvitationProps {
   isOpen?: boolean;
   onOpen?: () => void;
+  onReplayDragonPhoenix?: () => void;
 }
 
 export const HeroInvitation: React.FC<HeroInvitationProps> = ({
   isOpen: controlledIsOpen,
   onOpen,
+  onReplayDragonPhoenix,
 }) => {
   const { data: weddingData } = useWeddingData();
   const { playMusic, isPlaying } = useMusic();
@@ -293,15 +295,29 @@ export const HeroInvitation: React.FC<HeroInvitationProps> = ({
                 </div>
               </div>
 
-              {/* Nút cuộn xuống xem chi tiết */}
-              <button
-                type="button"
-                onClick={scrollToContent}
-                className="mt-2 inline-flex items-center gap-2 text-xs uppercase tracking-wider text-[#4A6741] hover:text-[#C4715A] font-medium transition-colors cursor-pointer"
-              >
-                <span>Xem Chi Tiết Hôn Lễ</span>
-                <ChevronDown className="w-4 h-4 animate-bounce text-[#C4715A]" />
-              </button>
+              {/* Nút cuộn xuống xem chi tiết & Nút xem lại hiệu ứng Rồng Phượng */}
+              <div className="mt-4 flex flex-col sm:flex-row items-center justify-center gap-2.5">
+                <button
+                  type="button"
+                  onClick={scrollToContent}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#4A6741] hover:bg-[#354D2E] text-[#FDFAF5] text-xs uppercase tracking-wider font-semibold shadow-md transition-all active:scale-95 cursor-pointer"
+                >
+                  <span>Xem Chi Tiết Hôn Lễ</span>
+                  <ChevronDown className="w-4 h-4 animate-bounce text-[#C9A84C]" />
+                </button>
+
+                {onReplayDragonPhoenix && (
+                  <button
+                    type="button"
+                    onClick={onReplayDragonPhoenix}
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#FDF0EC] hover:bg-[#F5E2DB] text-[#C4715A] border border-[#E8D5CF] text-xs font-serif font-semibold shadow-xs transition-all active:scale-95 cursor-pointer"
+                    title="Xem lại hiệu ứng Rồng Phượng bay lượn"
+                  >
+                    <Sparkles className="w-3.5 h-3.5 text-[#C9A84C] animate-pulse" />
+                    <span>Xem Lại Rồng Phượng Bay</span>
+                  </button>
+                )}
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
