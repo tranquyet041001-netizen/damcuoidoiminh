@@ -79,7 +79,7 @@ export const WeddingDetails: React.FC = () => {
                 <div className="flex items-start gap-3 text-sm text-[#5C4033]">
                   <Calendar className="w-4 h-4 text-[#C4715A] mt-0.5 shrink-0" />
                   <div>
-                    <span className="font-medium text-[#354D2E]">{event.date}</span>
+                    <span className="font-medium text-[#354D2E]">{event.date || weddingData.weddingDateFormatted}</span>
                   </div>
                 </div>
 
@@ -101,7 +101,7 @@ export const WeddingDetails: React.FC = () => {
 
                 {event.notes && (
                   <p className="text-xs text-[#8C6A58] italic font-serif mt-2 pl-7">
-                    * {event.notes}
+                    * {event.notes.startsWith("*") ? event.notes.slice(1).trim() : event.notes}
                   </p>
                 )}
               </div>

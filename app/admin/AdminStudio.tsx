@@ -1174,34 +1174,123 @@ function StudioContent() {
               <div className="space-y-5 animate-in fade-in duration-300">
                 {/* Thời gian hôn lễ */}
                 <div className="bg-[#FDFAF5] border border-[#E8D5CF] p-4 sm:p-5 rounded-2xl space-y-4 shadow-2xs">
-                  <h3 className="font-serif font-bold text-sm text-[#354D2E] pb-2 border-b border-[#E8D5CF]">
-                    Thời Gian Hôn Lễ &amp; Lời Mở Đầu
-                  </h3>
+                  <div className="flex items-center justify-between pb-2 border-b border-[#E8D5CF]">
+                    <h3 className="font-serif font-bold text-sm text-[#354D2E]">
+                      Thời Gian Hôn Lễ &amp; Lời Mở Đầu
+                    </h3>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const updated = data.events.map((ev) => ({
+                          ...ev,
+                          date: data.weddingDateFormatted,
+                        }));
+                        updateData({ events: updated });
+                        showToast(`Đã đồng bộ ngày "${data.weddingDateFormatted}" sang tất cả ${data.events.length} sự kiện cưới!`, "success");
+                      }}
+                      className="text-[11px] text-[#4A6741] hover:text-[#354D2E] font-medium underline flex items-center gap-1 cursor-pointer"
+                    >
+                      <Sparkles className="w-3.5 h-3.5 text-[#C9A84C]" />
+                      <span>Đồng bộ ngày sang tất cả Sự Kiện</span>
+                    </button>
+                  </div>
 
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                      <label className="text-xs text-[#8C6A58] block mb-1 font-medium">Ngày Dương Lịch</label>
+                      <div className="flex items-center justify-between mb-1">
+                        <label className="text-xs text-[#8C6A58] font-bold">Ngày Dương Lịch (Chính)</label>
+                      </div>
                       <input
                         type="text"
                         value={data.weddingDateFormatted}
-                        onChange={(e) => updateData({ weddingDateFormatted: e.target.value })}
-                        className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs font-serif text-[#354D2E]"
+                        onChange={(e) => {
+                          const newDateStr = e.target.value;
+                          updateData((prev) => {
+                            const updatedEvts = prev.events.map((ev) => ({
+                              ...ev,
+                              date: ev.date === prev.weddingDateFormatted || !ev.date ? newDateStr : ev.date,
+                            }));
+                            return {
+                              ...prev,
+                              weddingDateFormatted: newDateStr,
+                              events: updatedEvts,
+                            };
+                          });
+                        }}
+                        className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs font-serif text-[#354D2E] font-bold focus:outline-none focus:border-[#4A6741]"
+                        placeholder="Ví dụ: Chủ Nhật, 24 Tháng 01 Năm 2027"
                       />
                     </div>
 
                     <div>
-                      <label className="text-xs text-[#8C6A58] block mb-1 font-medium">Ngày Âm Lịch</label>
+                      <label className="text-xs text-[#8C6A58] block mb-1 font-bold">Ngày Âm Lịch</label>
                       <input
                         type="text"
                         value={data.lunarDateFormatted}
                         onChange={(e) => updateData({ lunarDateFormatted: e.target.value })}
-                        className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs text-[#354D2E]"
+                        className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs text-[#354D2E] focus:outline-none focus:border-[#4A6741]"
+                        placeholder="Ví dụ: Nhằm ngày 17 tháng Chạp năm Bính Ngọ"
                       />
                     </div>
                   </div>
 
+                  {/* Tiện ích chọn lịch nhanh tự động định dạng */}
+                  <div className="p-3 bg-[#F0F5EE] border border-[#A8BCA1]/40 rounded-xl space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-[#354D2E] flex items-center gap-1.5">
+                        <Calendar className="w-3.5 h-3.5 text-[#4A6741]" />
+                        <span>Bộ Chọn Lịch Tự Động:</span>
+                      </span>
+                      <span className="text-[10px] text-[#8C6A58]">Tự điền Ngày Dương + Đếm Ngược + Sự Kiện</span>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <input
+                        type="date"
+                        value={(() => {
+                          try {
+                            const d = new Date(data.weddingDate);
+                            if (isNaN(d.getTime())) return "";
+                            const pad = (n: number) => n.toString().padStart(2, "0");
+                            return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+                          } catch {
+                            return "";
+                          }
+                        })()}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          if (!val) return;
+                          const [year, month, day] = val.split("-").map(Number);
+                          const d = new Date(year, month - 1, day, 10, 30, 0);
+                          const daysOfWeek = ["Chủ Nhật", "Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy"];
+                          const dayName = daysOfWeek[d.getDay()];
+                          const pad = (n: number) => n.toString().padStart(2, "0");
+                          const formattedDate = `${dayName}, ${pad(day)} Tháng ${pad(month)} Năm ${year}`;
+                          const iso = `${val}T10:30:00+07:00`;
+
+                          updateData((prev) => {
+                            const updatedEvts = prev.events.map((ev) => ({
+                              ...ev,
+                              date: formattedDate,
+                            }));
+                            return {
+                              ...prev,
+                              weddingDate: iso,
+                              weddingDateFormatted: formattedDate,
+                              events: updatedEvts,
+                            };
+                          });
+                          showToast(`Đã cập nhật ngày: ${formattedDate} và đồng bộ các sự kiện!`, "success");
+                        }}
+                        className="bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-1.5 text-xs text-[#354D2E] focus:outline-none focus:border-[#4A6741] cursor-pointer"
+                      />
+                      <span className="text-[11px] text-[#5C4033] italic">
+                        Bấm biểu tượng lịch để chọn ngày, hệ thống sẽ tự động cập nhật đồng bộ!
+                      </span>
+                    </div>
+                  </div>
+
                   <div>
-                    <label className="text-xs text-[#8C6A58] block mb-1 font-medium">Chuỗi ISO Cho Đếm Ngược</label>
+                    <label className="text-xs text-[#8C6A58] block mb-1 font-medium">Chuỗi ISO Cho Đồng Hồ Đếm Ngược</label>
                     <input
                       type="text"
                       value={data.weddingDate}
@@ -1355,13 +1444,14 @@ function StudioContent() {
                       const newEvt: WeddingEvent = {
                         id: `evt-${Date.now()}`,
                         title: "LỄ MỚI",
-                        subtitle: "Nghi lễ",
+                        subtitle: "Nghi thức",
                         date: data.weddingDateFormatted,
                         isoDate: data.weddingDate,
-                        time: "10:30",
-                        venue: "Tư gia",
-                        address: "Khu 5, Xóm 6, Xã Minh Châu, Hà Nội",
-                        mapUrl: "https://maps.google.com/?q=Xã+Minh+Châu+Hà+Nội",
+                        time: "10:30 Sáng",
+                        venue: "Tư Gia Hôn Trường",
+                        address: "Khu 5, Xóm 6, Xã Minh Châu, Thành phố Hà Nội",
+                        mapUrl: "https://maps.google.com/?q=Khu+5+Xóm+6+Minh+Châu+Hà+Nội",
+                        notes: "Trân trọng kính mời quý khách tới chung vui cùng gia đình.",
                       };
                       updateData((prev) => ({ ...prev, events: [...prev.events, newEvt] }));
                     }}
@@ -1372,10 +1462,40 @@ function StudioContent() {
                   </button>
                 </div>
 
+                {/* Thanh đồng bộ ngày nhanh */}
+                <div className="p-3 bg-[#F0F5EE] border border-[#A8BCA1]/40 rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 shadow-2xs">
+                  <div className="text-xs text-[#354D2E]">
+                    <span className="text-[#8C6A58]">Ngày cưới chính: </span>
+                    <strong className="font-serif font-bold">{data.weddingDateFormatted}</strong>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const updated = data.events.map((e) => ({
+                        ...e,
+                        date: data.weddingDateFormatted,
+                      }));
+                      updateData({ events: updated });
+                      showToast(`Đã đồng bộ ngày "${data.weddingDateFormatted}" sang tất cả ${data.events.length} sự kiện!`, "success");
+                    }}
+                    className="px-3 py-1.5 bg-[#4A6741] hover:bg-[#354D2E] text-white text-xs font-bold rounded-lg transition-all flex items-center gap-1 cursor-pointer shrink-0 shadow-2xs active:scale-95"
+                  >
+                    <Sparkles className="w-3.5 h-3.5 text-[#C9A84C]" />
+                    <span>Đồng bộ tất cả theo Ngày Cưới Chính</span>
+                  </button>
+                </div>
+
                 {data.events.map((evt, idx) => (
-                  <div key={evt.id} className="bg-[#FDFAF5] border border-[#E8D5CF] p-4 rounded-2xl space-y-2.5 relative shadow-2xs">
-                    <div className="flex items-center justify-between pb-1.5 border-b border-[#E8D5CF]">
-                      <span className="text-xs font-serif font-bold text-[#354D2E]">Sự kiện #{idx + 1}</span>
+                  <div key={evt.id} className="bg-[#FDFAF5] border border-[#E8D5CF] p-4 rounded-2xl space-y-3 relative shadow-2xs">
+                    <div className="flex items-center justify-between pb-2 border-b border-[#E8D5CF]">
+                      <div className="flex items-center gap-2">
+                        <span className="w-5 h-5 rounded-full bg-[#4A6741] text-white text-[11px] font-serif font-bold flex items-center justify-center">
+                          {idx + 1}
+                        </span>
+                        <span className="text-xs font-serif font-bold text-[#354D2E]">
+                          {evt.title || `Sự kiện #${idx + 1}`}
+                        </span>
+                      </div>
                       <button
                         type="button"
                         onClick={() => {
@@ -1384,72 +1504,170 @@ function StudioContent() {
                             events: prev.events.filter((e) => e.id !== evt.id),
                           }));
                         }}
-                        className="text-zinc-400 hover:text-[#C4715A] p-1 cursor-pointer"
+                        className="text-zinc-400 hover:text-[#C4715A] p-1 cursor-pointer transition-colors"
+                        title="Xóa sự kiện này"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-2">
+                    {/* Tiêu đề chính & Tiêu đề phụ (Subtitle) */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                      <div>
+                        <label className="text-[10px] text-[#8C6A58] block mb-1 font-bold uppercase tracking-wider">
+                          Tiêu Đề Sự Kiện
+                        </label>
+                        <input
+                          type="text"
+                          value={evt.title}
+                          placeholder="Ví dụ: Tiệc Cưới Chung Vui / Lễ Vu Quy..."
+                          onChange={(e) => {
+                            const evts = [...data.events];
+                            evts[idx].title = e.target.value;
+                            updateData({ events: evts });
+                          }}
+                          className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs font-serif font-bold text-[#354D2E] focus:outline-none focus:border-[#4A6741]"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-[10px] text-[#8C6A58] block mb-1 font-bold uppercase tracking-wider">
+                          Dòng Phụ Đề (Dòng Chữ Hoa Trên Cùng)
+                        </label>
+                        <input
+                          type="text"
+                          value={evt.subtitle || ""}
+                          placeholder="Ví dụ: ĐÓN KHÁCH & KHAI TIỆC CHUNG VUI HAI HỌ"
+                          onChange={(e) => {
+                            const evts = [...data.events];
+                            evts[idx].subtitle = e.target.value;
+                            updateData({ events: evts });
+                          }}
+                          className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs font-medium text-[#C4715A] focus:outline-none focus:border-[#C4715A]"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Ngày tổ chức & Giờ tổ chức */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                      <div>
+                        <div className="flex items-center justify-between mb-1">
+                          <label className="text-[10px] text-[#8C6A58] font-bold uppercase tracking-wider">
+                            Ngày Diễn Ra Sự Kiện
+                          </label>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const evts = [...data.events];
+                              evts[idx].date = data.weddingDateFormatted;
+                              updateData({ events: evts });
+                              showToast("Đã lấy ngày cưới chính!", "success");
+                            }}
+                            className="text-[10px] text-[#4A6741] hover:underline font-medium cursor-pointer"
+                          >
+                            ⚡ Lấy ngày cưới chính
+                          </button>
+                        </div>
+                        <input
+                          type="text"
+                          value={evt.date || ""}
+                          placeholder="Ví dụ: Chủ Nhật, 24 Tháng 01 Năm 2027"
+                          onChange={(e) => {
+                            const evts = [...data.events];
+                            evts[idx].date = e.target.value;
+                            updateData({ events: evts });
+                          }}
+                          className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs text-[#354D2E] focus:outline-none focus:border-[#4A6741]"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-[10px] text-[#8C6A58] block mb-1 font-bold uppercase tracking-wider">
+                          Giờ Tổ Chức / Đón Khách
+                        </label>
+                        <input
+                          type="text"
+                          value={evt.time}
+                          placeholder="Ví dụ: 11:30 Trưa (Đón khách từ 11:00)"
+                          onChange={(e) => {
+                            const evts = [...data.events];
+                            evts[idx].time = e.target.value;
+                            updateData({ events: evts });
+                          }}
+                          className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs text-[#354D2E] focus:outline-none focus:border-[#4A6741]"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Tên Hôn Trường & Địa Chỉ Cụ Thể */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                      <div>
+                        <label className="text-[10px] text-[#8C6A58] block mb-1 font-bold uppercase tracking-wider">
+                          Tên Hôn Trường / Địa Điểm
+                        </label>
+                        <input
+                          type="text"
+                          value={evt.venue}
+                          placeholder="Ví dụ: Hôn Trường Tư Gia Hai Họ"
+                          onChange={(e) => {
+                            const evts = [...data.events];
+                            evts[idx].venue = e.target.value;
+                            updateData({ events: evts });
+                          }}
+                          className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs text-[#354D2E] focus:outline-none focus:border-[#4A6741]"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-[10px] text-[#8C6A58] block mb-1 font-bold uppercase tracking-wider">
+                          Địa Chỉ Cụ Thể
+                        </label>
+                        <input
+                          type="text"
+                          value={evt.address}
+                          placeholder="Ví dụ: Khu 5, Xóm 6, Xã Minh Châu, Thành phố Hà Nội"
+                          onChange={(e) => {
+                            const evts = [...data.events];
+                            evts[idx].address = e.target.value;
+                            updateData({ events: evts });
+                          }}
+                          className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs text-[#5C4033] focus:outline-none focus:border-[#4A6741]"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Lời nhắn / Ghi chú cho khách */}
+                    <div>
+                      <label className="text-[10px] text-[#8C6A58] block mb-1 font-bold uppercase tracking-wider">
+                        Lời Nhắn / Lời Dặn Cho Khách
+                      </label>
                       <input
                         type="text"
-                        value={evt.title}
-                        placeholder="Tiêu đề sự kiện"
+                        value={evt.notes || ""}
+                        placeholder="Ví dụ: Trân trọng kính mời quý khách dùng bữa cơm thân mật chung vui cùng gia đình."
                         onChange={(e) => {
                           const evts = [...data.events];
-                          evts[idx].title = e.target.value;
+                          evts[idx].notes = e.target.value;
                           updateData({ events: evts });
                         }}
-                        className="bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-1.5 text-xs font-serif font-bold text-[#354D2E]"
-                      />
-                      <input
-                        type="text"
-                        value={evt.time}
-                        placeholder="Giờ (10:30)"
-                        onChange={(e) => {
-                          const evts = [...data.events];
-                          evts[idx].time = e.target.value;
-                          updateData({ events: evts });
-                        }}
-                        className="bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-1.5 text-xs text-[#354D2E]"
+                        className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs italic font-serif text-[#8C6A58] focus:outline-none focus:border-[#4A6741]"
                       />
                     </div>
 
-                    <input
-                      type="text"
-                      value={evt.venue}
-                      placeholder="Tên địa điểm / Nhà hàng"
-                      onChange={(e) => {
-                        const evts = [...data.events];
-                        evts[idx].venue = e.target.value;
-                        updateData({ events: evts });
-                      }}
-                      className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-1.5 text-xs text-[#354D2E]"
-                    />
-
-                    <input
-                      type="text"
-                      value={evt.address}
-                      placeholder="Địa chỉ cụ thể"
-                      onChange={(e) => {
-                        const evts = [...data.events];
-                        evts[idx].address = e.target.value;
-                        updateData({ events: evts });
-                      }}
-                      className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-1.5 text-xs text-[#5C4033]"
-                    />
-
-                    <input
-                      type="url"
-                      value={evt.mapUrl}
-                      placeholder="Đường dẫn Google Maps"
-                      onChange={(e) => {
-                        const evts = [...data.events];
-                        evts[idx].mapUrl = e.target.value;
-                        updateData({ events: evts });
-                      }}
-                      className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-1.5 text-xs font-mono text-[#4A6741]"
-                    />
+                    {/* Đường dẫn Google Maps */}
+                    <div>
+                      <label className="text-[10px] text-[#8C6A58] block mb-1 font-bold uppercase tracking-wider">
+                        Đường Dẫn Bản Đồ Google Maps
+                      </label>
+                      <input
+                        type="url"
+                        value={evt.mapUrl}
+                        placeholder="https://maps.google.com/?q=..."
+                        onChange={(e) => {
+                          const evts = [...data.events];
+                          evts[idx].mapUrl = e.target.value;
+                          updateData({ events: evts });
+                        }}
+                        className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs font-mono text-[#4A6741] focus:outline-none focus:border-[#4A6741]"
+                      />
+                    </div>
                   </div>
                 ))}
               </div>
