@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 import os from "os";
+import { Redis } from "@upstash/redis";
 import { weddingData as defaultData } from "@/data/wedding";
 import { WeddingData } from "@/types/wedding";
 
@@ -12,16 +13,34 @@ declare global {
   var __latestWeddingData: WeddingData | undefined;
 }
 
+function getRedisClient(): Redis | null {
+  const url =
+    process.env.UPSTASH_REDIS_REST_URL ||
+    process.env.KV_REST_API_URL ||
+    process.env.UPSTASH_REDIS_REST_KV_URL;
+  const token =
+    process.env.UPSTASH_REDIS_REST_TOKEN ||
+    process.env.KV_REST_API_TOKEN ||
+    process.env.UPSTASH_REDIS_REST_KV_TOKEN;
+
+  if (url && token) {
+    try {
+      return new Redis({ url, token });
+    } catch (err) {
+      console.warn("Could not initialize Upstash Redis:", err);
+    }
+  }
+  return null;
+}
+
 /**
  * Đọc dữ liệu thiệp cưới mới nhất (Đồng bộ)
  */
 export function getLatestWeddingData(): WeddingData {
-  // 1. Kiểm tra cache trong bộ nhớ tiến trình (serverless instance)
   if (globalThis.__latestWeddingData) {
     return globalThis.__latestWeddingData;
   }
 
-  // 2. Kiểm tra file trong /tmp (writeable trên Vercel Serverless)
   try {
     if (fs.existsSync(tmpFilePath)) {
       const content = fs.readFileSync(tmpFilePath, "utf8");
@@ -35,7 +54,6 @@ export function getLatestWeddingData(): WeddingData {
     // ignore
   }
 
-  // 3. Kiểm tra file tĩnh data/saved_wedding_data.json
   try {
     if (fs.existsSync(jsonFilePath)) {
       const content = fs.readFileSync(jsonFilePath, "utf8");
@@ -56,34 +74,16 @@ export function getLatestWeddingData(): WeddingData {
  * Đọc dữ liệu thiệp cưới mới nhất (Hỗ trợ Vercel KV / Upstash Redis)
  */
 export async function getLatestWeddingDataAsync(): Promise<WeddingData> {
-  const kvUrl =
-    process.env.KV_REST_API_URL ||
-    process.env.UPSTASH_REDIS_REST_URL ||
-    process.env.UPSTASH_REDIS_REST_KV_URL;
-  const kvToken =
-    process.env.KV_REST_API_TOKEN ||
-    process.env.UPSTASH_REDIS_REST_TOKEN ||
-    process.env.UPSTASH_REDIS_REST_KV_TOKEN;
-
-  if (kvUrl && kvToken) {
+  const redis = getRedisClient();
+  if (redis) {
     try {
-      const res = await fetch(`${kvUrl}/get/wedding_custom_data`, {
-        headers: { Authorization: `Bearer ${kvToken}` },
-        cache: "no-store",
-      });
-      if (res.ok) {
-        const json = await res.json();
-        if (json.result) {
-          const parsed =
-            typeof json.result === "string" ? JSON.parse(json.result) : json.result;
-          if (parsed && typeof parsed === "object" && parsed.groom && parsed.bride) {
-            globalThis.__latestWeddingData = parsed;
-            return parsed;
-          }
-        }
+      const cached = await redis.get<WeddingData>("wedding_custom_data");
+      if (cached && typeof cached === "object" && cached.groom && cached.bride) {
+        globalThis.__latestWeddingData = cached;
+        return cached;
       }
-    } catch (kvErr) {
-      console.warn("Could not read from Vercel KV:", kvErr);
+    } catch (err) {
+      console.warn("Could not read from Upstash Redis:", err);
     }
   }
 
@@ -92,48 +92,30 @@ export async function getLatestWeddingDataAsync(): Promise<WeddingData> {
 
 /**
  * Lưu dữ liệu thiệp cưới đa tầng an toàn:
- * - Tầng 1: Vercel KV / Upstash Redis (nếu được kết nối trên Vercel)
- * - Tầng 2: Ghi file data/saved_wedding_data.json và data/wedding.ts (trên localhost / VPS)
+ * - Tầng 1: Upstash Redis / Vercel KV (Lưu vĩnh viễn trên đám mây)
+ * - Tầng 2: Ghi file data/saved_wedding_data.json và data/wedding.ts (trên localhost)
  * - Tầng 3: Ghi file /tmp/saved_wedding_data.json (luôn ghi được trên Vercel Serverless)
  * - Tầng 4: Lưu vào bộ nhớ toàn cục (globalThis.__latestWeddingData)
- * ĐẢM BẢO 100% KHÔNG BAO GIỜ BỊ LỖI 500 HAY EROFS TRÊN VERCEL!
  */
 export async function saveLatestWeddingData(data: WeddingData): Promise<{
   success: boolean;
-  persistedTo: "kv" | "local_disk" | "tmp_storage";
+  persistedTo: "redis" | "local_disk" | "tmp_storage";
 }> {
   globalThis.__latestWeddingData = data;
-  let target: "kv" | "local_disk" | "tmp_storage" = "tmp_storage";
+  let target: "redis" | "local_disk" | "tmp_storage" = "tmp_storage";
 
-  // 1. Tầng 1: Vercel KV / Upstash Redis
-  const kvUrl =
-    process.env.KV_REST_API_URL ||
-    process.env.UPSTASH_REDIS_REST_URL ||
-    process.env.UPSTASH_REDIS_REST_KV_URL;
-  const kvToken =
-    process.env.KV_REST_API_TOKEN ||
-    process.env.UPSTASH_REDIS_REST_TOKEN ||
-    process.env.UPSTASH_REDIS_REST_KV_TOKEN;
-
-  if (kvUrl && kvToken) {
+  // 1. Tầng 1: Upstash Redis / Vercel KV
+  const redis = getRedisClient();
+  if (redis) {
     try {
-      const res = await fetch(`${kvUrl}/set/wedding_custom_data`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${kvToken}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
-      if (res.ok) {
-        target = "kv";
-      }
-    } catch (kvErr) {
-      console.warn("Could not save to Vercel KV:", kvErr);
+      await redis.set("wedding_custom_data", data);
+      target = "redis";
+    } catch (err) {
+      console.warn("Could not save to Upstash Redis:", err);
     }
   }
 
-  // 2. Tầng 2: Ghi vào file mã nguồn (chạy tốt trên localhost)
+  // 2. Tầng 2: Ghi vào file mã nguồn (chạy tốt trên localhost / PC)
   try {
     fs.writeFileSync(jsonFilePath, JSON.stringify(data, null, 2), "utf8");
 
@@ -144,15 +126,14 @@ export async function saveLatestWeddingData(data: WeddingData): Promise<{
     )};\n`;
     fs.writeFileSync(tsFilePath, tsCode, "utf8");
 
-    if (target !== "kv") {
+    if (target !== "redis") {
       target = "local_disk";
     }
   } catch {
-    // Khi chạy trên Vercel Serverless, thư mục mã nguồn là read-only (EROFS)
-    // Hệ thống sẽ ghi vào /tmp ở tầng 3 mà không ném lỗi 500!
+    // EROFS trên Vercel là bình thường
   }
 
-  // 3. Tầng 3: Ghi vào /tmp (thư mục luôn cho phép ghi trên Vercel Serverless)
+  // 3. Tầng 3: Ghi vào /tmp (luôn ghi được trên Vercel Serverless)
   try {
     fs.writeFileSync(tmpFilePath, JSON.stringify(data, null, 2), "utf8");
   } catch (tmpErr) {
