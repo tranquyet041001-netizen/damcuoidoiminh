@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   Menu,
   Map,
@@ -15,7 +15,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useWeddingData } from "@/context/WeddingDataContext";
 import { useToast } from "@/components/ui/Toast";
 import { ShareModal } from "@/components/invitation/ShareModal";
-import { VietnameseLotus, BotanicalBranch } from "@/components/ui/VietnamesePattern";
+import { extractYouTubeId, isYouTubeUrl, YouTubeIcon } from "@/utils/youtube";
 
 interface FloatingControlsProps {
   isGuestView?: boolean;
@@ -40,23 +40,55 @@ export const FloatingControls: React.FC<FloatingControlsProps> = ({
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isShareOpen, setIsShareOpen] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const ytIframeRef = useRef<HTMLIFrameElement | null>(null);
   const { showToast } = useToast();
   const { data } = useWeddingData();
 
-  const toggleMusic = () => {
-    if (!audioRef.current) return;
-    if (isPlaying) {
+  const isYt = isYouTubeUrl(data.musicUrl);
+  const ytId = extractYouTubeId(data.musicUrl);
+
+  // Reset khi đổi link nhạc
+  useEffect(() => {
+    setIsPlaying(false);
+    if (audioRef.current) {
       audioRef.current.pause();
-      setIsPlaying(false);
-      showToast("Đã tạm dừng nhạc nền", "info");
+    }
+  }, [data.musicUrl]);
+
+  const toggleMusic = () => {
+    if (isYt && ytId) {
+      // Điều khiển YouTube qua postMessage
+      if (isPlaying) {
+        ytIframeRef.current?.contentWindow?.postMessage(
+          JSON.stringify({ event: "command", func: "pauseVideo", args: "" }),
+          "*"
+        );
+        setIsPlaying(false);
+        showToast("Đã tạm dừng nhạc YouTube", "info");
+      } else {
+        ytIframeRef.current?.contentWindow?.postMessage(
+          JSON.stringify({ event: "command", func: "playVideo", args: "" }),
+          "*"
+        );
+        setIsPlaying(true);
+        showToast("Đang phát nhạc nền YouTube 🎵", "success");
+      }
     } else {
-      audioRef.current
-        .play()
-        .then(() => {
-          setIsPlaying(true);
-          showToast("Đang phát điệu nhạc hạnh phúc 🎵", "success");
-        })
-        .catch(() => showToast("Vui lòng chạm lại để bật âm thanh", "info"));
+      // Điều khiển file Audio HTML5 (.mp3)
+      if (!audioRef.current) return;
+      if (isPlaying) {
+        audioRef.current.pause();
+        setIsPlaying(false);
+        showToast("Đã tạm dừng nhạc nền", "info");
+      } else {
+        audioRef.current
+          .play()
+          .then(() => {
+            setIsPlaying(true);
+            showToast("Đang phát điệu nhạc hạnh phúc 🎵", "success");
+          })
+          .catch(() => showToast("Vui lòng chạm lại để bật âm thanh", "info"));
+      }
     }
   };
 
@@ -67,7 +99,24 @@ export const FloatingControls: React.FC<FloatingControlsProps> = ({
 
   return (
     <>
-      <audio ref={audioRef} src={data.musicUrl} preload="none" loop aria-hidden="true" />
+      {/* Trình phát file âm thanh thường (.mp3) */}
+      {!isYt && (
+        <audio ref={audioRef} src={data.musicUrl} preload="none" loop aria-hidden="true" />
+      )}
+
+      {/* Trình phát ẩn YouTube Background Audio */}
+      {isYt && ytId && (
+        <div className="fixed -left-[9999px] -top-[9999px] opacity-0 pointer-events-none" aria-hidden="true">
+          <iframe
+            ref={ytIframeRef}
+            width="200"
+            height="200"
+            src={`https://www.youtube.com/embed/${ytId}?enablejsapi=1&autoplay=0&loop=1&playlist=${ytId}`}
+            title="YouTube Background Audio"
+            allow="autoplay"
+          />
+        </div>
+      )}
 
       {/* ── MENU DRAWER ── */}
       <AnimatePresence>
@@ -153,8 +202,16 @@ export const FloatingControls: React.FC<FloatingControlsProps> = ({
                       : "bg-[#FDFAF5] text-[#8C6A58] border border-[#E8D5CF]"
                   }`}
                 >
-                  {isPlaying ? <Volume2 className="w-3.5 h-3.5 animate-pulse" /> : <VolumeX className="w-3.5 h-3.5" />}
-                  <span>{isPlaying ? "Tắt Nhạc" : "Bật Nhạc"}</span>
+                  {isYt ? (
+                    <YouTubeIcon className={`w-3.5 h-3.5 ${isPlaying ? "text-[#C4715A] animate-pulse" : ""}`} />
+                  ) : isPlaying ? (
+                    <Volume2 className="w-3.5 h-3.5 animate-pulse" />
+                  ) : (
+                    <VolumeX className="w-3.5 h-3.5" />
+                  )}
+                  <span>
+                    {isPlaying ? "Tắt Nhạc" : isYt ? "Bật Nhạc YouTube" : "Bật Nhạc"}
+                  </span>
                 </button>
               </div>
             </motion.div>
@@ -208,16 +265,28 @@ export const FloatingControls: React.FC<FloatingControlsProps> = ({
             </span>
           </button>
 
-          {/* Nhạc nền */}
+          {/* Nhạc nền (Hỗ trợ cả YouTube và MP3) */}
           <button
             type="button"
             onClick={toggleMusic}
+            title={isYt ? "Nhạc nền từ YouTube" : "Nhạc nền"}
             className={`flex flex-col items-center gap-0.5 px-2 py-1 transition-colors ${
               isPlaying ? "text-[#4A6741]" : "text-[#8C6A58]"
             }`}
           >
-            {isPlaying ? <Volume2 className="w-4 h-4 animate-pulse" /> : <VolumeX className="w-4 h-4" />}
-            <span className="text-[9px] uppercase tracking-wider font-sans font-semibold">Nhạc</span>
+            {isYt ? (
+              <div className="relative">
+                <Volume2 className={`w-4 h-4 ${isPlaying ? "animate-pulse text-[#4A6741]" : ""}`} />
+                <span className="absolute -top-1 -right-2 text-[8px] font-bold text-[#C4715A] leading-none">YT</span>
+              </div>
+            ) : isPlaying ? (
+              <Volume2 className="w-4 h-4 animate-pulse" />
+            ) : (
+              <VolumeX className="w-4 h-4" />
+            )}
+            <span className="text-[9px] uppercase tracking-wider font-sans font-semibold">
+              {isPlaying ? "Đang phát" : "Nhạc"}
+            </span>
           </button>
 
           {/* Lời chúc */}

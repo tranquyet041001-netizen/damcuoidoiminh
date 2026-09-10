@@ -30,14 +30,19 @@ import {
   Check,
   Lock,
   QrCode,
-  Sliders,
+  Play,
 } from "lucide-react";
 import { WeddingDataProvider, useWeddingData } from "@/context/WeddingDataContext";
 import { ToastProvider, useToast } from "@/components/ui/Toast";
 import { WeddingInvitationView } from "@/components/invitation/WeddingInvitationView";
 import { ShareModal } from "@/components/invitation/ShareModal";
-import { VietnameseLotus, RedSealStamp } from "@/components/ui/VietnamesePattern";
 import { processAndUploadImage } from "@/utils/imageUpload";
+import {
+  extractYouTubeId,
+  isYouTubeUrl,
+  SUGGESTED_WEDDING_SONGS,
+  YouTubeIcon,
+} from "@/utils/youtube";
 import {
   RSVPSubmission,
   WishSubmission,
@@ -47,14 +52,14 @@ import {
 } from "@/types/wedding";
 
 const ADMIN_TABS = [
-  { id: "couple", label: "Đôi Uyên Ương", icon: Heart, badge: "Dâu & Rể" },
-  { id: "email", label: "Chia Sẻ & Email", icon: Share2, badge: "Link & Mail" },
-  { id: "time", label: "Thời Gian & Nhạc", icon: Calendar, badge: "Lịch & Âm nhạc" },
-  { id: "events", label: "Sự Kiện Cưới", icon: Clock, badge: "Địa điểm" },
-  { id: "story", label: "Chuyện Chúng Mình", icon: Sparkles, badge: "Timeline" },
-  { id: "gallery", label: "Album Ảnh Cưới", icon: Camera, badge: "Hình ảnh" },
-  { id: "bank", label: "Mừng Cưới & QR", icon: CreditCard, badge: "Tài khoản" },
-  { id: "rsvps", label: "Khách Mời RSVP", icon: Users, badge: "Phản hồi" },
+  { id: "couple", label: "Dâu & Rể", icon: Heart },
+  { id: "email", label: "Chia Sẻ & Mail", icon: Share2 },
+  { id: "time", label: "Lịch & Nhạc YT", icon: Calendar },
+  { id: "events", label: "Sự Kiện Cưới", icon: Clock },
+  { id: "story", label: "Chuyện Tình", icon: Sparkles },
+  { id: "gallery", label: "Album Ảnh", icon: Camera },
+  { id: "bank", label: "Mừng Cưới", icon: CreditCard },
+  { id: "rsvps", label: "Khách Mời", icon: Users },
 ] as const;
 
 type TabId = (typeof ADMIN_TABS)[number]["id"];
@@ -214,7 +219,7 @@ function StudioContent() {
   };
 
   const handleReset = () => {
-    if (window.confirm("Khôi phục toàn bộ nội dung thiệp cưới về mẫu ban đầu?")) {
+    if (window.confirm("Khôi phục toàn bộ nội dung thiệp cưới về mặc định?")) {
       resetToDefault();
       showToast("Đã khôi phục dữ liệu ban đầu!", "info");
     }
@@ -273,17 +278,19 @@ function StudioContent() {
     showToast("Đã xuất danh sách khách mời ra file Excel (CSV)!", "success");
   };
 
+  const currentYtId = extractYouTubeId(data.musicUrl);
+
   return (
     <div className="min-h-screen bg-[#F7F4EE] text-[#5C4033] flex flex-col font-sans selection:bg-[#C4715A] selection:text-[#FDFAF5]">
       {/* ── TOP NAVIGATION BAR ── */}
-      <header className="h-16 bg-[#FFFDF9] border-b border-[#E8D5CF] px-4 sm:px-6 flex items-center justify-between z-30 flex-shrink-0 shadow-2xs">
-        <div className="flex items-center gap-3">
+      <header className="h-14 sm:h-16 bg-[#FFFDF9] border-b border-[#E8D5CF] px-3 sm:px-6 flex items-center justify-between z-30 shrink-0 shadow-2xs">
+        <div className="flex items-center gap-2 sm:gap-3">
           <Link
             href="/"
-            className="flex items-center gap-1.5 text-xs text-[#5C4033] hover:text-[#4A6741] transition-colors p-1.5 rounded-lg hover:bg-[#F0F5EE]"
+            className="flex items-center gap-1 text-xs text-[#5C4033] hover:text-[#4A6741] transition-colors p-1.5 rounded-lg hover:bg-[#F0F5EE]"
           >
             <ArrowLeft className="w-4 h-4 text-[#4A6741]" />
-            <span className="hidden sm:inline font-medium">Về Thiệp Cưới</span>
+            <span className="hidden md:inline font-medium">Về Thiệp Cưới</span>
           </Link>
 
           <span className="text-[#E8D5CF] hidden sm:inline">|</span>
@@ -292,19 +299,16 @@ function StudioContent() {
             <div className="w-7 h-7 rounded-full bg-[#4A6741] text-[#FDFAF5] flex items-center justify-center font-serif text-xs font-bold shadow-2xs">
               HỶ
             </div>
-            <h1 className="font-serif font-bold text-base text-[#354D2E] tracking-wide flex items-center gap-2">
-              <span>Studio Chỉnh Sửa</span>
-              <span className="text-[10px] font-sans font-semibold uppercase px-2 py-0.5 rounded-full bg-[#4A6741]/10 text-[#4A6741] border border-[#4A6741]/20">
-                Botanical
-              </span>
+            <h1 className="font-serif font-bold text-sm sm:text-base text-[#354D2E] tracking-wide flex items-center gap-1.5">
+              <span>Thư Phòng Chỉnh Sửa</span>
             </h1>
           </div>
         </div>
 
         {/* Center: Status & Device Switcher */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           {/* Trạng thái tự động lưu */}
-          <div className="flex items-center gap-1.5 text-xs font-serif font-medium px-3 py-1 rounded-full bg-[#F0F5EE] border border-[#A8BCA1]/40">
+          <div className="hidden sm:flex items-center gap-1.5 text-xs font-serif font-medium px-3 py-1 rounded-full bg-[#F0F5EE] border border-[#A8BCA1]/40">
             {autoSaveStatus === "saving" ? (
               <>
                 <span className="w-2 h-2 rounded-full bg-[#C4715A] animate-ping" />
@@ -313,13 +317,13 @@ function StudioContent() {
             ) : (
               <>
                 <span className="w-2 h-2 rounded-full bg-emerald-600" />
-                <span className="text-[#4A6741] hidden sm:inline">Đã lưu tự động</span>
+                <span className="text-[#4A6741]">Đã lưu</span>
               </>
             )}
           </div>
 
           {/* Device Switcher */}
-          <div className="flex items-center bg-[#F0F5EE] p-1 rounded-xl border border-[#A8BCA1]/30">
+          <div className="flex items-center bg-[#F0F5EE] p-0.5 sm:p-1 rounded-xl border border-[#A8BCA1]/30">
             <button
               type="button"
               onClick={() => setPreviewDevice("mobile")}
@@ -348,41 +352,41 @@ function StudioContent() {
         </div>
 
         {/* Right Action Buttons */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2">
           <button
             type="button"
             onClick={handleReset}
             title="Khôi phục dữ liệu ban đầu"
-            className="p-2 sm:px-3 sm:py-1.5 rounded-lg bg-[#FDFAF5] hover:bg-[#FDF0EC] text-[#8C6A58] text-xs border border-[#E8D5CF] flex items-center gap-1.5 transition-colors font-medium cursor-pointer"
+            className="p-1.5 sm:px-3 sm:py-1.5 rounded-lg bg-[#FDFAF5] hover:bg-[#FDF0EC] text-[#8C6A58] text-xs border border-[#E8D5CF] flex items-center gap-1 transition-colors font-medium cursor-pointer"
           >
             <RotateCcw className="w-3.5 h-3.5" />
-            <span className="hidden md:inline">Khôi Phục</span>
+            <span className="hidden xl:inline">Khôi Phục</span>
           </button>
 
           <button
             type="button"
             onClick={handleExportCode}
             title="Tải về file data/wedding.ts để deploy Vercel"
-            className="p-2 sm:px-3 sm:py-1.5 rounded-lg bg-[#FDFAF5] hover:bg-[#F0F5EE] text-[#4A6741] text-xs border border-[#A8BCA1]/40 flex items-center gap-1.5 transition-colors font-medium cursor-pointer"
+            className="p-1.5 sm:px-3 sm:py-1.5 rounded-lg bg-[#FDFAF5] hover:bg-[#F0F5EE] text-[#4A6741] text-xs border border-[#A8BCA1]/40 flex items-center gap-1 transition-colors font-medium cursor-pointer"
           >
             <Download className="w-3.5 h-3.5 text-[#C4715A]" />
-            <span className="hidden md:inline">Xuất wedding.ts</span>
+            <span className="hidden xl:inline">Xuất Code</span>
           </button>
 
           {/* Chia sẻ link cho khách */}
           <button
             type="button"
             onClick={() => setIsShareModalOpen(true)}
-            className="p-2 sm:px-3 sm:py-1.5 rounded-lg bg-[#4A6741] hover:bg-[#354D2E] text-[#FDFAF5] text-xs font-semibold shadow-xs flex items-center gap-1.5 transition-all cursor-pointer"
+            className="p-1.5 sm:px-3 sm:py-1.5 rounded-lg bg-[#4A6741] hover:bg-[#354D2E] text-[#FDFAF5] text-xs font-semibold shadow-xs flex items-center gap-1 transition-all cursor-pointer"
           >
             <Share2 className="w-3.5 h-3.5 text-[#C9A84C]" />
-            <span className="hidden sm:inline">Chia Sẻ Link Khách</span>
+            <span className="hidden md:inline">Chia Sẻ Link Khách</span>
           </button>
 
           <Link
             href="/"
             target="_blank"
-            className="px-4 py-1.5 rounded-full bg-[#C4715A] hover:bg-[#A4503B] text-[#FDFAF5] text-xs font-semibold shadow-xs flex items-center gap-1.5 transition-all"
+            className="px-3 sm:px-4 py-1.5 rounded-full bg-[#C4715A] hover:bg-[#A4503B] text-[#FDFAF5] text-xs font-semibold shadow-xs flex items-center gap-1 transition-all"
           >
             <ExternalLink className="w-3.5 h-3.5 text-[#FDFAF5]" />
             <span>Xem Thiệp</span>
@@ -393,37 +397,39 @@ function StudioContent() {
       {/* ── MAIN STUDIO BODY (SPLIT EDITOR & PREVIEW) ── */}
       <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
         {/* Left Side: Sidebar Tabs + Form Content */}
-        <div className="w-full lg:w-[500px] xl:w-[540px] bg-[#FFFDF9] border-r border-[#E8D5CF] flex flex-col h-[calc(100vh-64px)] overflow-hidden">
-          {/* Tabs thanh cuộn ngang hoặc grid */}
-          <div className="p-2 border-b border-[#E8D5CF] bg-[#FDFAF5] flex items-center gap-1.5 overflow-x-auto no-scrollbar shrink-0">
-            {ADMIN_TABS.map((tab) => {
-              const Icon = tab.icon;
-              const isActive = activeTab === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  type="button"
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`py-2 px-3 rounded-xl text-xs font-serif font-semibold flex items-center gap-1.5 shrink-0 transition-all cursor-pointer ${
-                    isActive
-                      ? "bg-[#4A6741] text-[#FDFAF5] shadow-xs"
-                      : "text-[#5C4033] hover:bg-[#F0F5EE] border border-transparent"
-                  }`}
-                >
-                  <Icon className={`w-3.5 h-3.5 ${isActive ? "text-[#C9A84C]" : "text-[#8C6A58]"}`} />
-                  <span>{tab.label}</span>
-                </button>
-              );
-            })}
+        <div className="w-full lg:w-[480px] xl:w-[540px] bg-[#FFFDF9] border-r border-[#E8D5CF] flex flex-col h-[calc(100vh-56px)] sm:h-[calc(100vh-64px)] overflow-hidden shrink-0">
+          {/* Tabs 4x2 Grid (Luôn hiển thị đầy đủ 8 tab, không bị cuộn mất) */}
+          <div className="p-2.5 border-b border-[#E8D5CF] bg-[#FDFAF5] shrink-0 shadow-2xs">
+            <div className="grid grid-cols-4 gap-1.5">
+              {ADMIN_TABS.map((tab) => {
+                const Icon = tab.icon;
+                const isActive = activeTab === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`py-2 px-1 rounded-xl text-[11px] font-serif font-bold flex flex-col items-center justify-center gap-1 transition-all cursor-pointer text-center ${
+                      isActive
+                        ? "bg-[#4A6741] text-[#FDFAF5] shadow-xs"
+                        : "bg-[#FFFDF9] text-[#5C4033] hover:bg-[#F0F5EE] border border-[#E8D5CF]/60 hover:border-[#A8BCA1]"
+                    }`}
+                  >
+                    <Icon className={`w-3.5 h-3.5 ${isActive ? "text-[#C9A84C]" : "text-[#4A6741]"}`} />
+                    <span className="leading-tight line-clamp-1">{tab.label}</span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
           {/* Form Content Area */}
-          <div className="flex-1 overflow-y-auto p-5 space-y-6">
+          <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-5">
             {/* 1. DÂU & RỂ */}
             {activeTab === "couple" && (
               <div className="space-y-5 animate-in fade-in duration-300">
                 {/* Chú Rể */}
-                <div className="bg-[#FDFAF5] border border-[#E8D5CF] p-4 sm:p-5 rounded-2xl space-y-3 shadow-2xs">
+                <div className="bg-[#FDFAF5] border border-[#E8D5CF] p-4 rounded-2xl space-y-3 shadow-2xs">
                   <div className="flex items-center justify-between pb-2 border-b border-[#E8D5CF]">
                     <h3 className="font-serif font-bold text-sm text-[#354D2E]">Thông Tin Chú Rể</h3>
                     <span className="text-[10px] text-[#4A6741] bg-[#F0F5EE] px-2 py-0.5 rounded-full uppercase font-bold tracking-wider">
@@ -516,7 +522,7 @@ function StudioContent() {
                 </div>
 
                 {/* Cô Dâu */}
-                <div className="bg-[#FDFAF5] border border-[#E8D5CF] p-4 sm:p-5 rounded-2xl space-y-3 shadow-2xs">
+                <div className="bg-[#FDFAF5] border border-[#E8D5CF] p-4 rounded-2xl space-y-3 shadow-2xs">
                   <div className="flex items-center justify-between pb-2 border-b border-[#E8D5CF]">
                     <h3 className="font-serif font-bold text-sm text-[#354D2E]">Thông Tin Cô Dâu</h3>
                     <span className="text-[10px] text-[#C4715A] bg-[#FDF0EC] px-2 py-0.5 rounded-full uppercase font-bold tracking-wider">
@@ -614,7 +620,7 @@ function StudioContent() {
             {activeTab === "email" && (
               <div className="space-y-5 animate-in fade-in duration-300">
                 {/* Slug link rút gọn */}
-                <div className="bg-[#FDFAF5] border border-[#E8D5CF] p-5 rounded-2xl space-y-3 shadow-2xs">
+                <div className="bg-[#FDFAF5] border border-[#E8D5CF] p-4 sm:p-5 rounded-2xl space-y-3 shadow-2xs">
                   <div className="flex items-center justify-between pb-2 border-b border-[#E8D5CF]">
                     <div className="flex items-center gap-2">
                       <Share2 className="w-4 h-4 text-[#C4715A]" />
@@ -700,7 +706,7 @@ function StudioContent() {
                 </div>
 
                 {/* Phân luồng email */}
-                <div className="bg-[#FDFAF5] border border-[#E8D5CF] p-5 rounded-2xl space-y-3 shadow-2xs">
+                <div className="bg-[#FDFAF5] border border-[#E8D5CF] p-4 sm:p-5 rounded-2xl space-y-3 shadow-2xs">
                   <div className="flex items-center gap-2 pb-2 border-b border-[#E8D5CF]">
                     <Mail className="w-4 h-4 text-[#4A6741]" />
                     <h3 className="font-serif font-bold text-sm text-[#354D2E]">
@@ -753,65 +759,152 @@ function StudioContent() {
               </div>
             )}
 
-            {/* 3. THỜI GIAN & NHẠC */}
+            {/* 3. THỜI GIAN & NHẠC (HỖ TRỢ YOUTUBE) */}
             {activeTab === "time" && (
-              <div className="bg-[#FDFAF5] border border-[#E8D5CF] p-5 rounded-2xl space-y-4 shadow-2xs animate-in fade-in duration-300">
-                <h3 className="font-serif font-bold text-sm text-[#354D2E] pb-2 border-b border-[#E8D5CF]">
-                  Thời Gian Hôn Lễ &amp; Lời Mở Đầu
-                </h3>
+              <div className="space-y-5 animate-in fade-in duration-300">
+                {/* Thời gian hôn lễ */}
+                <div className="bg-[#FDFAF5] border border-[#E8D5CF] p-4 sm:p-5 rounded-2xl space-y-4 shadow-2xs">
+                  <h3 className="font-serif font-bold text-sm text-[#354D2E] pb-2 border-b border-[#E8D5CF]">
+                    Thời Gian Hôn Lễ &amp; Lời Mở Đầu
+                  </h3>
 
-                <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="text-xs text-[#8C6A58] block mb-1 font-medium">Ngày Dương Lịch</label>
+                      <input
+                        type="text"
+                        value={data.weddingDateFormatted}
+                        onChange={(e) => updateData({ weddingDateFormatted: e.target.value })}
+                        className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs font-serif text-[#354D2E]"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-xs text-[#8C6A58] block mb-1 font-medium">Ngày Âm Lịch</label>
+                      <input
+                        type="text"
+                        value={data.lunarDateFormatted}
+                        onChange={(e) => updateData({ lunarDateFormatted: e.target.value })}
+                        className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs text-[#354D2E]"
+                      />
+                    </div>
+                  </div>
+
                   <div>
-                    <label className="text-xs text-[#8C6A58] block mb-1 font-medium">Ngày Dương Lịch</label>
+                    <label className="text-xs text-[#8C6A58] block mb-1 font-medium">Chuỗi ISO Cho Đếm Ngược</label>
                     <input
                       type="text"
-                      value={data.weddingDateFormatted}
-                      onChange={(e) => updateData({ weddingDateFormatted: e.target.value })}
-                      className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs font-serif text-[#354D2E]"
+                      value={data.weddingDate}
+                      onChange={(e) => updateData({ weddingDate: e.target.value })}
+                      className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs font-mono text-[#354D2E]"
                     />
                   </div>
 
                   <div>
-                    <label className="text-xs text-[#8C6A58] block mb-1 font-medium">Ngày Âm Lịch</label>
+                    <label className="text-xs text-[#8C6A58] block mb-1 font-medium">Câu Châm Ngôn Bìa Thiệp</label>
                     <input
                       type="text"
-                      value={data.lunarDateFormatted}
-                      onChange={(e) => updateData({ lunarDateFormatted: e.target.value })}
-                      className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs text-[#354D2E]"
+                      value={data.welcomeQuote}
+                      onChange={(e) => updateData({ welcomeQuote: e.target.value })}
+                      className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs font-serif italic text-[#354D2E]"
                     />
                   </div>
                 </div>
 
-                <div>
-                  <label className="text-xs text-[#8C6A58] block mb-1 font-medium">Chuỗi ISO Cho Đếm Ngược</label>
-                  <input
-                    type="text"
-                    value={data.weddingDate}
-                    onChange={(e) => updateData({ weddingDate: e.target.value })}
-                    className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs font-mono text-[#354D2E]"
-                  />
-                </div>
+                {/* Hộp Nhạc Nền YouTube & MP3 */}
+                <div className="bg-[#FDFAF5] border-2 border-[#C4715A]/40 p-4 sm:p-5 rounded-2xl space-y-4 shadow-2xs">
+                  <div className="flex items-center justify-between pb-2 border-b border-[#E8D5CF]">
+                    <div className="flex items-center gap-2">
+                      <YouTubeIcon className="w-5 h-5 text-[#C4715A]" />
+                      <h3 className="font-serif font-bold text-sm text-[#354D2E]">
+                        Nhạc Nền Thiệp Cưới (Hỗ trợ YouTube &amp; MP3)
+                      </h3>
+                    </div>
+                    <span className="text-[10px] text-[#C4715A] bg-[#FDF0EC] px-2.5 py-0.5 rounded-full font-bold uppercase">
+                      YouTube Audio
+                    </span>
+                  </div>
 
-                <div>
-                  <label className="text-xs text-[#8C6A58] block mb-1 font-medium">Câu Châm Ngôn Bìa Thiệp</label>
-                  <input
-                    type="text"
-                    value={data.welcomeQuote}
-                    onChange={(e) => updateData({ welcomeQuote: e.target.value })}
-                    className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs font-serif italic text-[#354D2E]"
-                  />
-                </div>
+                  <p className="text-xs text-[#5C4033] leading-relaxed">
+                    Bạn có thể dán bất kỳ link bài hát nào từ <strong>YouTube</strong> (ví dụ: <code>https://www.youtube.com/watch?v=...</code> hoặc <code>https://youtu.be/...</code>) hoặc đường dẫn file <code>.mp3</code>. Khi khách chạm nút <strong>Nhạc</strong> trên thiệp, nhạc sẽ tự động phát!
+                  </p>
 
-                <div>
-                  <label className="text-xs text-[#8C6A58] block mb-1 font-medium">Link Nhạc Nền (.mp3)</label>
-                  <div className="flex items-center gap-2">
-                    <Music className="w-4 h-4 text-[#4A6741]" />
-                    <input
-                      type="url"
-                      value={data.musicUrl}
-                      onChange={(e) => updateData({ musicUrl: e.target.value })}
-                      className="flex-1 bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs text-[#354D2E]"
-                    />
+                  <div>
+                    <label className="text-xs text-[#8C6A58] block mb-1 font-bold">
+                      Đường Dẫn Link Nhạc
+                    </label>
+                    <div className="flex items-center gap-2">
+                      <div className="p-2 rounded-xl bg-[#F0F5EE] border border-[#E8D5CF]">
+                        {currentYtId ? (
+                          <YouTubeIcon className="w-4 h-4 text-[#C4715A]" />
+                        ) : (
+                          <Music className="w-4 h-4 text-[#4A6741]" />
+                        )}
+                      </div>
+                      <input
+                        type="url"
+                        value={data.musicUrl}
+                        placeholder="Dán link YouTube (https://www.youtube.com/watch?v=...) hoặc file .mp3..."
+                        onChange={(e) => updateData({ musicUrl: e.target.value })}
+                        className="flex-1 bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs text-[#354D2E] font-mono focus:outline-none focus:border-[#4A6741]"
+                      />
+                    </div>
+
+                    {/* Trạng thái nhận diện link YouTube */}
+                    {currentYtId && (
+                      <div className="mt-2 p-2.5 rounded-xl bg-[#F0F5EE] border border-[#A8BCA1]/40 flex items-center justify-between text-xs text-[#4A6741]">
+                        <span className="flex items-center gap-1.5 font-medium">
+                          <Check className="w-3.5 h-3.5 text-emerald-600" />
+                          <span>Đã nhận diện video YouTube:</span>
+                          <strong className="font-mono">{currentYtId}</strong>
+                        </span>
+                        <a
+                          href={`https://www.youtube.com/watch?v=${currentYtId}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[11px] text-[#C4715A] hover:underline flex items-center gap-1"
+                        >
+                          <ExternalLink className="w-3 h-3" />
+                          <span>Nghe thử trên YT</span>
+                        </a>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Danh sách gợi ý bài hát cưới 1-click */}
+                  <div className="pt-2 border-t border-[#E8D5CF]">
+                    <div className="text-[11px] font-bold text-[#8C6A58] uppercase tracking-wider mb-2">
+                      Gợi Ý Bài Hát Cưới Lãng Mạn (Bấm để chọn nhanh):
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      {SUGGESTED_WEDDING_SONGS.map((song, i) => (
+                        <button
+                          key={i}
+                          type="button"
+                          onClick={() => {
+                            updateData({ musicUrl: song.url });
+                            showToast(`Đã chọn bài: ${song.title}`, "success");
+                          }}
+                          className={`p-2 rounded-xl border text-left flex items-center gap-2 transition-all cursor-pointer ${
+                            data.musicUrl === song.url
+                              ? "bg-[#4A6741] text-[#FDFAF5] border-[#4A6741] shadow-2xs"
+                              : "bg-[#FFFDF9] text-[#5C4033] border-[#E8D5CF] hover:border-[#A8BCA1] hover:bg-[#F0F5EE]"
+                          }`}
+                        >
+                          {song.type === "youtube" ? (
+                            <YouTubeIcon className={`w-3.5 h-3.5 shrink-0 ${data.musicUrl === song.url ? "text-[#C9A84C]" : "text-[#C4715A]"}`} />
+                          ) : (
+                            <Music className={`w-3.5 h-3.5 shrink-0 ${data.musicUrl === song.url ? "text-[#C9A84C]" : "text-[#4A6741]"}`} />
+                          )}
+                          <div className="truncate">
+                            <div className="text-xs font-serif font-bold truncate">{song.title}</div>
+                            <div className={`text-[10px] ${data.musicUrl === song.url ? "text-[#FDFAF5]/80" : "text-[#8C6A58]"}`}>
+                              {song.artist} • {song.type.toUpperCase()}
+                            </div>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -829,14 +922,14 @@ function StudioContent() {
                     onClick={() => {
                       const newEvt: WeddingEvent = {
                         id: `evt-${Date.now()}`,
-                        title: "LỄ BÁO HỶ MỚI",
+                        title: "LỄ MỚI",
                         subtitle: "Nghi lễ",
                         date: data.weddingDateFormatted,
                         isoDate: data.weddingDate,
                         time: "10:30",
-                        venue: "Tên nơi tổ chức",
-                        address: "Địa chỉ cụ thể",
-                        mapUrl: "https://maps.google.com",
+                        venue: "Tư gia",
+                        address: "Khu 5, Xóm 6, Xã Minh Châu, Hà Nội",
+                        mapUrl: "https://maps.google.com/?q=Xã+Minh+Châu+Hà+Nội",
                       };
                       updateData((prev) => ({ ...prev, events: [...prev.events, newEvt] }));
                     }}
@@ -1086,7 +1179,7 @@ function StudioContent() {
                         };
                         updateData((prev) => ({ ...prev, gallery: [...prev.gallery, newPhoto] }));
                       }}
-                      className="p-2 rounded-xl bg-[#FFFDF9] border border-[#E8D5CF] hover:bg-[#F0F5EE] text-xs"
+                      className="p-2 rounded-xl bg-[#FFFDF9] border border-[#E8D5CF] hover:bg-[#F0F5EE] text-xs cursor-pointer"
                       title="Thêm ảnh qua URL"
                     >
                       <Plus className="w-4 h-4 text-[#4A6741]" />
@@ -1316,23 +1409,23 @@ function StudioContent() {
         </div>
 
         {/* Right Side: Real-time Live Interactive Preview */}
-        <div className="flex-1 bg-[#2C3E28] p-4 sm:p-6 flex items-center justify-center overflow-hidden relative">
+        <div className="flex-1 bg-[#2C3E28] p-3 sm:p-5 flex items-center justify-center overflow-hidden relative">
           {previewDevice === "mobile" ? (
             /* Khung điện thoại thông minh viền cong cao cấp */
-            <div className="w-[375px] h-[730px] rounded-[48px] border-[10px] border-[#1C2919] shadow-2xl overflow-hidden relative bg-[#FDFAF5] flex flex-col ring-1 ring-[#C9A84C]/30">
+            <div className="w-[375px] max-w-full h-[700px] max-h-[calc(100vh-80px)] rounded-[44px] border-[10px] border-[#1C2919] shadow-2xl overflow-hidden relative bg-[#FDFAF5] flex flex-col ring-1 ring-[#C9A84C]/30">
               {/* Phone Notch */}
-              <div className="h-6 bg-[#1C2919] w-36 mx-auto rounded-b-2xl z-50 shrink-0 flex items-center justify-center">
+              <div className="h-6 bg-[#1C2919] w-36 mx-auto rounded-b-2xl z-40 shrink-0 flex items-center justify-center">
                 <div className="w-10 h-1 rounded-full bg-zinc-700" />
               </div>
 
               {/* Màn hình thiệp cưới tương tác trực tiếp */}
-              <div className="flex-1 overflow-y-auto no-scrollbar pb-16">
+              <div className="flex-1 overflow-y-auto no-scrollbar pb-16 relative">
                 <WeddingInvitationView isPreview={true} />
               </div>
             </div>
           ) : (
             /* Khung máy tính với thanh trình duyệt */
-            <div className="w-full h-full max-h-[820px] rounded-2xl border-2 border-[#1C2919] shadow-2xl overflow-hidden flex flex-col bg-[#FDFAF5]">
+            <div className="w-full h-full max-h-[calc(100vh-80px)] rounded-2xl border-2 border-[#1C2919] shadow-2xl overflow-hidden flex flex-col bg-[#FDFAF5]">
               <div className="h-9 bg-[#1C2919] px-4 flex items-center gap-2 z-30 shrink-0">
                 <div className="flex items-center gap-1.5">
                   <span className="w-2.5 h-2.5 rounded-full bg-[#C4715A]" />
@@ -1340,11 +1433,11 @@ function StudioContent() {
                   <span className="w-2.5 h-2.5 rounded-full bg-[#4A6741]" />
                 </div>
                 <div className="flex-1 max-w-sm mx-auto bg-[#2C3E28] rounded-md py-0.5 px-3 text-[11px] text-[#A8BCA1] font-mono text-center truncate">
-                  https://an-minh.vn/thiep-cuoi
+                  https://an-minh.vn/i/{data.slug || "quyet-han"}
                 </div>
               </div>
 
-              <div className="flex-1 overflow-y-auto pb-16">
+              <div className="flex-1 overflow-y-auto pb-16 relative">
                 <WeddingInvitationView isPreview={true} />
               </div>
             </div>

@@ -30,7 +30,7 @@ export const WeddingInvitationView: React.FC<WeddingInvitationViewProps> = ({
       }`}
     >
       {/* Thanh tiêu đề cuộn nhẹ */}
-      <Header isGuestView={isGuestView} />
+      <Header isGuestView={isGuestView} isPreview={isPreview} />
 
       <main className="flex-1">
         {/* 1. Màn hình mở thiệp */}
