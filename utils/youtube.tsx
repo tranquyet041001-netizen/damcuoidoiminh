@@ -42,9 +42,21 @@ export interface SuggestedSong {
 
 export const SUGGESTED_WEDDING_SONGS: SuggestedSong[] = [
   {
-    title: "Acoustic Guitar Lãng Mạn (Mặc Định)",
-    artist: "Nhạc Cưới Không Lời",
+    title: "Acoustic Guitar Lãng Mạn (Khuyên Dùng)",
+    artist: "Nhạc Cưới Không Lời • Chuẩn Mobile/Zalo",
     url: "/audio/wedding-acoustic.mp3",
+    type: "mp3",
+  },
+  {
+    title: "Canon in D - Giai Điệu Hạnh Phúc",
+    artist: "Nhạc Cưới Cổ Điển • Chuẩn Mobile/Zalo",
+    url: "/audio/wedding-canon-in-d.mp3",
+    type: "mp3",
+  },
+  {
+    title: "Piano Ballad Ngọt Ngào",
+    artist: "Piano Solo • Chuẩn Mobile/Zalo",
+    url: "/audio/wedding-piano.mp3",
     type: "mp3",
   },
   {

@@ -120,15 +120,17 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({
           videoId: ytId,
           playerVars: {
             autoplay: 0,
-            controls: 1,
+            controls: 0,
             disablekb: 1,
             fs: 0,
+            iv_load_policy: 3,
             loop: 1,
             playlist: ytId,
             modestbranding: 1,
             playsinline: 1,
             rel: 0,
-            origin: window.location.origin,
+            enablejsapi: 1,
+            origin: typeof window !== "undefined" ? window.location.origin : undefined,
           },
           events: {
             onReady: (event: any) => {
@@ -137,6 +139,14 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({
               try {
                 event.target.unMute();
                 event.target.setVolume(100);
+                const iframe = event.target.getIframe?.();
+                if (iframe) {
+                  iframe.setAttribute("playsinline", "1");
+                  iframe.setAttribute("webkit-playsinline", "true");
+                  iframe.setAttribute("allow", "autoplay; encrypted-media");
+                  iframe.setAttribute("tabindex", "-1");
+                  iframe.style.pointerEvents = "none";
+                }
               } catch {
                 // ignore
               }
@@ -161,23 +171,19 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({
             onError: (event: any) => {
               console.warn("YouTube player error code:", event.data);
               if (!isSubscribed) return;
-              // 101/150 = owner disabled embedding, 100 = not found, 2 = invalid param
-              if (event.data === 101 || event.data === 150 || event.data === 100 || event.data === 2) {
-                showToast(
-                  "Video YouTube này bị giới hạn nhúng ngoài trang. Tự động chuyển sang nhạc acoustic lãng mạn 🎵",
-                  "info"
-                );
-                setUseFallbackAudio(true);
-                // Tự động phát nhạc thay thế
-                setTimeout(() => {
-                  if (audioRef.current) {
-                    audioRef.current
-                      .play()
-                      .then(() => setIsPlaying(true))
-                      .catch(() => {});
-                  }
-                }, 300);
-              }
+              showToast(
+                "Đang phát nhạc nền tiệc cưới lãng mạn 🎵",
+                "info"
+              );
+              setUseFallbackAudio(true);
+              setTimeout(() => {
+                if (audioRef.current) {
+                  audioRef.current
+                    .play()
+                    .then(() => setIsPlaying(true))
+                    .catch(() => {});
+                }
+              }, 300);
             },
           },
         });
@@ -218,10 +224,18 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({
           ytPlayerRef.current.unMute();
           ytPlayerRef.current.setVolume(100);
           ytPlayerRef.current.playVideo();
+          const iframe = ytPlayerRef.current.getIframe?.();
+          if (iframe) {
+            iframe.blur?.();
+          }
           setIsPlaying(true);
           showToast(`Đang phát: ${currentSongTitle} 🎵`, "success");
         } catch (e) {
-          console.warn("Play YT error:", e);
+          console.warn("Play YT error, fallback to local audio:", e);
+          setUseFallbackAudio(true);
+          if (audioRef.current) {
+            audioRef.current.play().then(() => setIsPlaying(true)).catch(() => {});
+          }
         }
       } else {
         pendingPlayRef.current = true;
@@ -340,14 +354,14 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({
       {/* Trình phát YouTube */}
       {isYt && ytId && !useFallbackAudio && (
         <>
-          {/* Container YouTube ẩn nhưng nằm trong viewport để Chrome không tắt âm thanh */}
+          {/* Container YouTube: Khi ẩn sẽ ở ngoài màn hình với kích thước chuẩn 16:9 để tránh iOS fullscreen và không bị nhảy cuộn trang */}
           <div
             className={`transition-all duration-300 ${
               showVideoPreview
-                ? "fixed bottom-20 right-4 z-50 w-72 h-44 rounded-2xl overflow-hidden shadow-2xl border-2 border-[#C9A84C] bg-black"
-                : "fixed bottom-0 left-0 w-8 h-8 pointer-events-none overflow-hidden z-[-1]"
+                ? "fixed bottom-20 right-4 z-50 w-72 h-44 rounded-2xl overflow-hidden shadow-2xl border-2 border-[#C9A84C] bg-black pointer-events-auto"
+                : "fixed -top-[9999px] -left-[9999px] w-[320px] h-[180px] pointer-events-none overflow-hidden"
             }`}
-            style={showVideoPreview ? {} : { opacity: 0.01 }}
+            style={showVideoPreview ? {} : { opacity: 0.001, pointerEvents: "none" }}
             aria-hidden={!showVideoPreview}
           >
             {showVideoPreview && (
