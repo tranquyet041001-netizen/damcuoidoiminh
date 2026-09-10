@@ -2,64 +2,85 @@
 
 import React from "react";
 import Link from "next/link";
-import { Edit3 } from "lucide-react";
+import { motion } from "framer-motion";
+import { Edit3, ArrowUp, Heart } from "lucide-react";
 import { useWeddingData } from "@/context/WeddingDataContext";
-import { VietnameseLotus, DongSonBorder } from "@/components/ui/VietnamesePattern";
+import { VietnameseLotus, LacBirdPair, BotanicalBranch } from "@/components/ui/VietnamesePattern";
 
-export const Footer: React.FC = () => {
+interface FooterProps {
+  isGuestView?: boolean;
+}
+
+export const Footer: React.FC<FooterProps> = ({ isGuestView = false }) => {
   const { data } = useWeddingData();
 
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   return (
-    <footer className="relative pt-16 pb-24 text-center px-4 overflow-hidden border-t border-[#E5D4B6]/60">
+    <footer className="relative pt-16 pb-12 px-4 text-center overflow-hidden bg-green-texture text-[#FDFAF5]">
       <div className="max-w-md mx-auto relative z-10">
-        <VietnameseLotus size={40} color="#9E3D32" opacity={0.8} className="mx-auto mb-4" />
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+        >
+          <LacBirdPair color="#C9A84C" className="mb-4 opacity-70" />
+        </motion.div>
 
-        <h3 className="text-xl sm:text-2xl font-serif text-[#183A3A] font-medium tracking-tight mb-2">
-          Cảm Ơn Bạn Đã Đến
-        </h3>
+        {/* Tên dâu rể thư pháp */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.7, delay: 0.1 }}
+          className="mb-4"
+        >
+          <div className="font-calligraphy text-4xl sm:text-5xl text-[#FDFAF5]">
+            {data.groom.shortName} &amp; {data.bride.shortName}
+          </div>
+        </motion.div>
 
-        <p className="text-sm sm:text-base text-[#5A473E] italic leading-relaxed mb-6">
-          &ldquo;Hạnh phúc trọn vẹn nhất là khi được sẻ chia cùng những người thân yêu. Cảm ơn tình cảm và sự hiện diện của bạn trên từng chặng đường chúng mình đi qua.&rdquo;
+        {/* Lời cảm ơn */}
+        <p className="text-sm text-[#A8BCA1] italic font-serif leading-relaxed max-w-sm mx-auto mb-6">
+          &ldquo;Hạnh phúc trọn vẹn nhất là khi được sẻ chia cùng những người thân yêu. Cảm ơn sự hiện diện và tình cảm quý báu của bạn trong ngày trọng đại của chúng mình.&rdquo;
         </p>
 
-        <DongSonBorder color="#9E3D32" opacity={0.3} className="max-w-xs mx-auto mb-6" />
-
-        {/* Chữ ký dâu rể */}
-        <div className="flex items-center justify-center gap-8 text-[#183A3A] mb-8">
-          <div>
-            <div className="font-serif italic text-lg sm:text-xl font-medium tracking-wide">
-              {data.groom.shortName}
-            </div>
-            <div className="text-[11px] text-[#78928A] tracking-widest uppercase mt-0.5">
-              Chú Rể
-            </div>
-          </div>
-
-          <span className="text-[#9E3D32] text-xl font-serif">&</span>
-
-          <div>
-            <div className="font-serif italic text-lg sm:text-xl font-medium tracking-wide">
-              {data.bride.shortName}
-            </div>
-            <div className="text-[11px] text-[#78928A] tracking-widest uppercase mt-0.5">
-              Cô Dâu
-            </div>
-          </div>
+        {/* Ngày cưới */}
+        <div className="inline-block px-5 py-2 rounded-2xl bg-white/10 border border-white/15 text-[#FDFAF5] text-xs font-serif font-medium mb-8">
+          {data.weddingDateFormatted} • {data.lunarDateFormatted}
         </div>
 
-        <div className="text-xs text-[#8A7569] tracking-wider mb-4">
-          © 2027 {data.groom.shortName} & {data.bride.shortName} • Đám cưới phong cách Việt Cổ
-        </div>
-
-        <div className="pt-2">
-          <Link
-            href="/admin"
-            className="inline-flex items-center gap-1.5 text-xs text-[#78928A] hover:text-[#9E3D32] transition-colors"
+        {/* Nút Cuộn Lên Đầu Trang */}
+        <div className="flex justify-center mb-8">
+          <button
+            type="button"
+            onClick={scrollToTop}
+            className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-xs font-serif font-semibold text-[#FDFAF5] transition-all cursor-pointer active:scale-95"
           >
-            <Edit3 className="w-3.5 h-3.5" />
-            <span>Mở trang chỉnh sửa nội dung (Admin)</span>
-          </Link>
+            <ArrowUp className="w-3.5 h-3.5 text-[#C9A84C]" />
+            <span>Về Đầu Trang</span>
+          </button>
         </div>
+
+        <div className="text-[10px] text-[#A8BCA1]/80 tracking-wider uppercase font-sans mb-4">
+          © 2027 {data.groom.shortName} &amp; {data.bride.shortName} • Phong Cách Botanical Romance
+        </div>
+
+        {/* Link admin nếu không phải guest view */}
+        {!isGuestView && (
+          <div>
+            <Link
+              href="/admin"
+              className="inline-flex items-center gap-1.5 text-xs text-[#A8BCA1] hover:text-[#FDFAF5] transition-colors"
+            >
+              <Edit3 className="w-3 h-3" />
+              <span>Mở thư phòng biên tập (Admin)</span>
+            </Link>
+          </div>
+        )}
       </div>
     </footer>
   );

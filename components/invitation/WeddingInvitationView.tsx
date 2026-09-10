@@ -16,17 +16,21 @@ import { GiftCard } from "@/components/invitation/GiftCard";
 
 interface WeddingInvitationViewProps {
   isPreview?: boolean;
+  isGuestView?: boolean;
 }
 
-export const WeddingInvitationView: React.FC<WeddingInvitationViewProps> = ({ isPreview = false }) => {
+export const WeddingInvitationView: React.FC<WeddingInvitationViewProps> = ({
+  isPreview = false,
+  isGuestView = false,
+}) => {
   return (
     <div
-      className={`relative w-full min-h-full bg-do-texture flex flex-col selection:bg-[#9E3D32] selection:text-[#FFF9EE] ${
+      className={`relative w-full min-h-full bg-ivory-texture flex flex-col selection:bg-[#C4715A] selection:text-[#FDFAF5] ${
         isPreview ? "text-[95%]" : ""
       }`}
     >
       {/* Thanh tiêu đề cuộn nhẹ */}
-      <Header />
+      <Header isGuestView={isGuestView} />
 
       <main className="flex-1">
         {/* 1. Màn hình mở thiệp */}
@@ -58,10 +62,10 @@ export const WeddingInvitationView: React.FC<WeddingInvitationViewProps> = ({ is
       </main>
 
       {/* 10. Lời cảm ơn & Chữ ký */}
-      <Footer />
+      <Footer isGuestView={isGuestView} />
 
       {/* Nút nổi điều khiển nhạc, chia sẻ và RSVP nhanh */}
-      {!isPreview && <FloatingControls />}
+      {!isPreview && <FloatingControls isGuestView={isGuestView} />}
     </div>
   );
 };

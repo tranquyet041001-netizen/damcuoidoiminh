@@ -1,119 +1,136 @@
 "use client";
 
 import React from "react";
-import { Navigation, CalendarPlus } from "lucide-react";
+import { motion } from "framer-motion";
+import { Clock, Calendar, MapPin, Navigation, CalendarPlus } from "lucide-react";
 import { useWeddingData } from "@/context/WeddingDataContext";
-import { WeddingEvent } from "@/types/wedding";
-import { VietnameseLotus, DongSonSun } from "@/components/ui/VietnamesePattern";
-import { useToast } from "@/components/ui/Toast";
+import { VietnameseLotus, BotanicalBranch } from "@/components/ui/VietnamesePattern";
 
 export const WeddingDetails: React.FC = () => {
-  const { showToast } = useToast();
   const { data: weddingData } = useWeddingData();
 
-  const handleAddToCalendar = (event: WeddingEvent) => {
-    const startDate = event.isoDate.replace(/[-:]/g, "").split("+")[0] + "Z";
-    const icsContent = [
-      "BEGIN:VCALENDAR",
-      "VERSION:2.0",
-      "PRODID:-//DamCuoiVietCo//WeddingInvitation//VI",
-      "BEGIN:VEVENT",
-      `SUMMARY:${event.title} - ${weddingData.groom.shortName} & ${weddingData.bride.shortName}`,
-      `DESCRIPTION:${event.subtitle || event.title}. ${event.notes || ""}`,
-      `LOCATION:${event.venue} - ${event.address}`,
-      `DTSTART:${startDate}`,
-      "STATUS:CONFIRMED",
-      "END:VEVENT",
-      "END:VCALENDAR",
-    ].join("\r\n");
-
-    const blob = new Blob([icsContent], { type: "text/calendar;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.setAttribute("download", `hon-le-${event.id}.ics`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-    showToast("Đã tải file lịch (.ics)!", "success");
+  const handleAddToCalendar = (event: (typeof weddingData.events)[0]) => {
+    const title = encodeURIComponent(`${event.title} - ${weddingData.groom.shortName} & ${weddingData.bride.shortName}`);
+    const details = encodeURIComponent(`Trân trọng kính mời quý khách đến tham dự ${event.title} tại ${event.venue}.\nĐịa chỉ: ${event.address}`);
+    const location = encodeURIComponent(event.address);
+    const googleCalendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&details=${details}&location=${location}`;
+    window.open(googleCalendarUrl, "_blank");
   };
 
   return (
-    <section id="details" className="py-12 px-4 bg-[#FAF3E8]">
-      <div className="max-w-md mx-auto">
-        {/* Tiêu đề theo ảnh mẫu */}
-        <div className="text-center mb-8">
-          <h2 className="text-xl sm:text-2xl font-serif font-bold tracking-wider uppercase text-[#183A3A]">
-            THÔNG TIN HÔN LỄ
+    <section id="details" className="py-16 px-4 bg-ivory-texture relative overflow-hidden">
+      <div className="max-w-xl mx-auto relative z-10">
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="text-center mb-10"
+        >
+          <div className="inline-flex items-center justify-center mb-2">
+            <VietnameseLotus size={36} color="#4A6741" opacity={0.85} />
+          </div>
+          <p className="text-[11px] uppercase tracking-[0.3em] text-[#C4715A] font-sans font-semibold mb-1">
+            Chương Trình Hôn Lễ
+          </p>
+          <h2 className="font-serif text-2xl sm:text-3xl font-bold text-[#354D2E] tracking-wide">
+            Thông Tin Tiệc Cưới
           </h2>
-          <div className="w-12 h-0.5 bg-[#D4AF37] mx-auto mt-2" />
-        </div>
+          <div className="flex items-center justify-center my-3">
+            <BotanicalBranch size={52} color="#C9A84C" opacity={0.7} />
+          </div>
+          <p className="text-xs sm:text-sm text-[#8C6A58] italic font-serif max-w-sm mx-auto">
+            Sự hiện diện và chúc phúc của quý khách là niềm vinh hạnh lớn nhất của gia đình chúng tôi.
+          </p>
+        </motion.div>
 
-        {/* Các thẻ sự kiện bo tròn với hoa văn hoa sen và trống đồng */}
-        <div className="space-y-4">
-          {weddingData.events.map((event, idx) => (
-            <div
-              key={event.id}
-              className="relative bg-[#FFF9EE] border-2 border-[#EADBCE] rounded-2xl p-5 shadow-md overflow-hidden transition-all hover:border-[#D4AF37]/60"
+        {/* Cards danh sách sự kiện */}
+        <div className="space-y-6">
+          {weddingData.events.map((event, index) => (
+            <motion.div
+              key={event.id || index}
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: index * 0.1 }}
+              className="rounded-3xl p-6 sm:p-8 bg-[#FFFDF9] border border-[#E8D5CF] shadow-xs relative overflow-hidden"
+              style={{
+                boxShadow: "0 12px 32px -8px rgba(74, 103, 65, 0.08)",
+              }}
             >
-              {/* Hoa văn Trống Đồng in chìm mờ ở góc phải theo ảnh mẫu */}
-              <div className="absolute -right-8 -bottom-8 pointer-events-none opacity-20">
-                <DongSonSun size={130} color="#D4AF37" opacity={0.6} />
-              </div>
-
-              <div className="flex items-center gap-4 relative z-10">
-                {/* Minh họa hoa sen (sự kiện 1) hoặc trống đồng (sự kiện 2) ở góc trái */}
-                <div className="w-14 h-14 rounded-xl bg-[#FAF3E8] border border-[#D4AF37]/50 flex items-center justify-center flex-shrink-0 shadow-2xs">
-                  {idx === 0 ? (
-                    <VietnameseLotus size={36} color="#D4AF37" opacity={0.9} />
-                  ) : (
-                    <DongSonSun size={40} color="#D4AF37" opacity={0.85} />
-                  )}
-                </div>
-
-                {/* Thông tin chính */}
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-serif font-bold text-base sm:text-lg text-[#183A3A] tracking-wide uppercase">
+              {/* Badge Tiêu đề & Subtitle */}
+              <div className="flex flex-wrap items-center justify-between gap-2 mb-4 pb-3 border-b border-[#E8D5CF]/60">
+                <div>
+                  <span className="text-[10px] uppercase tracking-[0.2em] font-sans font-bold text-[#C4715A] block">
+                    {event.subtitle || "Sự Kiện"}
+                  </span>
+                  <h3 className="font-serif text-xl sm:text-2xl font-bold text-[#354D2E] mt-0.5">
                     {event.title}
                   </h3>
-                  <div className="text-xs text-[#9E3D32] font-semibold mt-0.5">
-                    Thời gian: {event.time} — {event.date}
-                  </div>
-                  <div className="text-xs text-[#5A473E] truncate mt-0.5">
-                    Địa điểm: <strong>{event.venue}</strong>
-                  </div>
+                </div>
+                <div className="px-3 py-1 rounded-full bg-[#F0F5EE] border border-[#A8BCA1]/40 text-[#4A6741] text-xs font-serif font-bold">
+                  {event.time}
                 </div>
               </div>
 
-              {/* Địa chỉ chi tiết và nút tác vụ */}
-              <div className="mt-3 pt-3 border-t border-[#EADBCE]/80 flex items-center justify-between text-xs">
-                <span className="text-[11px] text-[#78928A] truncate max-w-[200px]">
-                  {event.address}
-                </span>
+              {/* Thông tin thời gian & địa điểm */}
+              <div className="space-y-3 mb-6">
+                <div className="flex items-start gap-3 text-sm text-[#5C4033]">
+                  <Calendar className="w-4 h-4 text-[#C4715A] mt-0.5 shrink-0" />
+                  <div>
+                    <span className="font-medium text-[#354D2E]">{event.date}</span>
+                  </div>
+                </div>
 
-                <div className="flex items-center gap-2 flex-shrink-0">
+                <div className="flex items-start gap-3 text-sm text-[#5C4033]">
+                  <Clock className="w-4 h-4 text-[#4A6741] mt-0.5 shrink-0" />
+                  <div>
+                    <span>Vào lúc </span>
+                    <span className="font-semibold text-[#354D2E]">{event.time}</span>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 text-sm text-[#5C4033]">
+                  <MapPin className="w-4 h-4 text-[#C9A84C] mt-0.5 shrink-0" />
+                  <div>
+                    <div className="font-semibold text-[#354D2E]">{event.venue}</div>
+                    <div className="text-xs text-[#8C6A58] mt-0.5 leading-relaxed">{event.address}</div>
+                  </div>
+                </div>
+
+                {event.notes && (
+                  <p className="text-xs text-[#8C6A58] italic font-serif mt-2 pl-7">
+                    * {event.notes}
+                  </p>
+                )}
+              </div>
+
+              {/* Các nút hành động: Chỉ đường & Thêm lịch */}
+              <div className="flex items-center gap-3 pt-4 border-t border-[#E8D5CF]/60">
+                {event.mapUrl && (
                   <a
                     href={event.mapUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#183A3A] hover:bg-[#2B5757] text-[#FFF9EE] text-[11px] font-medium transition-all shadow-2xs"
+                    className="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-full bg-[#4A6741] hover:bg-[#354D2E] text-[#FDFAF5] text-xs font-serif font-semibold tracking-wide transition-all shadow-xs active:scale-98"
                   >
-                    <Navigation className="w-3 h-3 text-[#D4AF37]" />
-                    <span>Chỉ đường</span>
+                    <Navigation className="w-3.5 h-3.5" />
+                    <span>Xem Bản Đồ &amp; Chỉ Đường</span>
                   </a>
+                )}
 
-                  <button
-                    type="button"
-                    onClick={() => handleAddToCalendar(event)}
-                    className="p-1 rounded-full text-[#9E3D32] hover:bg-[#FAF3E8]"
-                    title="Thêm vào lịch"
-                  >
-                    <CalendarPlus className="w-4 h-4" />
-                  </button>
-                </div>
+                <button
+                  type="button"
+                  onClick={() => handleAddToCalendar(event)}
+                  className="flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-full bg-[#FDF0EC] hover:bg-[#F5E2DB] text-[#C4715A] text-xs font-serif font-semibold border border-[#E8D5CF] transition-all active:scale-98"
+                  title="Thêm sự kiện vào Google Calendar"
+                >
+                  <CalendarPlus className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">Lưu Lịch</span>
+                </button>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>

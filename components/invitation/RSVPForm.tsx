@@ -1,317 +1,284 @@
 "use client";
 
 import React, { useState } from "react";
-import { Send, CheckCircle2, Heart, User, Phone, Users, MessageSquare, Mail } from "lucide-react";
-import { SectionTitle } from "@/components/ui/SectionTitle";
-import { PaperCard } from "@/components/ui/PaperTexture";
+import { motion, AnimatePresence } from "framer-motion";
+import { Send, CheckCircle2, Heart, Users, Check, X, HelpCircle, Loader2 } from "lucide-react";
+import { useWeddingData } from "@/context/WeddingDataContext";
 import { useToast } from "@/components/ui/Toast";
-import confetti from "canvas-confetti";
+import { VietnameseLotus, BotanicalBranch } from "@/components/ui/VietnamesePattern";
 
 export const RSVPForm: React.FC = () => {
+  const { data: weddingData } = useWeddingData();
   const { showToast } = useToast();
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSubmitted, setIsSubmitted] = useState(false);
-  const [sentRecipients, setSentRecipients] = useState<string[]>([]);
 
-  const [formData, setFormData] = useState({
-    fullName: "",
-    phone: "",
-    guestOf: "both" as "groom" | "bride" | "both",
-    attendance: "attending" as "attending" | "declined" | "undecided",
-    guestCount: 1,
-    dietaryOrNote: "",
-  });
+  const [fullName, setFullName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [guestOf, setGuestOf] = useState<"groom" | "bride" | "both">("both");
+  const [attendance, setAttendance] = useState<"attending" | "declined" | "undecided">("attending");
+  const [guestCount, setGuestCount] = useState(1);
+  const [dietaryOrNote, setDietaryOrNote] = useState("");
 
-  const [errors, setErrors] = useState<{ fullName?: string; phone?: string }>({});
-
-  const validate = () => {
-    const err: { fullName?: string; phone?: string } = {};
-    if (!formData.fullName.trim()) {
-      err.fullName = "Vui lòng nhập họ và tên của bạn";
-    }
-    if (!formData.phone.trim()) {
-      err.phone = "Vui lòng nhập số điện thoại liên hệ";
-    } else if (!/^[0-9+-\s.]{8,15}$/.test(formData.phone.trim())) {
-      err.phone = "Số điện thoại không đúng định dạng";
-    }
-    setErrors(err);
-    return Object.keys(err).length === 0;
-  };
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validate()) return;
+    if (!fullName.trim() || !phone.trim()) {
+      showToast("Vui lòng nhập họ tên và số điện thoại", "info");
+      return;
+    }
 
-    setIsSubmitting(true);
+    setSubmitting(true);
     try {
       const res = await fetch("/api/rsvp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          fullName,
+          phone,
+          guestOf,
+          attendance,
+          guestCount: attendance === "attending" ? guestCount : 0,
+          dietaryOrNote,
+        }),
       });
       const data = await res.json();
-
       if (data.success) {
-        setIsSubmitted(true);
-        if (Array.isArray(data.emailSentTo)) {
-          setSentRecipients(data.emailSentTo);
-        }
-        showToast("Xác nhận thành công! Thông báo đã gửi tới email dâu rể.", "success");
-        try {
-          confetti({
-            particleCount: 50,
-            spread: 70,
-            origin: { y: 0.7 },
-            colors: ["#D4AF37", "#9E3D32", "#F4E8D2", "#183A3A"],
-          });
-        } catch {
-          // ignore
-        }
+        setSubmitted(true);
+        showToast("Xác nhận tham dự thành công!", "success");
       } else {
-        showToast(data.message || "Không thể gửi dữ liệu", "info");
+        showToast(data.message || "Không thể gửi xác nhận", "info");
       }
     } catch {
-      showToast("Có lỗi kết nối, vui lòng thử lại sau", "info");
+      showToast("Có lỗi xảy ra, vui lòng thử lại sau", "info");
     } finally {
-      setIsSubmitting(false);
+      setSubmitting(false);
     }
   };
 
   return (
-    <section id="rsvp" className="py-14 px-4 bg-[#FAF3E8]">
-      <div className="max-w-md mx-auto">
-        <SectionTitle
-          subtitle="SỰ HIỆN DIỆN CỦA BẠN"
-          title="XÁC NHẬN THAM DỰ"
-          description="Để chúng mình chuẩn bị đón tiếp chu đáo nhất, xin vui lòng gửi phản hồi trước ngày 15 tháng 01 năm 2027."
-          variant="lotus"
-        />
+    <section id="rsvp" className="py-16 px-4 bg-ivory-texture relative overflow-hidden">
+      <div className="max-w-lg mx-auto relative z-10">
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="text-center mb-10"
+        >
+          <div className="inline-flex items-center justify-center mb-2">
+            <VietnameseLotus size={36} color="#4A6741" opacity={0.85} />
+          </div>
+          <p className="text-[11px] uppercase tracking-[0.3em] text-[#C4715A] font-sans font-semibold mb-1">
+            Xác Nhận Tham Dự
+          </p>
+          <h2 className="font-serif text-2xl sm:text-3xl font-bold text-[#354D2E] tracking-wide">
+            Sự Hiện Diện Của Bạn
+          </h2>
+          <div className="flex items-center justify-center my-3">
+            <BotanicalBranch size={48} color="#C9A84C" opacity={0.7} />
+          </div>
+          <p className="text-xs sm:text-sm text-[#8C6A58] italic font-serif max-w-sm mx-auto">
+            Để gia đình đón tiếp chu đáo nhất, xin vui lòng phản hồi trước ngày {weddingData.weddingDateFormatted}.
+          </p>
+        </motion.div>
 
-        <PaperCard className="relative overflow-hidden shadow-lg border-2 border-[#EADBCE]">
-          {isSubmitted ? (
-            <div className="py-10 text-center space-y-4">
-              <div className="w-16 h-16 mx-auto rounded-full bg-[#FAF3E8] border border-[#78928A] flex items-center justify-center text-[#9E3D32]">
-                <Heart className="w-8 h-8 fill-current" />
-              </div>
-
-              <h3 className="font-serif text-2xl text-[#183A3A] font-bold">
-                Cảm Ơn Bạn Rất Nhiều!
-              </h3>
-
-              <p className="text-sm text-[#5A473E] leading-relaxed">
-                Thông tin xác nhận của bạn đã được ghi nhận.
-              </p>
-
-              {sentRecipients.length > 0 && (
-                <div className="p-3 bg-[#FAF3E8] rounded-lg border border-[#EADBCE] text-xs text-[#183A3A] flex items-center justify-center gap-2">
-                  <Mail className="w-4 h-4 text-[#9E3D32]" />
-                  <span>
-                    Email thông báo đã gửi tới:{" "}
-                    <strong>{sentRecipients.join(", ")}</strong>
-                  </span>
+        {/* Form Card */}
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.1 }}
+          className="rounded-3xl p-6 sm:p-9 bg-[#FFFDF9] border border-[#E8D5CF] shadow-xs relative"
+          style={{
+            boxShadow: "0 14px 36px -10px rgba(74, 103, 65, 0.09)",
+          }}
+        >
+          <AnimatePresence mode="wait">
+            {submitted ? (
+              <motion.div
+                key="success"
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="py-12 text-center space-y-4"
+              >
+                <div className="w-16 h-16 rounded-full bg-[#F0F5EE] text-[#4A6741] flex items-center justify-center mx-auto">
+                  <CheckCircle2 className="w-9 h-9 text-[#4A6741]" />
                 </div>
-              )}
-
-              <div className="pt-4">
+                <h3 className="font-serif text-2xl font-bold text-[#354D2E]">
+                  Cảm Ơn Bạn Rất Nhiều!
+                </h3>
+                <p className="text-sm text-[#5C4033] font-serif italic max-w-sm mx-auto leading-relaxed">
+                  Thông tin phản hồi của bạn đã được chuyển tới gia đình dâu rể. Hẹn gặp lại bạn trong ngày vui!
+                </p>
                 <button
                   type="button"
-                  onClick={() => setIsSubmitted(false)}
-                  className="text-xs uppercase tracking-wider text-[#9E3D32] hover:underline font-semibold"
+                  onClick={() => setSubmitted(false)}
+                  className="mt-4 px-6 py-2 rounded-full text-xs font-serif font-semibold text-[#4A6741] bg-[#F0F5EE] hover:bg-[#E2EBDD] transition-colors"
                 >
-                  Gửi lại phản hồi khác
+                  Gửi Phản Hồi Khác
                 </button>
-              </div>
-            </div>
-          ) : (
-            <form onSubmit={handleSubmit} className="space-y-4 text-xs sm:text-sm">
-              {/* Lựa chọn đối tượng khách mời */}
-              <div>
-                <label className="block text-[11px] uppercase tracking-wider text-[#6B5549] font-bold mb-1.5">
-                  Bạn Là Khách Của Ai? <span className="text-[#9E3D32]">*</span>
-                </label>
-                <div className="grid grid-cols-3 gap-1.5">
-                  {[
-                    { id: "groom", label: "Nhà Trai", desc: "(Gửi mail Chú Rể)" },
-                    { id: "bride", label: "Nhà Gái", desc: "(Gửi mail Cô Dâu)" },
-                    { id: "both", label: "Cả Hai Bạn", desc: "(Gửi mail cả 2)" },
-                  ].map((option) => (
-                    <button
-                      key={option.id}
-                      type="button"
-                      onClick={() =>
-                        setFormData({ ...formData, guestOf: option.id as "groom" | "bride" | "both" })
-                      }
-                      className={`p-2 rounded-lg border text-center transition-all ${
-                        formData.guestOf === option.id
-                          ? "bg-[#183A3A] text-[#FFF9EE] border-[#183A3A] shadow-xs"
-                          : "bg-[#FFF9EE] text-[#5A473E] border-[#E5D4B6] hover:bg-[#FAF3E8]"
-                      }`}
-                    >
-                      <div className="font-serif font-bold text-xs sm:text-sm">{option.label}</div>
-                      <div className="text-[9px] opacity-80 mt-0.5">{option.desc}</div>
-                    </button>
-                  ))}
+              </motion.div>
+            ) : (
+              <form onSubmit={handleSubmit} className="space-y-5">
+                {/* Bạn là khách của ai */}
+                <div>
+                  <label className="block text-xs uppercase tracking-wider text-[#8C6A58] font-sans font-bold mb-2">
+                    Bạn Là Khách Của Ai? <span className="text-[#C4715A]">*</span>
+                  </label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {[
+                      { id: "groom", label: "Nhà Trai", emoji: "🤵" },
+                      { id: "bride", label: "Nhà Gái", emoji: "👰" },
+                      { id: "both", label: "Cả Hai", emoji: "💑" },
+                    ].map((item) => (
+                      <button
+                        key={item.id}
+                        type="button"
+                        onClick={() => setGuestOf(item.id as any)}
+                        className={`p-3 rounded-2xl border text-center transition-all flex flex-col items-center gap-1 ${
+                          guestOf === item.id
+                            ? "border-[#4A6741] bg-[#F0F5EE] text-[#354D2E] shadow-xs"
+                            : "border-[#E8D5CF] bg-[#FDFAF5] text-[#8C6A58] hover:border-[#A8BCA1]"
+                        }`}
+                      >
+                        <span className="text-xl">{item.emoji}</span>
+                        <span className="text-xs font-serif font-medium">{item.label}</span>
+                      </button>
+                    ))}
+                  </div>
                 </div>
-              </div>
 
-              {/* Dự định tham dự */}
-              <div>
-                <label className="block text-[11px] uppercase tracking-wider text-[#6B5549] font-bold mb-1.5">
-                  Dự Định Của Bạn
-                </label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setFormData({ ...formData, attendance: "attending" })}
-                    className={`py-2 px-3 rounded-lg border flex items-center justify-center gap-1.5 font-medium transition-all ${
-                      formData.attendance === "attending"
-                        ? "bg-[#9E3D32] text-[#FFF9EE] border-[#9E3D32]"
-                        : "bg-[#FFF9EE] text-[#5A473E] border-[#E5D4B6] hover:bg-[#FAF3E8]"
-                    }`}
-                  >
-                    <CheckCircle2 className="w-4 h-4" />
-                    <span>Rất hân hạnh tham dự</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setFormData({ ...formData, attendance: "declined" })}
-                    className={`py-2 px-3 rounded-lg border flex items-center justify-center gap-1.5 font-medium transition-all ${
-                      formData.attendance === "declined"
-                        ? "bg-[#78928A] text-[#FFF9EE] border-[#78928A]"
-                        : "bg-[#FFF9EE] text-[#5A473E] border-[#E5D4B6] hover:bg-[#FAF3E8]"
-                    }`}
-                  >
-                    <Heart className="w-4 h-4" />
-                    <span>Gửi lời chúc mừng</span>
-                  </button>
-                </div>
-              </div>
-
-              {/* Họ tên */}
-              <div>
-                <label
-                  htmlFor="fullName"
-                  className="block text-[11px] uppercase tracking-wider text-[#6B5549] font-bold mb-1"
-                >
-                  Họ Và Tên Của Bạn <span className="text-[#9E3D32]">*</span>
-                </label>
-                <div className="relative">
-                  <User className="w-4 h-4 text-[#78928A] absolute left-3 top-2.5" />
+                {/* Họ tên */}
+                <div>
+                  <label htmlFor="fullName" className="block text-xs uppercase tracking-wider text-[#8C6A58] font-sans font-bold mb-1">
+                    Họ Và Tên Của Bạn <span className="text-[#C4715A]">*</span>
+                  </label>
                   <input
                     id="fullName"
                     type="text"
                     required
-                    value={formData.fullName}
-                    onChange={(e) => {
-                      setFormData({ ...formData, fullName: e.target.value });
-                      if (errors.fullName) setErrors({ ...errors, fullName: undefined });
-                    }}
-                    placeholder="Ví dụ: Nguyễn Văn A"
-                    className={`w-full pl-9 pr-3 py-2 bg-[#FAF3E8] border rounded-lg text-xs sm:text-sm text-[#183A3A] placeholder-[#8A7569] focus:outline-none focus:ring-1 focus:ring-[#183A3A] ${
-                      errors.fullName ? "border-[#9E3D32]" : "border-[#E5D4B6]"
-                    }`}
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    placeholder="Ví dụ: Nguyễn Văn An"
+                    className="w-full px-4 py-2.5 rounded-xl bg-[#FDFAF5] border border-[#E8D5CF] text-sm text-[#354D2E] placeholder-[#8C6A58]/60 focus:outline-none focus:ring-2 focus:ring-[#4A6741]/20 focus:border-[#4A6741] transition-all font-sans"
                   />
                 </div>
-                {errors.fullName && <p className="text-[11px] text-[#9E3D32] mt-0.5">{errors.fullName}</p>}
-              </div>
 
-              {/* SĐT & Số người */}
-              <div className="grid grid-cols-2 gap-2">
+                {/* Điện thoại */}
                 <div>
-                  <label
-                    htmlFor="phone"
-                    className="block text-[11px] uppercase tracking-wider text-[#6B5549] font-bold mb-1"
-                  >
-                    Số Điện Thoại <span className="text-[#9E3D32]">*</span>
+                  <label htmlFor="phone" className="block text-xs uppercase tracking-wider text-[#8C6A58] font-sans font-bold mb-1">
+                    Số Điện Thoại <span className="text-[#C4715A]">*</span>
                   </label>
-                  <div className="relative">
-                    <Phone className="w-4 h-4 text-[#78928A] absolute left-3 top-2.5" />
-                    <input
-                      id="phone"
-                      type="tel"
-                      required
-                      value={formData.phone}
-                      onChange={(e) => {
-                        setFormData({ ...formData, phone: e.target.value });
-                        if (errors.phone) setErrors({ ...errors, phone: undefined });
-                      }}
-                      placeholder="0912 345 678"
-                      className={`w-full pl-9 pr-3 py-2 bg-[#FAF3E8] border rounded-lg text-xs sm:text-sm text-[#183A3A] placeholder-[#8A7569] focus:outline-none focus:ring-1 focus:ring-[#183A3A] ${
-                        errors.phone ? "border-[#9E3D32]" : "border-[#E5D4B6]"
-                      }`}
-                    />
-                  </div>
-                  {errors.phone && <p className="text-[11px] text-[#9E3D32] mt-0.5">{errors.phone}</p>}
+                  <input
+                    id="phone"
+                    type="tel"
+                    required
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    placeholder="0912 345 678"
+                    className="w-full px-4 py-2.5 rounded-xl bg-[#FDFAF5] border border-[#E8D5CF] text-sm text-[#354D2E] placeholder-[#8C6A58]/60 focus:outline-none focus:ring-2 focus:ring-[#4A6741]/20 focus:border-[#4A6741] transition-all font-sans"
+                  />
                 </div>
 
+                {/* Trạng thái tham dự */}
                 <div>
-                  <label
-                    htmlFor="guestCount"
-                    className="block text-[11px] uppercase tracking-wider text-[#6B5549] font-bold mb-1"
-                  >
-                    Số Khách Tham Dự
+                  <label className="block text-xs uppercase tracking-wider text-[#8C6A58] font-sans font-bold mb-2">
+                    Bạn Sẽ Tham Dự Chứ? <span className="text-[#C4715A]">*</span>
                   </label>
-                  <div className="relative">
-                    <Users className="w-4 h-4 text-[#78928A] absolute left-3 top-2.5" />
-                    <select
-                      id="guestCount"
-                      value={formData.guestCount}
-                      disabled={formData.attendance === "declined"}
-                      onChange={(e) =>
-                        setFormData({ ...formData, guestCount: Number(e.target.value) })
-                      }
-                      className="w-full pl-9 pr-3 py-2 bg-[#FAF3E8] border border-[#E5D4B6] rounded-lg text-xs sm:text-sm text-[#183A3A] focus:outline-none focus:ring-1 focus:ring-[#183A3A]"
-                    >
-                      <option value={1}>1 người (Mình tôi)</option>
-                      <option value={2}>2 người (+ Người thương)</option>
-                      <option value={3}>3 người</option>
-                      <option value={4}>4 người (Gia đình)</option>
-                    </select>
+                  <div className="grid grid-cols-3 gap-2">
+                    {[
+                      { id: "attending", label: "Có Tham Dự", icon: Check, color: "text-[#4A6741]" },
+                      { id: "declined", label: "Rất Tiếc Vắng Mặt", icon: X, color: "text-[#C4715A]" },
+                      { id: "undecided", label: "Chưa Rõ Lịch", icon: HelpCircle, color: "text-[#C9A84C]" },
+                    ].map((item) => {
+                      const Icon = item.icon;
+                      return (
+                        <button
+                          key={item.id}
+                          type="button"
+                          onClick={() => setAttendance(item.id as any)}
+                          className={`p-2.5 rounded-xl border text-center transition-all flex flex-col items-center gap-1 ${
+                            attendance === item.id
+                              ? "border-[#4A6741] bg-[#F0F5EE] text-[#354D2E]"
+                              : "border-[#E8D5CF] bg-[#FDFAF5] text-[#8C6A58] hover:border-[#A8BCA1]"
+                          }`}
+                        >
+                          <Icon className={`w-4 h-4 ${item.color}`} />
+                          <span className="text-[11px] font-serif font-medium">{item.label}</span>
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
-              </div>
 
-              {/* Lời nhắn gửi */}
-              <div>
-                <label
-                  htmlFor="dietaryOrNote"
-                  className="block text-[11px] uppercase tracking-wider text-[#6B5549] font-bold mb-1"
-                >
-                  Lời Nhắn Cho Dâu Rể / Ghi Chú Ăn Uống
-                </label>
-                <div className="relative">
-                  <MessageSquare className="w-4 h-4 text-[#78928A] absolute left-3 top-2.5" />
+                {/* Số lượng người nếu tham dự */}
+                {attendance === "attending" && (
+                  <div>
+                    <label className="block text-xs uppercase tracking-wider text-[#8C6A58] font-sans font-bold mb-1">
+                      Số Lượng Người Tham Dự
+                    </label>
+                    <div className="flex items-center gap-3">
+                      {[1, 2, 3, 4].map((num) => (
+                        <button
+                          key={num}
+                          type="button"
+                          onClick={() => setGuestCount(num)}
+                          className={`flex-1 py-2 rounded-xl text-xs font-serif font-bold transition-all ${
+                            guestCount === num
+                              ? "bg-[#4A6741] text-[#FDFAF5]"
+                              : "bg-[#FDFAF5] border border-[#E8D5CF] text-[#5C4033] hover:border-[#4A6741]"
+                          }`}
+                        >
+                          {num} Người
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Lời nhắn / Ăn uống */}
+                <div>
+                  <label htmlFor="dietary" className="block text-xs uppercase tracking-wider text-[#8C6A58] font-sans font-bold mb-1">
+                    Lời Nhắn Hoặc Chế Độ Ăn Uống (nếu có)
+                  </label>
                   <textarea
-                    id="dietaryOrNote"
+                    id="dietary"
                     rows={2}
-                    value={formData.dietaryOrNote}
-                    onChange={(e) => setFormData({ ...formData, dietaryOrNote: e.target.value })}
-                    placeholder="Gửi lời chúc riêng hoặc ăn chay..."
-                    className="w-full pl-9 pr-3 py-2 bg-[#FAF3E8] border border-[#E5D4B6] rounded-lg text-xs sm:text-sm text-[#183A3A] placeholder-[#8A7569] focus:outline-none focus:ring-1 focus:ring-[#183A3A] resize-none"
+                    value={dietaryOrNote}
+                    onChange={(e) => setDietaryOrNote(e.target.value)}
+                    placeholder="Ví dụ: Ăn chay, dị ứng hải sản..."
+                    className="w-full px-4 py-2 rounded-xl bg-[#FDFAF5] border border-[#E8D5CF] text-sm text-[#354D2E] placeholder-[#8C6A58]/60 focus:outline-none focus:ring-2 focus:ring-[#4A6741]/20 focus:border-[#4A6741] transition-all font-sans resize-none"
                   />
                 </div>
-              </div>
 
-              <div className="pt-2">
+                {/* Nút gửi */}
                 <button
                   type="submit"
-                  disabled={isSubmitting}
-                  className="w-full flex items-center justify-center gap-2 py-3 px-6 rounded-full bg-[#183A3A] hover:bg-[#2B5757] text-[#FFF9EE] font-serif text-sm font-semibold tracking-wide shadow-md transition-all active:scale-98 disabled:opacity-70"
+                  disabled={submitting}
+                  className="w-full flex items-center justify-center gap-2 py-3.5 px-6 rounded-full text-sm font-serif font-semibold text-[#FDFAF5] transition-all shadow-md active:scale-98 disabled:opacity-70 cursor-pointer"
+                  style={{
+                    background: "linear-gradient(135deg, #C4715A 0%, #A4503B 100%)",
+                    boxShadow: "0 8px 20px -4px rgba(196, 113, 90, 0.4)",
+                  }}
                 >
-                  {isSubmitting ? (
-                    <span>Đang gửi xác nhận & gửi mail...</span>
+                  {submitting ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>Đang Gửi Phản Hồi...</span>
+                    </>
                   ) : (
                     <>
-                      <Send className="w-4 h-4 text-[#D4AF37]" />
-                      <span>Gửi Xác Nhận Tham Dự</span>
+                      <Send className="w-4 h-4" />
+                      <span>Gửi Phản Hồi Xác Nhận</span>
                     </>
                   )}
                 </button>
-              </div>
-            </form>
-          )}
-        </PaperCard>
+              </form>
+            )}
+          </AnimatePresence>
+        </motion.div>
       </div>
     </section>
   );

@@ -151,8 +151,8 @@ export async function POST(request: Request) {
     }
 
     // 1. Phân luồng email nhận thông báo theo lựa chọn của khách
-    const groomEmail = weddingData.contactEmails?.groom || "quangminh.wedding@gmail.com";
-    const brideEmail = weddingData.contactEmails?.bride || "thucan.wedding@gmail.com";
+    const groomEmail = weddingData.contactEmails?.groom || "congquyet.wedding@gmail.com";
+    const brideEmail = weddingData.contactEmails?.bride || "ngochan.wedding@gmail.com";
 
     let recipients: string[] = [];
     if (guestOf === "groom") {

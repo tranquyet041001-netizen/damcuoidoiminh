@@ -1,208 +1,248 @@
 "use client";
 
 import React, { useState } from "react";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown, Sparkles } from "lucide-react";
+import { ChevronDown, Sparkles, Heart } from "lucide-react";
 import { useWeddingData } from "@/context/WeddingDataContext";
-import { VietnameseLotus, DongSonSun } from "@/components/ui/VietnamesePattern";
-import confetti from "canvas-confetti";
+import {
+  VietnameseLotus,
+  DongSonBorder,
+  RedSealStamp,
+  BotanicalCorner,
+  BotanicalBranch,
+} from "@/components/ui/VietnamesePattern";
 
 export const HeroInvitation: React.FC = () => {
-  const [isOpened, setIsOpened] = useState(false);
   const { data: weddingData } = useWeddingData();
+  const [isEnvelopeOpen, setIsEnvelopeOpen] = useState(false);
 
-  const handleOpen = () => {
-    setIsOpened(true);
+  const handleOpenInvitation = () => {
+    setIsEnvelopeOpen(true);
+  };
 
-    try {
-      confetti({
-        particleCount: 50,
-        spread: 60,
-        origin: { y: 0.6 },
-        colors: ["#D4AF37", "#9E3D32", "#F4E8D2", "#78928A"],
-      });
-    } catch {
-      // ignore
+  const scrollToContent = () => {
+    const nextSection = document.getElementById("letter");
+    if (nextSection) {
+      nextSection.scrollIntoView({ behavior: "smooth" });
     }
-
-    setTimeout(() => {
-      const targetElement = document.getElementById("letter") || document.getElementById("story");
-      if (targetElement) {
-        targetElement.scrollIntoView({ behavior: "smooth" });
-      }
-    }, 600);
   };
 
   return (
     <section
       id="hero"
-      className="relative min-h-[92vh] flex flex-col items-center justify-center pt-14 pb-12 px-3 overflow-hidden"
+      className="relative min-h-[92vh] flex flex-col items-center justify-center px-4 py-16 overflow-hidden bg-peach-texture"
     >
-      {/* Nền chàm hoa văn Trống đồng Đông Sơn mờ quay chậm */}
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
-        <DongSonSun
-          size={560}
-          color="#183A3A"
-          opacity={0.07}
-          className="animate-spin-slow"
-          style={{ animationDuration: "140s" }}
-        />
+      {/* Decorative Botanical corners */}
+      <div className="absolute top-3 left-3 opacity-60 pointer-events-none">
+        <BotanicalCorner size={72} color="#4A6741" position="top-left" />
+      </div>
+      <div className="absolute top-3 right-3 opacity-60 pointer-events-none">
+        <BotanicalCorner size={72} color="#4A6741" position="top-right" />
+      </div>
+      <div className="absolute bottom-3 left-3 opacity-60 pointer-events-none">
+        <BotanicalCorner size={72} color="#4A6741" position="bottom-left" />
+      </div>
+      <div className="absolute bottom-3 right-3 opacity-60 pointer-events-none">
+        <BotanicalCorner size={72} color="#4A6741" position="bottom-right" />
       </div>
 
-      <div className="w-full max-w-[420px] mx-auto relative z-10">
+      <div className="w-full max-w-lg mx-auto relative z-10">
         <AnimatePresence mode="wait">
-          {!isOpened ? (
-            /* BÌA THIỆP PHONG BÌ UỐN VÒM VIỆT CỔ - THEO ẢNH MẪU */
+          {!isEnvelopeOpen ? (
+            /* ─── TRẠNG THÁI BÌA THIỆP (CLOSED ENVELOPE) ─── */
             <motion.div
               key="closed-envelope"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.96, transition: { duration: 0.4 } }}
-              className="relative bg-[#183A3A] text-[#FFF9EE] rounded-2xl overflow-hidden shadow-2xl border border-[#78928A]/30 flex flex-col text-center"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.94, y: -25 }}
+              transition={{ duration: 0.6, ease: "easeOut" }}
+              className="relative rounded-3xl p-6 sm:p-10 text-center shadow-xl border border-[#E8D5CF]/80 bg-[#FDFAF5]"
               style={{
-                boxShadow:
-                  "0 25px 50px -12px rgba(24, 58, 58, 0.45), 0 0 0 1px rgba(212, 175, 55, 0.25)",
+                boxShadow: "0 20px 45px -12px rgba(196, 113, 90, 0.15), 0 0 0 1px rgba(232, 213, 207, 0.5)",
               }}
             >
-              {/* Nắp phong bì uốn vòm cong bằng giấy dó bên trên */}
-              <div className="relative bg-[#FAF3E8] text-[#3A2D26] pt-6 pb-8 px-6 border-b-2 border-[#9E3D32] shadow-sm">
-                {/* Viền nắp phong bì uốn lượn cổ điển */}
-                <div className="absolute -bottom-3 left-0 right-0 h-6 flex justify-center pointer-events-none">
-                  <svg
-                    viewBox="0 0 400 30"
-                    fill="none"
-                    preserveAspectRatio="none"
-                    className="w-full h-full text-[#FAF3E8]"
-                  >
-                    <path
-                      d="M0 0 C120 0 150 25 200 25 C250 25 280 0 400 0 Z"
-                      fill="#FAF3E8"
-                      stroke="#9E3D32"
-                      strokeWidth="2"
-                    />
-                  </svg>
-                </div>
+              {/* Vòng viền thanh nhã */}
+              <div className="absolute inset-2.5 rounded-2xl border border-dashed border-[#C9A84C]/40 pointer-events-none" />
 
-                {/* Đóa sen vàng mờ trên đỉnh nắp phong bì */}
-                <div className="flex justify-center mb-1">
-                  <VietnameseLotus size={36} color="#D4AF37" opacity={0.85} />
-                </div>
-                <div className="text-[10px] uppercase tracking-[0.3em] text-[#9E3D32] font-semibold">
-                  THIỆP BÁO HỶ
-                </div>
+              {/* Tag đầu thiệp */}
+              <div className="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-[#F0F5EE] border border-[#A8BCA1]/40 text-[#4A6741] text-[11px] uppercase tracking-[0.25em] font-medium mb-5">
+                <Sparkles className="w-3 h-3 text-[#C9A84C]" />
+                <span>Thiệp Báo Hỷ</span>
+                <Sparkles className="w-3 h-3 text-[#C9A84C]" />
               </div>
 
-              {/* Phần thân thiệp màu chàm sang trọng */}
-              <div className="pt-10 pb-10 px-6 sm:px-8 space-y-6 flex-1 flex flex-col items-center justify-center">
-                <div className="space-y-1">
-                  <div className="text-[11px] uppercase tracking-[0.25em] text-[#D4AF37] font-medium">
-                    MỜI TRÂN TRỌNG
-                  </div>
+              {/* Hoa sen vẽ nét */}
+              <div className="flex justify-center mb-3">
+                <VietnameseLotus size={46} color="#4A6741" opacity={0.85} className="animate-breathe" />
+              </div>
 
-                  {/* Tên dâu rể theo phong cách chữ vàng dát kim */}
-                  <div className="py-2 space-y-1">
-                    <h1 className="font-serif italic text-3xl sm:text-4xl text-[#EADBCE] font-medium tracking-wide drop-shadow-sm text-center">
-                      {weddingData.groom.fullName}
-                    </h1>
-                    <div className="font-serif italic text-xl text-[#D4AF37]">&</div>
-                    <h1 className="font-serif italic text-3xl sm:text-4xl text-[#EADBCE] font-medium tracking-wide drop-shadow-sm text-center">
-                      {weddingData.bride.fullName}
-                    </h1>
-                  </div>
+              {/* Tiêu đề thiệp */}
+              <p className="text-xs uppercase tracking-[0.3em] text-[#8C6A58] font-sans font-semibold mb-2">
+                Trân Trọng Kính Mời
+              </p>
+
+              {/* Tên dâu rể thư pháp lãng mạn */}
+              <div className="my-4 space-y-1">
+                <h1 className="font-calligraphy text-4xl sm:text-5xl text-[#354D2E] leading-tight">
+                  {weddingData.groom.shortName}
+                </h1>
+                <div className="flex items-center justify-center gap-3">
+                  <div className="h-[1px] w-12 bg-gradient-to-r from-transparent to-[#C9A84C]" />
+                  <span className="font-serif italic text-2xl text-[#C4715A]">&amp;</span>
+                  <div className="h-[1px] w-12 bg-gradient-to-l from-transparent to-[#C9A84C]" />
                 </div>
+                <h1 className="font-calligraphy text-4xl sm:text-5xl text-[#354D2E] leading-tight">
+                  {weddingData.bride.shortName}
+                </h1>
+              </div>
 
-                <div className="py-3 border-y border-[#78928A]/30 w-full max-w-xs mx-auto">
-                  <div className="text-[11px] uppercase tracking-[0.2em] text-[#D4AF37]/90 font-medium mb-1">
-                    HÔN LỄ ĐƯỢC CỬ HÀNH VÀO
-                  </div>
-                  <div className="font-serif text-lg sm:text-xl font-semibold text-[#FFF9EE] tracking-wide">
-                    {weddingData.weddingDateFormatted}
-                  </div>
-                  <div className="text-[11px] text-[#A7BCB6] mt-0.5">
-                    ({weddingData.lunarDateFormatted})
-                  </div>
-                </div>
+              <p className="text-sm sm:text-base text-[#5C4033] font-serif italic max-w-sm mx-auto leading-relaxed my-4">
+                &ldquo;Duyên tao ngộ kết trăm năm ước hẹn, hoa nở đôi nhánh một tấm chân tình.&rdquo;
+              </p>
 
-                {/* Nút bấm XEM CHI TIẾT INVITATION mộc bản cổ điển */}
-                <div className="pt-2">
-                  <button
-                    type="button"
-                    onClick={handleOpen}
-                    className="group relative inline-flex items-center justify-center gap-2 px-7 py-3 rounded-md bg-[#D4AF37]/20 hover:bg-[#D4AF37]/30 text-[#FFF9EE] border-2 border-[#D4AF37] shadow-lg hover:shadow-xl transition-all duration-300 active:scale-95"
-                    style={{
-                      backgroundImage:
-                        "linear-gradient(135deg, rgba(212, 175, 55, 0.25) 0%, rgba(158, 61, 50, 0.25) 100%)",
-                    }}
-                  >
-                    <span className="font-serif text-xs sm:text-sm tracking-[0.15em] uppercase font-bold text-[#F4E8D2] group-hover:text-white">
-                      XEM CHI TIẾT INVITATION
-                    </span>
-                    <Sparkles className="w-4 h-4 text-[#D4AF37] animate-pulse" />
-                  </button>
+              <div className="flex items-center justify-center my-4">
+                <BotanicalBranch size={56} color="#4A6741" opacity={0.7} />
+              </div>
 
-                  <div className="text-[11px] text-[#78928A] mt-3 italic">
-                    Chạm để mở thiệp chúc phúc
-                  </div>
-                </div>
+              {/* Badge ngày cưới */}
+              <div className="inline-block px-5 py-2 rounded-xl bg-[#FDF0EC] border border-[#E8D5CF] text-[#4A6741] text-xs sm:text-sm font-serif font-medium mb-7">
+                {weddingData.weddingDateFormatted}
+              </div>
+
+              {/* Nút Mở Thiệp - Nét son đào quý phái */}
+              <div className="flex flex-col items-center justify-center gap-3">
+                <button
+                  type="button"
+                  onClick={handleOpenInvitation}
+                  className="group relative inline-flex items-center gap-3 px-8 py-3.5 rounded-full text-sm sm:text-base font-serif font-semibold text-[#FDFAF5] shadow-lg transition-all duration-300 transform active:scale-95 cursor-pointer overflow-hidden"
+                  style={{
+                    background: "linear-gradient(135deg, #C4715A 0%, #A4503B 100%)",
+                    boxShadow: "0 8px 22px -4px rgba(196, 113, 90, 0.45)",
+                  }}
+                >
+                  <span className="relative z-10 flex items-center gap-2 tracking-wide">
+                    <span>Mở Thiệp Chúc Mừng</span>
+                    <Heart className="w-4 h-4 fill-current text-[#FDFAF5] group-hover:scale-125 transition-transform" />
+                  </span>
+                  <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
+                </button>
+                <span className="text-[11px] text-[#8C6A58] tracking-wider uppercase font-sans">
+                  Chạm nhẹ để xem nội dung
+                </span>
               </div>
             </motion.div>
           ) : (
-            /* TRẠNG THÁI THIỆP ĐÃ MỞ (NỀN GIẤY DÓ CỔ ĐIỂN) */
+            /* ─── TRẠNG THÁI ĐÃ MỞ THIỆP (OPENED CARD) ─── */
             <motion.div
               key="opened-invitation"
-              initial={{ opacity: 0, y: 30, scale: 0.97 }}
+              initial={{ opacity: 0, y: 35, scale: 0.96 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
-              transition={{ duration: 0.6, ease: "easeOut" }}
-              className="relative bg-[#FFF9EE] border-2 border-[#E5D4B6] rounded-2xl p-8 sm:p-10 shadow-2xl text-center"
+              transition={{ duration: 0.7, ease: "easeOut" }}
+              className="relative rounded-3xl p-6 sm:p-10 text-center shadow-2xl border border-[#E8D5CF] bg-[#FDFAF5]"
+              style={{
+                boxShadow: "0 25px 50px -12px rgba(74, 103, 65, 0.15)",
+              }}
             >
-              {/* Viền góc son đỏ */}
-              <div className="absolute top-3 left-3 w-4 h-4 border-t-2 border-l-2 border-[#9E3D32]" />
-              <div className="absolute top-3 right-3 w-4 h-4 border-t-2 border-r-2 border-[#9E3D32]" />
-              <div className="absolute bottom-3 left-3 w-4 h-4 border-b-2 border-l-2 border-[#9E3D32]" />
-              <div className="absolute bottom-3 right-3 w-4 h-4 border-b-2 border-r-2 border-[#9E3D32]" />
+              <div className="absolute inset-2.5 rounded-2xl border border-dashed border-[#C9A84C]/30 pointer-events-none" />
 
-              <div className="flex justify-center mb-3">
-                <VietnameseLotus size={40} color="#9E3D32" opacity={0.85} />
+              {/* Con dấu son nhỏ */}
+              <div className="absolute -top-4 right-8">
+                <RedSealStamp size={44} text="TRĂM NĂM" />
               </div>
 
-              <span className="inline-block text-[11px] uppercase tracking-[0.3em] text-[#9E3D32] font-semibold mb-2">
-                TRÂN TRỌNG BÁO HỶ
-              </span>
+              {/* Lời trân trọng */}
+              <p className="text-xs uppercase tracking-[0.3em] text-[#8C6A58] font-sans font-semibold mb-2">
+                Hôn Lễ Thành Hôn
+              </p>
 
-              <div className="my-3 space-y-1">
-                <h1 className="font-serif text-3xl sm:text-4xl text-[#183A3A] font-semibold tracking-tight">
-                  {weddingData.groom.fullName}
-                </h1>
-                <div className="text-lg text-[#9E3D32] font-serif italic">&</div>
-                <h1 className="font-serif text-3xl sm:text-4xl text-[#183A3A] font-semibold tracking-tight">
-                  {weddingData.bride.fullName}
-                </h1>
+              {/* Tên cặp đôi */}
+              <div className="my-2">
+                <h2 className="font-calligraphy text-3xl sm:text-4xl text-[#354D2E]">
+                  {weddingData.groom.shortName} &amp; {weddingData.bride.shortName}
+                </h2>
               </div>
 
-              <div className="my-5 py-4 border-y border-[#EADBCE]">
-                <p className="text-sm sm:text-base text-[#5A473E] italic leading-relaxed max-w-sm mx-auto">
-                  &ldquo;{weddingData.welcomeMessage}&rdquo;
-                </p>
+              {/* Cặp ảnh chân dung dâu rể */}
+              <div className="flex items-center justify-center gap-4 sm:gap-6 my-6">
+                {/* Chú Rể */}
+                <div className="flex flex-col items-center">
+                  <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-full p-1 bg-gradient-to-tr from-[#C9A84C] to-[#A8BCA1] shadow-md">
+                    <div className="relative w-full h-full rounded-full overflow-hidden">
+                      <Image
+                        src={weddingData.groom.avatarUrl}
+                        alt={weddingData.groom.fullName}
+                        fill
+                        className="object-cover"
+                        sizes="96px"
+                      />
+                    </div>
+                  </div>
+                  <span className="font-serif font-medium text-xs sm:text-sm text-[#354D2E] mt-2">
+                    {weddingData.groom.shortName}
+                  </span>
+                  <span className="text-[10px] uppercase tracking-wider text-[#8C6A58]">
+                    Chú Rể
+                  </span>
+                </div>
+
+                {/* Trái tim kết nối */}
+                <div className="flex flex-col items-center justify-center">
+                  <Heart className="w-5 h-5 text-[#C4715A] fill-[#C4715A]/20 animate-heartbeat" />
+                  <span className="text-[10px] text-[#C9A84C] font-serif italic mt-1">Duyên</span>
+                </div>
+
+                {/* Cô Dâu */}
+                <div className="flex flex-col items-center">
+                  <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-full p-1 bg-gradient-to-tr from-[#C4715A] to-[#E8D5CF] shadow-md">
+                    <div className="relative w-full h-full rounded-full overflow-hidden">
+                      <Image
+                        src={weddingData.bride.avatarUrl}
+                        alt={weddingData.bride.fullName}
+                        fill
+                        className="object-cover"
+                        sizes="96px"
+                      />
+                    </div>
+                  </div>
+                  <span className="font-serif font-medium text-xs sm:text-sm text-[#354D2E] mt-2">
+                    {weddingData.bride.shortName}
+                  </span>
+                  <span className="text-[10px] uppercase tracking-wider text-[#8C6A58]">
+                    Cô Dâu
+                  </span>
+                </div>
               </div>
 
-              <div className="space-y-0.5">
-                <div className="text-base sm:text-lg font-serif font-semibold text-[#183A3A]">
+              <DongSonBorder color="#4A6741" opacity={0.3} className="max-w-xs mx-auto" />
+
+              {/* Lời chúc mở đầu */}
+              <p className="font-serif italic text-sm sm:text-base text-[#5C4033] leading-relaxed max-w-md mx-auto my-4">
+                &ldquo;{weddingData.welcomeMessage}&rdquo;
+              </p>
+
+              {/* Ngày tháng cử hành */}
+              <div className="my-5 p-3 rounded-2xl bg-[#F0F5EE] border border-[#A8BCA1]/30 max-w-sm mx-auto">
+                <div className="text-xs uppercase tracking-widest text-[#4A6741] font-semibold">
+                  Ngày Hỷ Sự
+                </div>
+                <div className="text-base sm:text-lg font-serif font-bold text-[#354D2E] mt-0.5">
                   {weddingData.weddingDateFormatted}
                 </div>
-                <div className="text-xs text-[#8A7569]">
-                  {weddingData.lunarDateFormatted}
+                <div className="text-xs text-[#8C6A58] italic font-serif">
+                  ({weddingData.lunarDateFormatted})
                 </div>
               </div>
 
-              <div className="mt-8">
-                <a
-                  href="#story"
-                  className="inline-flex flex-col items-center text-xs text-[#78928A] hover:text-[#183A3A] tracking-wider uppercase transition-colors"
-                >
-                  <span>Cuộn để xem tiếp</span>
-                  <ChevronDown className="w-4 h-4 mt-1 animate-bounce" />
-                </a>
-              </div>
+              {/* Nút cuộn xuống xem chi tiết */}
+              <button
+                type="button"
+                onClick={scrollToContent}
+                className="mt-2 inline-flex items-center gap-2 text-xs uppercase tracking-wider text-[#4A6741] hover:text-[#C4715A] font-medium transition-colors cursor-pointer"
+              >
+                <span>Xem Chi Tiết Hôn Lễ</span>
+                <ChevronDown className="w-4 h-4 animate-bounce text-[#C4715A]" />
+              </button>
             </motion.div>
           )}
         </AnimatePresence>

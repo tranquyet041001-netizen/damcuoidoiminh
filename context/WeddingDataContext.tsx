@@ -13,7 +13,7 @@ interface WeddingDataContextType {
   exportAsCode: () => string;
 }
 
-const LOCAL_STORAGE_KEY = "wedding_invitation_custom_data_v1";
+const LOCAL_STORAGE_KEY = "wedding_invitation_custom_data_v3";
 
 const WeddingDataContext = createContext<WeddingDataContextType | undefined>(undefined);
 

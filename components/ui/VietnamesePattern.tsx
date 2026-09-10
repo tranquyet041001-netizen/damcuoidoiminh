@@ -153,27 +153,112 @@ export const VietnameseLotus: React.FC<PatternProps> = ({
 };
 
 /**
- * Đường viền họa tiết Đông Sơn (dùng phân cách các section hoặc khung thiệp)
+ * Đường viền họa tiết hoa cành / Đông Sơn kết hợp
  */
 export const DongSonBorder: React.FC<{
   className?: string;
   color?: string;
   opacity?: number;
-}> = ({ className = "", color = "#9E3D32", opacity = 0.35 }) => {
+}> = ({ className = "", color = "#4A6741", opacity = 0.35 }) => {
   return (
     <div
       className={`w-full flex items-center justify-center gap-2 my-4 select-none ${className}`}
       style={{ opacity }}
       aria-hidden="true"
     >
-      <div className="h-[1px] flex-1 bg-gradient-to-r from-transparent via-[#9E3D32] to-[#9E3D32]" />
+      <div className="h-[1px] flex-1 bg-gradient-to-r from-transparent via-current to-current" style={{ color }} />
       <svg width="40" height="16" viewBox="0 0 40 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="20" cy="8" r="3" fill={color} />
+        <circle cx="20" cy="8" r="2.5" fill={color} />
         <path d="M12 8 L6 8 M28 8 L34 8" stroke={color} strokeWidth="1" />
-        <path d="M16 4 L20 8 L16 12 M24 4 L20 8 L24 12" stroke={color} strokeWidth="1" />
+        <path d="M15 5 C17 6.5 17 9.5 15 11 M25 5 C23 6.5 23 9.5 25 11" stroke={color} strokeWidth="1" strokeLinecap="round" />
       </svg>
-      <div className="h-[1px] flex-1 bg-gradient-to-l from-transparent via-[#9E3D32] to-[#9E3D32]" />
+      <div className="h-[1px] flex-1 bg-gradient-to-l from-transparent via-current to-current" style={{ color }} />
     </div>
+  );
+};
+
+/**
+ * Cành lá hoa botanical thanh lịch cho góc khung hoặc phân cách
+ */
+export const BotanicalBranch: React.FC<PatternProps> = ({
+  className = "",
+  size = 48,
+  color = "#4A6741",
+  opacity = 0.7,
+}) => {
+  return (
+    <svg
+      width={size}
+      height={size * 0.5}
+      viewBox="0 0 100 50"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+      style={{ opacity }}
+      aria-hidden="true"
+    >
+      <path
+        d="M10 25 C30 24 50 26 90 25"
+        stroke={color}
+        strokeWidth="1.2"
+        strokeLinecap="round"
+      />
+      {/* Lá chét bên trên */}
+      <path d="M30 25 C32 15 42 12 45 18 C40 22 36 24 30 25 Z" fill={color} fillOpacity="0.6" stroke={color} strokeWidth="0.8" />
+      <path d="M55 25 C58 13 70 12 72 19 C66 23 62 25 55 25 Z" fill={color} fillOpacity="0.6" stroke={color} strokeWidth="0.8" />
+      {/* Lá chét bên dưới */}
+      <path d="M42 25 C45 35 55 37 57 31 C52 28 48 26 42 25 Z" fill={color} fillOpacity="0.6" stroke={color} strokeWidth="0.8" />
+      <path d="M68 25 C72 36 82 36 84 30 C78 27 75 25 68 25 Z" fill={color} fillOpacity="0.6" stroke={color} strokeWidth="0.8" />
+      {/* Nụ hoa nhỏ ở đầu */}
+      <circle cx="92" cy="25" r="2" fill="#C4715A" />
+    </svg>
+  );
+};
+
+/**
+ * Họa tiết góc hoa lá Botanical Corner
+ */
+export const BotanicalCorner: React.FC<{
+  className?: string;
+  size?: number;
+  color?: string;
+  position?: "top-left" | "top-right" | "bottom-left" | "bottom-right";
+}> = ({ className = "", size = 64, color = "#4A6741", position = "top-left" }) => {
+  const transform =
+    position === "top-right"
+      ? "scaleX(-1)"
+      : position === "bottom-left"
+      ? "scaleY(-1)"
+      : position === "bottom-right"
+      ? "scale(-1, -1)"
+      : "none";
+
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 80 80"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+      style={{ transform }}
+      aria-hidden="true"
+    >
+      {/* Dây leo cong theo góc */}
+      <path
+        d="M5 75 C10 40 40 10 75 5"
+        stroke={color}
+        strokeWidth="1.2"
+        strokeLinecap="round"
+      />
+      {/* Lá dọc theo nhánh */}
+      <path d="M22 45 C15 36 20 28 28 32 C26 39 24 43 22 45 Z" fill={color} fillOpacity="0.4" stroke={color} strokeWidth="0.8" />
+      <path d="M45 22 C36 15 28 20 32 28 C39 26 43 24 45 22 Z" fill={color} fillOpacity="0.4" stroke={color} strokeWidth="0.8" />
+      <path d="M38 34 C44 26 52 28 50 36 C45 37 41 36 38 34 Z" fill={color} fillOpacity="0.5" stroke={color} strokeWidth="0.8" />
+      {/* Hoa nhỏ ở góc đỉnh */}
+      <circle cx="75" cy="5" r="2.5" fill="#C4715A" />
+      <circle cx="5" cy="75" r="2.5" fill="#C4715A" />
+    </svg>
   );
 };
 
@@ -187,10 +272,10 @@ export const RedSealStamp: React.FC<{
 }> = ({ text = "SONG HỶ", className = "", size = 60 }) => {
   return (
     <div
-      className={`relative inline-flex items-center justify-center rounded-full bg-[#9E3D32] text-[#FFF9EE] shadow-md border border-[#BD4B3F] select-none ${className}`}
+      className={`relative inline-flex items-center justify-center rounded-full bg-[#C4715A] text-[#FDFAF5] shadow-md border border-[#E8D5CF] select-none ${className}`}
       style={{ width: size, height: size }}
     >
-      <div className="absolute inset-1 rounded-full border border-dashed border-[#F4E8D2]/50" />
+      <div className="absolute inset-1 rounded-full border border-dashed border-[#FDFAF5]/60" />
       <div className="text-center font-serif text-[11px] leading-tight font-semibold tracking-widest px-1">
         {text}
       </div>
@@ -203,7 +288,7 @@ export const RedSealStamp: React.FC<{
  */
 export const LacBirdPair: React.FC<{ className?: string; color?: string }> = ({
   className = "",
-  color = "#183A3A",
+  color = "#4A6741",
 }) => {
   return (
     <div className={`flex items-center justify-center gap-4 ${className}`} aria-hidden="true">
@@ -218,13 +303,13 @@ export const LacBirdPair: React.FC<{ className?: string; color?: string }> = ({
         <path
           d="M5 25 C15 24 25 15 32 8 C38 2 46 2 48 5 C45 10 38 14 30 18 C22 22 12 24 5 25 Z"
           stroke={color}
-          strokeWidth="1.8"
+          strokeWidth="1.6"
           fill="none"
         />
-        <path d="M30 18 C33 22 40 25 46 24" stroke={color} strokeWidth="1.4" />
+        <path d="M30 18 C33 22 40 25 46 24" stroke={color} strokeWidth="1.2" />
       </svg>
 
-      <span className="w-1.5 h-1.5 rounded-full bg-[#9E3D32] opacity-75" />
+      <span className="w-1.5 h-1.5 rounded-full bg-[#C4715A] opacity-75" />
 
       <svg
         width="36"
@@ -237,10 +322,10 @@ export const LacBirdPair: React.FC<{ className?: string; color?: string }> = ({
         <path
           d="M5 25 C15 24 25 15 32 8 C38 2 46 2 48 5 C45 10 38 14 30 18 C22 22 12 24 5 25 Z"
           stroke={color}
-          strokeWidth="1.8"
+          strokeWidth="1.6"
           fill="none"
         />
-        <path d="M30 18 C33 22 40 25 46 24" stroke={color} strokeWidth="1.4" />
+        <path d="M30 18 C33 22 40 25 46 24" stroke={color} strokeWidth="1.2" />
       </svg>
     </div>
   );

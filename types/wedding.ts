@@ -57,6 +57,7 @@ export interface ContactEmails {
 }
 
 export interface WeddingData {
+  slug?: string; // Link rút gọn ví dụ "minh-an" -> /i/minh-an
   groom: PersonInfo;
   bride: PersonInfo;
   contactEmails: ContactEmails;

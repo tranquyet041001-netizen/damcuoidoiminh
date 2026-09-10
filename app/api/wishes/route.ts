@@ -4,23 +4,23 @@ import { WishSubmission } from "@/types/wedding";
 const initialWishes: WishSubmission[] = [
   {
     id: "wish-1",
-    name: "Thanh Trúc & Quốc Bảo",
-    relationship: "Bạn đại học",
-    content: "Chúc Quang Minh & Thục An trăm năm hạnh phúc, răng long đầu bạc! Chúc gia đình nhỏ luôn ngập tràn tiếng cười và bình yên mỗi ngày.",
+    name: "Thanh Tùng & Mai Anh",
+    relationship: "Bạn thân đại học",
+    content: "Chúc mừng hạnh phúc Công Quyết & Ngọc Hân! Chúc hai bạn trăm năm viên mãn, răng long đầu bạc, tổ ấm nhỏ luôn tràn ngập tiếng cười và yêu thương.",
     createdAt: "2026-09-08T14:20:00Z",
   },
   {
     id: "wish-2",
-    name: "Cô Chú Hoàng Mai",
-    relationship: "Họ hàng nhà gái",
-    content: "Chúc hai cháu vẹn tròn duyên kiếp, yêu thương sẻ chia và cùng nhau vun vén cho tổ ấm đơm hoa kết trái ngọt ngào.",
+    name: "Bác Hùng & Cô Lan",
+    relationship: "Bà con xóm 6 Minh Châu",
+    content: "Chúc hai cháu trăm năm kết tóc se tơ, sớm hôm hòa thuận, cùng nhau vun vén cho mái ấm nhỏ thật hạnh phúc và bình an!",
     createdAt: "2026-09-09T09:15:00Z",
   },
   {
     id: "wish-3",
-    name: "Hội Bạn Cấp 3 Chu Văn An",
+    name: "Hội Bạn Thân Minh Châu",
     relationship: "Bạn bè chú rể",
-    content: "Mừng ngày Minh 'chống lầy' thành công! Chúc hai bạn sớm sinh quý tử, viên mãn như ý!",
+    content: "Chúc mừng người anh em Công Quyết rước được nàng dâu thảo Ngọc Hân về dinh! Chúc đôi bạn trẻ sớm có quý tử, vạn sự như ý!",
     createdAt: "2026-09-09T18:40:00Z",
   },
 ];

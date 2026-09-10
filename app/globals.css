@@ -1,23 +1,26 @@
 @import "tailwindcss";
 
 @theme {
-  --color-cham-dam: #183A3A;
-  --color-cham-deep: #112828;
-  --color-cham-light: #2B5757;
-  --color-son-tram: #9E3D32;
-  --color-son-light: #BD4B3F;
-  --color-giay-do: #F4E8D2;
-  --color-giay-do-light: #FAF3E8;
-  --color-giay-do-dark: #E5D4B6;
-  --color-nau-muc: #3A2D26;
-  --color-nau-muc-muted: #6B5549;
-  --color-xanh-ngoc: #78928A;
-  --color-xanh-ngoc-light: #A7BCB6;
-  --color-trang-nga: #FFF9EE;
+  /* ── Botanical Romance Color System ── */
+  --color-ivory:       #FDFAF5;   /* Nền chính — trắng ngà ấm */
+  --color-peach:       #FDF0EC;   /* Nền xen kẽ — giấy hồng đào */
+  --color-sage-light:  #F0F5EE;   /* Nền xen kẽ — xanh lá nhạt */
+  --color-green:       #4A6741;   /* Màu chủ — xanh lá trà */
+  --color-green-light: #6B8C61;   /* Xanh lá nhạt hơn */
+  --color-green-deep:  #354D2E;   /* Xanh lá đậm */
+  --color-rose:        #C4715A;   /* Accent — hồng đào trầm */
+  --color-rose-light:  #D9927D;   /* Hồng đào nhạt */
+  --color-rose-border: #E8D5CF;   /* Viền hồng đào */
+  --color-gold:        #C9A84C;   /* Vàng mật */
+  --color-gold-light:  #E2C97A;   /* Vàng mật nhạt */
+  --color-earth:       #5C4033;   /* Nâu đất — text chính */
+  --color-earth-muted: #8C6A58;   /* Nâu đất mờ */
+  --color-sage:        #A8BCA1;   /* Xanh sage nhạt — text phụ */
+  --color-blush:       #F5C5B5;   /* Hồng phấn nhẹ */
 
-  --font-serif: var(--font-noto-serif), Georgia, Cambria, serif;
-  --font-sans: var(--font-vietnam), system-ui, -apple-system, sans-serif;
-  --font-script: var(--font-script), cursive;
+  --font-serif:   var(--font-cormorant), var(--font-noto-serif), Georgia, Cambria, serif;
+  --font-sans:    var(--font-vietnam), system-ui, -apple-system, sans-serif;
+  --font-script:  var(--font-script), cursive;
 }
 
 :root {
@@ -25,52 +28,123 @@
 }
 
 body {
-  background-color: var(--color-giay-do-light);
-  color: var(--color-nau-muc);
+  background-color: #FDFAF5;
+  color: #5C4033;
   font-family: var(--font-sans);
   overflow-x: hidden;
-  selection-background-color: var(--color-son-tram);
-  selection-color: #ffffff;
 }
 
 ::selection {
-  background-color: #9E3D32;
-  color: #FFF9EE;
+  background-color: #C4715A;
+  color: #FDFAF5;
 }
 
-/* Texture Giấy Dó tinh tế */
-.bg-do-texture {
-  background-color: #FAF3E8;
-  background-image: 
-    radial-gradient(circle at 50% 50%, rgba(244, 232, 210, 0.7) 0%, rgba(229, 212, 182, 0.5) 100%),
-    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.04'/%3E%3C/svg%3E");
+/* ── Texture Backgrounds ── */
+
+/* Giấy ivory ấm */
+.bg-ivory-texture {
+  background-color: #FDFAF5;
+  background-image:
+    radial-gradient(ellipse at 30% 20%, rgba(201,168,76,0.06) 0%, transparent 60%),
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
 }
 
-.bg-paper-card {
-  background-color: #FFF9EE;
-  box-shadow: 0 4px 20px -2px rgba(58, 45, 38, 0.08), 0 2px 6px -1px rgba(58, 45, 38, 0.04);
+/* Giấy hồng đào */
+.bg-peach-texture {
+  background-color: #FDF0EC;
+  background-image:
+    radial-gradient(ellipse at 70% 80%, rgba(196,113,90,0.08) 0%, transparent 55%),
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
 }
 
-/* Custom Scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-}
-::-webkit-scrollbar-track {
-  background: #F4E8D2;
-}
-::-webkit-scrollbar-thumb {
-  background: #78928A;
-  border-radius: 4px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #183A3A;
+/* Nền xanh sage nhạt */
+.bg-sage-texture {
+  background-color: #F0F5EE;
+  background-image:
+    radial-gradient(ellipse at 50% 50%, rgba(74,103,65,0.05) 0%, transparent 60%),
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
 }
 
-/* Smooth motion control */
+/* Nền xanh lá trà đậm (footer) */
+.bg-green-texture {
+  background-color: #354D2E;
+  background-image:
+    radial-gradient(ellipse at 20% 80%, rgba(107,140,97,0.3) 0%, transparent 55%),
+    radial-gradient(ellipse at 80% 20%, rgba(43,65,37,0.4) 0%, transparent 55%),
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+}
+
+/* Font thư pháp */
+.font-calligraphy {
+  font-family: var(--font-script), 'Great Vibes', cursive;
+}
+
+/* Font tiêu đề mảnh — Cormorant */
+.font-display {
+  font-family: var(--font-cormorant), var(--font-noto-serif), Georgia, serif;
+}
+
+/* Hide scrollbar */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* ── Custom Scrollbar ── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #F0F5EE; }
+::-webkit-scrollbar-thumb { background: #A8BCA1; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #4A6741; }
+
+/* ── Animations ── */
+
+/* Xoay chậm */
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+.animate-spin-slow { animation: spin-slow 140s linear infinite; }
+
+/* Nhịp thở hoa sen */
+@keyframes breathe {
+  0%, 100% { transform: scale(1);    opacity: 0.85; }
+  50%       { transform: scale(1.06); opacity: 1; }
+}
+.animate-breathe { animation: breathe 3.5s ease-in-out infinite; }
+
+/* Trượt lên */
+@keyframes fade-slide-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-slide-up { animation: fade-slide-up 0.65s ease-out both; }
+
+/* Tim đập */
+@keyframes heartbeat {
+  0%, 100% { transform: scale(1); }
+  14%      { transform: scale(1.12); }
+  28%      { transform: scale(1); }
+  42%      { transform: scale(1.06); }
+  70%      { transform: scale(1); }
+}
+.animate-heartbeat { animation: heartbeat 1.6s ease-in-out infinite; }
+
+/* Cánh hoa rơi */
+@keyframes petal-fall {
+  0%   { transform: translateY(-20px) rotate(0deg);  opacity: 0; }
+  10%  { opacity: 0.7; }
+  90%  { opacity: 0.4; }
+  100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+}
+.animate-petal { animation: petal-fall linear infinite; }
+
+/* Shimmer vàng mật */
+@keyframes shimmer-gold {
+  0%   { background-position: -200% center; }
+  100% { background-position:  200% center; }
+}
+
+/* Smooth motion */
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
+  *, *::before, *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
