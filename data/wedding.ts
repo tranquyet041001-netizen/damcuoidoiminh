@@ -190,10 +190,12 @@ export const weddingData: WeddingData = {
   },
   "theme": "crimson-gold",
   "envelopeStyle": "vintage-envelope",
+  "heroStyle": "cinematic-3d",
   "animations": {
     "fallingPetals": true,
     "dragonPhoenix": true,
     "floatingHearts": true,
-    "sparkles": true
+    "sparkles": true,
+    "cinematicIntro": true
   }
 };

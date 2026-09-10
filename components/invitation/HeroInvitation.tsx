@@ -13,6 +13,7 @@ import {
   BotanicalCorner,
   BotanicalBranch,
 } from "@/components/ui/VietnamesePattern";
+import { CelestialScene3D } from "@/components/invitation/three/CelestialScene3D";
 
 interface HeroInvitationProps {
   isOpen?: boolean;
@@ -148,6 +149,28 @@ export const HeroInvitation: React.FC<HeroInvitationProps> = ({
       nextSection.scrollIntoView({ behavior: "smooth" });
     }
   };
+
+  const heroStyle = weddingData.heroStyle || "cinematic-3d";
+
+  // Nếu chọn Vũ Điệu Long Phụng 3D (Three.js WebGL)
+  if (heroStyle === "cinematic-3d") {
+    return (
+      <section id="hero" className="relative w-full overflow-hidden">
+        <CelestialScene3D
+          weddingData={weddingData}
+          isOpen={isEnvelopeOpen}
+          onOpenInvitation={() => {
+            if (!isPlaying) playMusic();
+            if (controlledIsOpen === undefined) {
+              setInternalIsOpen(true);
+            }
+            onOpen?.();
+          }}
+          isRedTheme={isRed}
+        />
+      </section>
+    );
+  }
 
   return (
     <section

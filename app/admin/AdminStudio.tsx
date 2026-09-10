@@ -965,17 +965,42 @@ function StudioContent() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-1">
+                    {/* Vũ Điệu Long Phụng 3D */}
+                    <div
+                      onClick={() => updateData({ heroStyle: "cinematic-3d" })}
+                      className={`relative p-4 rounded-2xl border-2 transition-all cursor-pointer ${
+                        (data.heroStyle || "cinematic-3d") === "cinematic-3d"
+                          ? "border-[#9F171B] bg-[#FEF2F2]/70 shadow-md ring-2 ring-[#9F171B]/20"
+                          : "border-[#E8D5CF] bg-[#FDFAF5] hover:border-[#9F171B]/40"
+                      }`}
+                    >
+                      {(data.heroStyle || "cinematic-3d") === "cinematic-3d" && (
+                        <div className="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-[#9F171B] text-white text-[10px] font-bold">
+                          Đang Chọn
+                        </div>
+                      )}
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="text-xl">🐉</span>
+                        <h4 className="font-serif font-bold text-sm text-[#9F171B]">
+                          Long Phụng 3D (Three.js)
+                        </h4>
+                      </div>
+                      <p className="text-xs text-[#5C4033] leading-relaxed">
+                        Không gian 3D điện ảnh tráng lệ: Rồng uốn lượn, Phượng múa cánh, xoay quanh chữ 囍 trong biển mây và bụi vàng với góc nhìn 3D tương tác.
+                      </p>
+                    </div>
+
                     {/* Phong Bì Thư 3D */}
                     <div
-                      onClick={() => updateData({ envelopeStyle: "vintage-envelope" })}
+                      onClick={() => updateData({ heroStyle: "vintage-envelope", envelopeStyle: "vintage-envelope" })}
                       className={`relative p-4 rounded-2xl border-2 transition-all cursor-pointer ${
-                        (data.envelopeStyle || "vintage-envelope") === "vintage-envelope"
+                        data.heroStyle === "vintage-envelope"
                           ? "border-[#9F171B] bg-[#FEF2F2]/60 shadow-md ring-2 ring-[#9F171B]/20"
                           : "border-[#E8D5CF] bg-[#FDFAF5] hover:border-[#9F171B]/40"
                       }`}
                     >
-                      {(data.envelopeStyle || "vintage-envelope") === "vintage-envelope" && (
+                      {data.heroStyle === "vintage-envelope" && (
                         <div className="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-[#9F171B] text-white text-[10px] font-bold">
                           Đang Chọn
                         </div>
@@ -991,16 +1016,16 @@ function StudioContent() {
                       </p>
                     </div>
 
-                    {/* Bìa Thiệp Tròn */}
+                    {/* Bìa Thiệp Hiện Đại */}
                     <div
-                      onClick={() => updateData({ envelopeStyle: "modern-card" })}
+                      onClick={() => updateData({ heroStyle: "modern-card", envelopeStyle: "modern-card" })}
                       className={`relative p-4 rounded-2xl border-2 transition-all cursor-pointer ${
-                        data.envelopeStyle === "modern-card"
+                        data.heroStyle === "modern-card"
                           ? "border-[#4A6741] bg-[#F0F5EE]/60 shadow-md ring-2 ring-[#4A6741]/20"
                           : "border-[#E8D5CF] bg-[#FDFAF5] hover:border-[#4A6741]/40"
                       }`}
                     >
-                      {data.envelopeStyle === "modern-card" && (
+                      {data.heroStyle === "modern-card" && (
                         <div className="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-[#4A6741] text-white text-[10px] font-bold">
                           Đang Chọn
                         </div>
@@ -1107,6 +1132,32 @@ function StudioContent() {
                           updateData((prev) => ({
                             ...prev,
                             animations: { ...prev.animations, floatingHearts: e.target.checked },
+                          }))
+                        }
+                        className="w-5 h-5 accent-[#9F171B] rounded cursor-pointer"
+                      />
+                    </div>
+
+                    {/* Cinematic Intro 3D */}
+                    <div className="flex items-center justify-between p-3 rounded-xl bg-[#FDFAF5] border border-[#E8D5CF]">
+                      <div className="flex items-center gap-2.5">
+                        <span className="text-lg">🎬</span>
+                        <div>
+                          <p className="text-xs font-serif font-bold text-[#354D2E]">
+                            Đoạn Phim Mở Màn Long Phụng 3D (Cinematic Intro 10s)
+                          </p>
+                          <p className="text-[11px] text-[#8C6A58]">
+                            Rồng Phượng lướt mây bay xoắn quanh chữ 囍 trước khi hiện tên Dâu &amp; Rể (có nút bỏ qua nhanh)
+                          </p>
+                        </div>
+                      </div>
+                      <input
+                        type="checkbox"
+                        checked={data.animations?.cinematicIntro !== false}
+                        onChange={(e) =>
+                          updateData((prev) => ({
+                            ...prev,
+                            animations: { ...prev.animations, cinematicIntro: e.target.checked },
                           }))
                         }
                         className="w-5 h-5 accent-[#9F171B] rounded cursor-pointer"

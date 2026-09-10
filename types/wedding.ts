@@ -84,17 +84,20 @@ export interface WeddingData {
   rsvpSettings?: RSVPSettings;
   theme?: WeddingTheme; // "crimson-gold" | "sage-green"
   envelopeStyle?: EnvelopeStyle; // "vintage-envelope" | "modern-card"
+  heroStyle?: HeroStyle; // "cinematic-3d" | "vintage-envelope" | "modern-card"
   animations?: WeddingAnimations;
 }
 
 export type WeddingTheme = "crimson-gold" | "sage-green";
 export type EnvelopeStyle = "vintage-envelope" | "modern-card";
+export type HeroStyle = "cinematic-3d" | "vintage-envelope" | "modern-card";
 
 export interface WeddingAnimations {
   fallingPetals?: boolean;
   dragonPhoenix?: boolean;
   floatingHearts?: boolean;
   sparkles?: boolean;
+  cinematicIntro?: boolean;
 }
 
 export interface RSVPSettings {
