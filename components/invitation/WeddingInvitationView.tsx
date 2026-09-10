@@ -14,6 +14,9 @@ import { RSVPForm } from "@/components/invitation/RSVPForm";
 import { PhotoGallery } from "@/components/invitation/PhotoGallery";
 import { WishBook } from "@/components/invitation/WishBook";
 import { GiftCard } from "@/components/invitation/GiftCard";
+import { CinematicOpeningVideo } from "@/components/invitation/CinematicOpeningVideo";
+import { useWeddingData } from "@/context/WeddingDataContext";
+import { useMusic } from "@/context/MusicContext";
 
 interface WeddingInvitationViewProps {
   isPreview?: boolean;
@@ -36,13 +39,26 @@ export const WeddingInvitationView: React.FC<WeddingInvitationViewProps> = ({
     return false;
   });
 
+  const { data: weddingData } = useWeddingData();
+  const { playMusic, isPlaying } = useMusic();
+
   const isEnvelopeOpen = controlledIsOpen !== undefined ? controlledIsOpen : internalIsOpen;
 
   const handleOpen = () => {
+    if (!isPlaying) {
+      playMusic();
+    }
     if (controlledIsOpen === undefined) {
       setInternalIsOpen(true);
     }
     onOpenChange?.(true);
+  };
+
+  const handleReplayOpening = () => {
+    if (controlledIsOpen === undefined) {
+      setInternalIsOpen(false);
+    }
+    onOpenChange?.(false);
   };
 
   // Tự động mở nếu khách truy cập bằng anchor link trực tiếp (#rsvp, #details, #gallery, #wishes)
@@ -68,6 +84,15 @@ export const WeddingInvitationView: React.FC<WeddingInvitationViewProps> = ({
         isPreview ? "text-[95%]" : ""
       }`}
     >
+      {/* ── MÀN HÌNH MỞ ĐẦU CINEMATIC VIDEO RỒNG - PHƯỢNG ── */}
+      {!isEnvelopeOpen && (
+        <CinematicOpeningVideo
+          weddingData={weddingData}
+          onOpenInvitation={handleOpen}
+          isOpen={isEnvelopeOpen}
+        />
+      )}
+
       {/* Thanh tiêu đề cuộn nhẹ */}
       <Header isGuestView={isGuestView} isPreview={isPreview} />
 
@@ -76,6 +101,7 @@ export const WeddingInvitationView: React.FC<WeddingInvitationViewProps> = ({
         <HeroInvitation
           isOpen={isEnvelopeOpen}
           onOpen={handleOpen}
+          onReplayOpening={handleReplayOpening}
         />
 
         {/* ── CÁC PHẦN SAU CHỈ HIỂN THỊ KHI ĐÃ ẤN "MỞ THIỆP CHÚC MỪNG" ── */}

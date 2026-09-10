@@ -17,11 +17,13 @@ import {
 interface HeroInvitationProps {
   isOpen?: boolean;
   onOpen?: () => void;
+  onReplayOpening?: () => void;
 }
 
 export const HeroInvitation: React.FC<HeroInvitationProps> = ({
   isOpen: controlledIsOpen,
   onOpen,
+  onReplayOpening,
 }) => {
   const { data: weddingData } = useWeddingData();
   const { playMusic, isPlaying } = useMusic();
@@ -294,14 +296,28 @@ export const HeroInvitation: React.FC<HeroInvitationProps> = ({
               </div>
 
               {/* Nút cuộn xuống xem chi tiết */}
-              <button
-                type="button"
-                onClick={scrollToContent}
-                className="mt-2 inline-flex items-center gap-2 text-xs uppercase tracking-wider text-[#4A6741] hover:text-[#C4715A] font-medium transition-colors cursor-pointer"
-              >
-                <span>Xem Chi Tiết Hôn Lễ</span>
-                <ChevronDown className="w-4 h-4 animate-bounce text-[#C4715A]" />
-              </button>
+              <div className="mt-2 flex flex-col items-center gap-3">
+                <button
+                  type="button"
+                  onClick={scrollToContent}
+                  className="inline-flex items-center gap-2 text-xs uppercase tracking-wider text-[#4A6741] hover:text-[#C4715A] font-medium transition-colors cursor-pointer"
+                >
+                  <span>Xem Chi Tiết Hôn Lễ</span>
+                  <ChevronDown className="w-4 h-4 animate-bounce text-[#C4715A]" />
+                </button>
+
+                {onReplayOpening && (
+                  <button
+                    type="button"
+                    onClick={onReplayOpening}
+                    className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-[#FDF0EC] hover:bg-[#FBE4DD] border border-[#E8D5CF] text-[#8B1A1E] text-[11px] font-serif transition-all hover:scale-105 active:scale-95 cursor-pointer shadow-xs"
+                    title="Xem lại video mở màn Long Phụng"
+                  >
+                    <Sparkles className="w-3 h-3 text-[#C9A84C]" />
+                    <span>Xem lại video Long Phụng</span>
+                  </button>
+                )}
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
