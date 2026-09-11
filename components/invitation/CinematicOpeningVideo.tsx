@@ -17,11 +17,21 @@ export const CinematicOpeningVideo: React.FC<CinematicOpeningVideoProps> = ({
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Nhận diện thiết bị di động (chiều rộng <= 768px hoặc màn hình dọc)
-  const [isMobile, setIsMobile] = useState<boolean>(false);
+  // Nhận diện thiết bị di động ngay từ lần khởi tạo đầu tiên trên client
+  const [isMobile, setIsMobile] = useState<boolean>(() => {
+    if (typeof window !== "undefined") {
+      return (
+        window.innerWidth <= 768 ||
+        window.innerHeight > window.innerWidth ||
+        (typeof window.matchMedia === "function" && window.matchMedia("(max-width: 768px)").matches)
+      );
+    }
+    return false;
+  });
+
   const [currentTime, setCurrentTime] = useState<number>(0);
   const [isTransitioning, setIsTransitioning] = useState<boolean>(false);
-  const [hasEnded, setHasEnded] = useState<boolean>(false);
+  const [showSongHySeal, setShowSongHySeal] = useState<boolean>(false);
 
   useEffect(() => {
     const checkDevice = () => {
@@ -32,7 +42,6 @@ export const CinematicOpeningVideo: React.FC<CinematicOpeningVideoProps> = ({
       setIsMobile(mobile);
     };
 
-    checkDevice();
     window.addEventListener("resize", checkDevice);
     window.addEventListener("orientationchange", checkDevice);
 
@@ -42,68 +51,114 @@ export const CinematicOpeningVideo: React.FC<CinematicOpeningVideoProps> = ({
     };
   }, []);
 
-  // Điện thoại: longphung2.mp4 (1080x1920 dọc), Máy tính: longphung.mp4 (1920x1080 ngang)
+  // Điện thoại: longphung2.mp4 (1080x1920 dọc không tiếng), Máy tính: longphung.mp4 (1920x1080 ngang không tiếng)
   const videoSrc = isMobile ? "/videos/longphung2.mp4" : "/videos/longphung.mp4";
 
-  // Mốc thời gian hiển thị: 0s - 3.8s chỉ thưởng thức video rồng phượng
-  // Từ 3.9s xuất hiện vòng hào quang và con dấu Chữ Hỷ (囍)
-  const showPulse = currentTime >= 3.6 && currentTime < 5.0;
-  const showSongHySeal = currentTime >= 3.9;
+  // Lắng nghe timeline video để bật con dấu Chữ Hỷ
+  const handleTimeUpdate = useCallback(() => {
+    const video = videoRef.current;
+    if (!video) return;
 
-  // Lắng nghe timeline video với độ mượt 60fps
+    const t = video.currentTime;
+    setCurrentTime(t);
+
+    if (t >= 3.8) {
+      setShowSongHySeal(true);
+    }
+
+    // Dừng tại frame cuối cùng (5.92s) để rồng và phượng ôm lấy chữ Hỷ
+    if (t >= 5.92 && !video.paused) {
+      video.pause();
+    }
+  }, []);
+
+  // requestAnimationFrame để mượt mà 60fps
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
 
     let rafId: number;
-    const checkTime = () => {
+    const checkLoop = () => {
       if (video) {
         const t = video.currentTime;
         setCurrentTime(t);
-
-        // Giữ frame cuối tại 5.92s - tuyệt đối không giật về frame đầu
+        if (t >= 3.8) {
+          setShowSongHySeal(true);
+        }
         if (t >= 5.92 && !video.paused) {
           video.pause();
-          setHasEnded(true);
         }
       }
-      rafId = requestAnimationFrame(checkTime);
+      rafId = requestAnimationFrame(checkLoop);
     };
 
-    rafId = requestAnimationFrame(checkTime);
+    rafId = requestAnimationFrame(checkLoop);
 
     return () => {
       cancelAnimationFrame(rafId);
     };
   }, [videoSrc]);
 
-  // Tự động play video với muted & playsInline
+  // Đảm bảo video tự động play trên mọi thiết bị di động (kể cả Low Power Mode)
   useEffect(() => {
     const video = videoRef.current;
-    if (video) {
-      video.muted = true;
-      video.playsInline = true;
-      const playPromise = video.play();
-      if (playPromise !== undefined) {
-        playPromise.catch(() => {});
-      }
+    if (!video) return;
+
+    video.muted = true;
+    video.defaultMuted = true;
+    video.playsInline = true;
+    video.setAttribute("playsinline", "");
+    video.setAttribute("webkit-playsinline", "true");
+    video.setAttribute("x5-playsinline", "true");
+
+    const playPromise = video.play();
+    if (playPromise !== undefined) {
+      playPromise.catch(() => {
+        // Nếu trình duyệt di động chặn autoplay, hiển thị con dấu 囍 ngay để khách chạm mở
+        setShowSongHySeal(true);
+      });
     }
   }, [videoSrc]);
 
-  // Xử lý sự kiện click ấn mở thiệp
-  const handleOpenClick = useCallback(() => {
-    if (isTransitioning) return;
-    setIsTransitioning(true);
+  // CƠ CHẾ BẢO VỆ (SAFEGUARD): Sau tối đa 3.8s, chắc chắn 100% con dấu 囍 xuất hiện
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowSongHySeal(true);
+    }, 3800);
+    return () => clearTimeout(timer);
+  }, []);
 
-    setTimeout(() => {
-      onOpenInvitation();
-    }, 1100);
-  }, [isTransitioning, onOpenInvitation]);
+  // Xử lý sự kiện chạm mở thiệp
+  const handleOpenClick = useCallback(
+    (e?: React.MouseEvent | React.TouchEvent) => {
+      if (e) {
+        e.stopPropagation();
+      }
+      if (isTransitioning) return;
+      setIsTransitioning(true);
+
+      setTimeout(() => {
+        onOpenInvitation();
+      }, 1000);
+    },
+    [isTransitioning, onOpenInvitation]
+  );
+
+  // Nếu video đang dừng do chính sách mobile, người dùng chạm vào màn hình sẽ kích hoạt chạy video
+  const handleContainerClick = () => {
+    const video = videoRef.current;
+    if (video && video.paused && video.currentTime < 5.8) {
+      video.play().catch(() => {});
+    }
+  };
+
+  const showPulse = currentTime >= 3.6 && currentTime < 5.2;
 
   return (
     <div
       ref={containerRef}
-      className={`fixed inset-0 z-50 w-full h-full flex items-center justify-center overflow-hidden transition-all duration-1000 select-none ${
+      onClick={handleContainerClick}
+      className={`fixed inset-0 z-50 w-full h-[100dvh] flex items-center justify-center overflow-hidden transition-all duration-1000 select-none ${
         isTransitioning ? "opacity-0 scale-105 pointer-events-none" : "opacity-100 scale-100"
       }`}
       style={{
@@ -116,13 +171,17 @@ export const CinematicOpeningVideo: React.FC<CinematicOpeningVideoProps> = ({
         key={videoSrc}
         src={videoSrc}
         playsInline
+        webkit-playsinline="true"
+        x5-playsinline="true"
         muted
         autoPlay
         preload="auto"
+        onTimeUpdate={handleTimeUpdate}
+        onError={() => setShowSongHySeal(true)}
         className="absolute inset-0 w-full h-full object-cover pointer-events-none"
       />
 
-      {/* ── LỚP BỤI VÀNG CỔ PHONG BAY TRONG KHÔNG GIAN ── */}
+      {/* ── BỤI VÀNG CỔ PHONG BAY TRONG KHÔNG GIAN ── */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden z-10">
         <div className="antique-particle particle-a" />
         <div className="antique-particle particle-b" />
@@ -137,7 +196,7 @@ export const CinematicOpeningVideo: React.FC<CinematicOpeningVideoProps> = ({
           <motion.div
             key="ceremonial-golden-pulse"
             initial={{ opacity: 0, scale: 0.6 }}
-            animate={{ opacity: [0, 0.65, 0], scale: [0.6, 1.35, 1.8] }}
+            animate={{ opacity: [0, 0.7, 0], scale: [0.6, 1.35, 1.8] }}
             transition={{ duration: 1.3, ease: "easeOut" }}
             className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 sm:w-96 sm:h-96 rounded-full pointer-events-none z-20"
             style={{
@@ -154,8 +213,8 @@ export const CinematicOpeningVideo: React.FC<CinematicOpeningVideoProps> = ({
         {showSongHySeal && (
           <motion.div
             initial={{ opacity: 0 }}
-            animate={{ opacity: 0.9 }}
-            transition={{ duration: 1.2 }}
+            animate={{ opacity: 0.95 }}
+            transition={{ duration: 1.0 }}
             className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 sm:w-96 h-72 sm:h-96 rounded-full pointer-events-none z-20"
             style={{
               background:
@@ -172,22 +231,23 @@ export const CinematicOpeningVideo: React.FC<CinematicOpeningVideoProps> = ({
           {showSongHySeal && !isTransitioning && (
             <motion.button
               key="ceremonial-songhy-seal"
+              type="button"
               onClick={handleOpenClick}
               initial={{ opacity: 0, scale: 0.65, y: 15 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9 }}
-              transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
+              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
               whileHover={{ scale: 1.08 }}
               whileTap={{ scale: 0.94 }}
-              className="group relative flex flex-col items-center justify-center cursor-pointer select-none outline-none"
+              className="group relative flex flex-col items-center justify-center cursor-pointer select-none outline-none p-4"
               aria-label="Mở thiệp cưới"
             >
               {/* Vòng hào quang vàng tỏa sáng nhịp nhàng */}
-              <div className="absolute -inset-4 sm:-inset-6 rounded-full bg-gradient-to-tr from-[#D4AF37]/35 to-[#F59E0B]/20 blur-xl animate-pulse pointer-events-none" />
+              <div className="absolute -inset-2 sm:-inset-4 rounded-full bg-gradient-to-tr from-[#D4AF37]/35 to-[#F59E0B]/20 blur-xl animate-pulse pointer-events-none" />
 
               {/* Vòng sóng gợn nhẹ lan tỏa */}
-              <div className="absolute inset-0 rounded-full border-2 border-[#FDE68A]/70 animate-ping opacity-25 pointer-events-none duration-1000" />
-              <div className="absolute -inset-2.5 sm:-inset-3 rounded-full border border-[#FDE68A]/40 animate-pulse pointer-events-none" />
+              <div className="absolute inset-2 rounded-full border-2 border-[#FDE68A]/70 animate-ping opacity-25 pointer-events-none duration-1000" />
+              <div className="absolute inset-0 rounded-full border border-[#FDE68A]/40 animate-pulse pointer-events-none" />
 
               {/* Khối triện tròn sơn son thiếp vàng chứa chữ 囍 */}
               <div
@@ -222,7 +282,7 @@ export const CinematicOpeningVideo: React.FC<CinematicOpeningVideoProps> = ({
               </div>
 
               {/* Dòng chữ hướng dẫn chạm nhẹ thanh nhã */}
-              <div className="mt-3 px-3.5 py-1 rounded-full bg-black/45 backdrop-blur-xs border border-[#E5C368]/45 shadow-lg">
+              <div className="mt-3 px-3.5 py-1 rounded-full bg-black/55 backdrop-blur-xs border border-[#E5C368]/45 shadow-lg">
                 <span
                   className="font-serif text-[11px] sm:text-xs text-[#FFF3B0] tracking-[0.25em] uppercase font-medium"
                   style={{
@@ -243,7 +303,7 @@ export const CinematicOpeningVideo: React.FC<CinematicOpeningVideoProps> = ({
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: [0, 0.85, 0], scale: [0.8, 1.4, 2.0] }}
-            transition={{ duration: 1.1, ease: "easeInOut" }}
+            transition={{ duration: 1.0, ease: "easeInOut" }}
             className="absolute inset-0 pointer-events-none z-40 flex items-center justify-center"
           >
             <div
