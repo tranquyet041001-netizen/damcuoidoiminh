@@ -209,6 +209,16 @@ export const CinematicOpeningVideo: React.FC<CinematicOpeningVideoProps> = ({
     [isTransitioning, onOpenInvitation, playMusic]
   );
 
+  // Sau khi xem trọn vẹn màn mở đầu (~7.2s), nếu khách chưa ấn thì tự động mở chiếu thư
+  useEffect(() => {
+    const autoOpenTimer = setTimeout(() => {
+      if (!openedRef.current) {
+        handleOpenClick();
+      }
+    }, 7200);
+    return () => clearTimeout(autoOpenTimer);
+  }, [handleOpenClick]);
+
   // Chạm vào màn hình để bật âm thanh hoặc phát video nếu bị trình duyệt chặn
   const handleContainerClick = () => {
     const video = videoRef.current;

@@ -23,27 +23,27 @@ export const ImperialScrollOpeningAnimation: React.FC<ImperialScrollOpeningAnima
   useEffect(() => {
     setGuestName(getGuestNameFromUrl());
 
-    // Kịch bản chuỗi hoạt ảnh mở chiếu thư hoàng cung:
-    // T = 0.3s: Tháo dây đai và ấn triện vàng
+    // Kịch bản hoạt ảnh chiếu thư hoàng cung TỰ ĐỘNG MỞ mượt mà (không cần bất kỳ thao tác bấm nào):
+    // T = 0.15s: Dây đai lụa và ấn triện vàng tháo mở
     const t1 = setTimeout(() => {
       setScrollPhase("untying");
-    }, 300);
+    }, 150);
 
-    // T = 0.9s: Hai trục cuộn bắt đầu mở bung sang hai bên
+    // T = 0.5s: Hai trục cuộn mạ vàng tự động lăn mở sang hai bên tả - hữu
     const t2 = setTimeout(() => {
       setScrollPhase("opening");
-    }, 900);
+    }, 500);
 
-    // T = 2.0s: Chiếu thư mở hoàn toàn, đóng dấu triện Chu Sa
+    // T = 1.1s: Chiếu thư mở hoàn toàn, hiển thị đại tự, tên khách & triện son Chu Sa
     const t3 = setTimeout(() => {
       setScrollPhase("opened");
       setCanSkip(true);
-    }, 2000);
+    }, 1100);
 
-    // T = 4.8s: Tự động chuyển êm ái sang thiệp cưới chính
+    // T = 2.8s: Chiếu thư tự động mở hoàn tất và chuyển tiếp êm ái vào thiệp chính
     const t4 = setTimeout(() => {
       onComplete();
-    }, 4800);
+    }, 2800);
 
     return () => {
       clearTimeout(t1);
@@ -59,7 +59,8 @@ export const ImperialScrollOpeningAnimation: React.FC<ImperialScrollOpeningAnima
       animate={{ opacity: 1 }}
       exit={{ opacity: 0, scale: 1.05 }}
       transition={{ duration: 0.8, ease: "easeInOut" }}
-      className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden select-none"
+      onClick={onComplete}
+      className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden select-none cursor-pointer"
       style={{ backgroundColor: "#0A0102" }}
     >
       {/* Nền gấm hoàng cung sâu thẳm */}
@@ -308,31 +309,37 @@ export const ImperialScrollOpeningAnimation: React.FC<ImperialScrollOpeningAnima
         </motion.div>
       </div>
 
-      {/* NÚT VÀO XEM THIỆP CHÍNH */}
-      <AnimatePresence>
-        {canSkip && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.5 }}
-            className="fixed bottom-8 sm:bottom-12 z-50"
-          >
-            <button
-              type="button"
-              onClick={onComplete}
-              className="flex items-center gap-2 px-6 sm:px-8 py-3 rounded-full text-xs sm:text-sm font-serif font-bold text-[#1A0305] transition-all transform active:scale-95 hover:scale-105 cursor-pointer shadow-[0_0_25px_rgba(229,195,104,0.8)]"
-              style={{
-                background: "linear-gradient(135deg, #FFF3B0 0%, #E5C368 50%, #C99B26 100%)",
-                border: "2px solid #FFF8D6",
-              }}
-            >
-              <span>Kính Mời Vào Hôn Lễ</span>
-              <ChevronRight className="w-4 h-4" />
-            </button>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* NÚT VÀO NGAY GÓC TRÊN DÀNH CHO KHÁCH MUỐN VÀO NHANH */}
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          onComplete();
+        }}
+        className="fixed top-5 right-5 z-50 text-[11px] font-serif text-[#E5C368] hover:text-[#FFF8D6] bg-[#1A0305]/80 hover:bg-[#2E0508] px-3.5 py-1.5 rounded-full border border-[#E5C368]/40 transition-all cursor-pointer shadow-md flex items-center gap-1"
+      >
+        <span>Vào ngay</span>
+        <ChevronRight className="w-3.5 h-3.5 text-[#E5C368]" />
+      </button>
+
+      {/* CHỈ BÁO TỰ ĐỘNG MỞ CHIẾU THƯ & NGHÊNH TIẾP QUAN KHÁCH */}
+      <div className="fixed bottom-6 sm:bottom-8 z-40 flex flex-col items-center gap-1 pointer-events-none">
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.5 }}
+          className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#1A0305]/85 border border-[#E5C368]/60 shadow-[0_4px_15px_rgba(0,0,0,0.6)] backdrop-blur-xs"
+        >
+          <Sparkles className="w-3 h-3 text-[#FDE68A] animate-spin" style={{ animationDuration: "3s" }} />
+          <span className="text-[10px] sm:text-xs text-[#FFF8D6] font-serif tracking-widest uppercase font-semibold">
+            Chiếu Thư Tự Động Mở &bull; Đang Vào Hôn Lễ
+          </span>
+          <Sparkles className="w-3 h-3 text-[#FDE68A] animate-spin" style={{ animationDuration: "3s" }} />
+        </motion.div>
+        <span className="text-[9px] text-[#E5C368]/70 font-serif italic pt-0.5">
+          (Chạm bất kỳ đâu trên màn hình để vào thiệp tức thì)
+        </span>
+      </div>
     </motion.div>
   );
 };

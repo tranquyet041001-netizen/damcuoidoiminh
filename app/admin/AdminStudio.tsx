@@ -467,25 +467,25 @@ function StudioContent() {
   const { isPlaying: isMusicPlaying, toggleMusic } = useMusic();
 
   return (
-    <div className="min-h-screen bg-[#F7F4EE] text-[#5C4033] flex flex-col font-sans selection:bg-[#C4715A] selection:text-[#FDFAF5]">
+    <div className="min-h-screen bg-[#0F0204] text-[#3B090D] flex flex-col font-sans selection:bg-[#BA1B22] selection:text-[#FFF8D6]">
       {/* ── TOP NAVIGATION BAR ── */}
-      <header className="h-14 sm:h-16 bg-[#FFFDF9] border-b border-[#E8D5CF] px-3 sm:px-6 flex items-center justify-between z-30 shrink-0 shadow-2xs">
+      <header className="h-14 sm:h-16 bg-gradient-to-r from-[#1A0305] via-[#2A050A] to-[#1A0305] border-b border-[#E5C368]/40 text-[#FFF8D6] px-3 sm:px-6 flex items-center justify-between z-30 shrink-0 shadow-2xs">
         <div className="flex items-center gap-2 sm:gap-3">
           <Link
             href="/"
-            className="flex items-center gap-1 text-xs text-[#5C4033] hover:text-[#4A6741] transition-colors p-1.5 rounded-lg hover:bg-[#F0F5EE]"
+            className="flex items-center gap-1 text-xs text-[#E5C368] hover:text-[#FFF8D6] transition-colors p-1.5 rounded-lg hover:bg-white/10"
           >
-            <ArrowLeft className="w-4 h-4 text-[#4A6741]" />
+            <ArrowLeft className="w-4 h-4 text-[#BA1B22]" />
             <span className="hidden md:inline font-medium">Về Thiệp Cưới</span>
           </Link>
 
           <span className="text-[#E8D5CF] hidden sm:inline">|</span>
 
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-full bg-[#4A6741] text-[#FDFAF5] flex items-center justify-center font-serif text-xs font-bold shadow-2xs">
+            <div className="w-7 h-7 rounded-full bg-[#BA1B22] text-[#FDFAF5] flex items-center justify-center font-serif text-xs font-bold shadow-2xs">
               HỶ
             </div>
-            <h1 className="font-serif font-bold text-sm sm:text-base text-[#354D2E] tracking-wide flex items-center gap-1.5">
+            <h1 className="font-serif font-bold text-sm sm:text-base text-[#3B090D] tracking-wide flex items-center gap-1.5">
               <span>Thư Phòng Chỉnh Sửa</span>
             </h1>
           </div>
@@ -494,11 +494,11 @@ function StudioContent() {
         {/* Center: Status & Device Switcher */}
         <div className="flex items-center gap-2 sm:gap-3">
           {/* Trạng thái tự động lưu & đồng bộ máy chủ */}
-          <div className="hidden sm:flex items-center gap-1.5 text-xs font-serif font-medium px-3 py-1 rounded-full bg-[#F0F5EE] border border-[#A8BCA1]/40">
+          <div className="hidden sm:flex items-center gap-1.5 text-xs font-serif font-medium px-3 py-1 rounded-full bg-[#120204]/80 border border-[#E5C368]/30">
             {autoSaveStatus === "saving" ? (
               <>
-                <span className="w-2 h-2 rounded-full bg-[#C4715A] animate-ping" />
-                <span className="text-[#C4715A]">Đang lưu...</span>
+                <span className="w-2 h-2 rounded-full bg-[#BA1B22] animate-ping" />
+                <span className="text-[#BA1B22]">Đang lưu...</span>
               </>
             ) : isModified ? (
               <>
@@ -508,20 +508,20 @@ function StudioContent() {
             ) : (
               <>
                 <span className="w-2 h-2 rounded-full bg-emerald-600" />
-                <span className="text-[#4A6741]">Đã đồng bộ máy chủ</span>
+                <span className="text-[#BA1B22]">Đã đồng bộ máy chủ</span>
               </>
             )}
           </div>
 
           {/* Device Switcher */}
-          <div className="flex items-center bg-[#F0F5EE] p-0.5 sm:p-1 rounded-xl border border-[#A8BCA1]/30">
+          <div className="flex items-center bg-[#120204]/80 p-0.5 sm:p-1 rounded-xl border border-[#E5C368]/30">
             <button
               type="button"
               onClick={() => setPreviewDevice("mobile")}
               className={`p-1.5 rounded-lg text-xs transition-all cursor-pointer ${
                 previewDevice === "mobile"
-                  ? "bg-[#4A6741] text-[#FDFAF5] shadow-xs"
-                  : "text-[#8C6A58] hover:text-[#354D2E]"
+                  ? "bg-[#BA1B22] text-[#FDFAF5] shadow-xs"
+                  : "text-[#78350F] hover:text-[#3B090D]"
               }`}
               title="Khung điện thoại"
             >
@@ -532,8 +532,8 @@ function StudioContent() {
               onClick={() => setPreviewDevice("desktop")}
               className={`p-1.5 rounded-lg text-xs transition-all cursor-pointer ${
                 previewDevice === "desktop"
-                  ? "bg-[#4A6741] text-[#FDFAF5] shadow-xs"
-                  : "text-[#8C6A58] hover:text-[#354D2E]"
+                  ? "bg-[#BA1B22] text-[#FDFAF5] shadow-xs"
+                  : "text-[#78350F] hover:text-[#3B090D]"
               }`}
               title="Khung máy tính"
             >
@@ -542,14 +542,14 @@ function StudioContent() {
           </div>
 
           {/* Envelope State Switcher in Preview */}
-          <div className="flex items-center bg-[#F0F5EE] p-0.5 sm:p-1 rounded-xl border border-[#A8BCA1]/30">
+          <div className="flex items-center bg-[#120204]/80 p-0.5 sm:p-1 rounded-xl border border-[#E5C368]/30">
             <button
               type="button"
               onClick={() => setPreviewEnvelopeOpen(!previewEnvelopeOpen)}
               className={`px-2 py-1 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
                 previewEnvelopeOpen
-                  ? "bg-[#4A6741] text-[#FDFAF5] shadow-xs"
-                  : "bg-white text-[#8C6A58] hover:text-[#354D2E] shadow-2xs"
+                  ? "bg-[#BA1B22] text-[#FDFAF5] shadow-xs"
+                  : "bg-white text-[#78350F] hover:text-[#3B090D] shadow-2xs"
               }`}
               title={
                 previewEnvelopeOpen
@@ -559,15 +559,15 @@ function StudioContent() {
             >
               {previewEnvelopeOpen ? (
                 <>
-                  <MailOpen className="w-3.5 h-3.5 text-[#C9A84C]" />
+                  <MailOpen className="w-3.5 h-3.5 text-[#E5C368]" />
                   <span className="hidden sm:inline">Đã Mở</span>
                 </>
               ) : (
                 <>
                   {data.openingStyle === "envelope" ? (
-                    <Mail className="w-3.5 h-3.5 text-[#C4715A]" />
+                    <Mail className="w-3.5 h-3.5 text-[#BA1B22]" />
                   ) : (
-                    <Video className="w-3.5 h-3.5 text-[#C4715A]" />
+                    <Video className="w-3.5 h-3.5 text-[#BA1B22]" />
                   )}
                   <span className="hidden sm:inline">
                     {data.openingStyle === "envelope" ? "Bìa Đóng" : "Màn Video"}
@@ -586,12 +586,12 @@ function StudioContent() {
             onClick={handleManualSave}
             disabled={isManualSaving}
             title="Lưu ngay lập tức toàn bộ thay đổi lên máy chủ"
-            className="px-3 sm:px-4 py-1.5 rounded-lg bg-[#4A6741] hover:bg-[#354D2E] text-white text-xs font-bold shadow-sm flex items-center gap-1.5 transition-all cursor-pointer disabled:opacity-60"
+            className="px-3 sm:px-4 py-1.5 rounded-xl bg-gradient-to-r from-[#D4AF37] via-[#F3E5AB] to-[#C59B27] hover:brightness-110 text-[#1A0305] text-xs font-serif font-bold shadow-[0_0_15px_rgba(212,175,55,0.4)] border border-[#FFF8D6] flex items-center gap-1.5 transition-all cursor-pointer disabled:opacity-60"
           >
             {isManualSaving ? (
               <Loader2 className="w-3.5 h-3.5 animate-spin text-white" />
             ) : (
-              <Save className="w-3.5 h-3.5 text-[#C9A84C]" />
+              <Save className="w-3.5 h-3.5 text-[#E5C368]" />
             )}
             <span>{isManualSaving ? "Đang lưu..." : "Lưu Thay Đổi"}</span>
           </button>
@@ -600,10 +600,10 @@ function StudioContent() {
           <Link
             href={`/i/${data.slug || "quyet-han"}`}
             target="_blank"
-            className="p-1.5 sm:px-3 sm:py-1.5 rounded-lg bg-[#FDFAF5] hover:bg-[#FDF0EC] text-[#C4715A] text-xs border border-[#E8D5CF] flex items-center gap-1 transition-colors font-semibold shadow-2xs"
+            className="p-1.5 sm:px-3 sm:py-1.5 rounded-xl bg-[#2A050A] hover:bg-[#3B090D] text-[#FFF8D6] text-xs border border-[#E5C368]/50 flex items-center gap-1 transition-colors font-serif font-semibold shadow-xs"
             title="Mở giao diện khách mời để kiểm tra trực tiếp"
           >
-            <ExternalLink className="w-3.5 h-3.5 text-[#C4715A]" />
+            <ExternalLink className="w-3.5 h-3.5 text-[#BA1B22]" />
             <span className="hidden md:inline">Link Khách Mời</span>
           </Link>
 
@@ -611,7 +611,7 @@ function StudioContent() {
           <button
             type="button"
             onClick={() => setIsShareModalOpen(true)}
-            className="p-1.5 sm:px-3 sm:py-1.5 rounded-lg bg-[#C4715A] hover:bg-[#A4503B] text-[#FDFAF5] text-xs font-semibold shadow-xs flex items-center gap-1 transition-all cursor-pointer"
+            className="p-1.5 sm:px-3 sm:py-1.5 rounded-xl bg-[#BA1B22] hover:bg-[#991B1B] text-[#FFF8D6] text-xs font-serif font-semibold shadow-xs flex items-center gap-1 border border-[#E5C368]/40 transition-all cursor-pointer"
           >
             <Share2 className="w-3.5 h-3.5 text-[#FDFAF5]" />
             <span className="hidden lg:inline">Chia Sẻ Link & QR</span>
@@ -621,7 +621,7 @@ function StudioContent() {
             type="button"
             onClick={handleReset}
             title="Khôi phục dữ liệu ban đầu"
-            className="p-1.5 sm:px-2.5 sm:py-1.5 rounded-lg bg-[#FDFAF5] hover:bg-[#FDF0EC] text-[#8C6A58] text-xs border border-[#E8D5CF] flex items-center gap-1 transition-colors font-medium cursor-pointer"
+            className="p-1.5 sm:px-2.5 sm:py-1.5 rounded-xl bg-[#2A050A] hover:bg-[#3B090D] text-[#E5C368]/80 text-xs border border-[#E5C368]/30 flex items-center gap-1 transition-colors font-serif font-medium cursor-pointer"
           >
             <RotateCcw className="w-3.5 h-3.5" />
             <span className="hidden xl:inline">Khôi Phục</span>
@@ -631,9 +631,9 @@ function StudioContent() {
             type="button"
             onClick={handleExportCode}
             title="Tải về file data/wedding.ts để deploy Vercel"
-            className="p-1.5 sm:px-2.5 sm:py-1.5 rounded-lg bg-[#FDFAF5] hover:bg-[#F0F5EE] text-[#4A6741] text-xs border border-[#A8BCA1]/40 flex items-center gap-1 transition-colors font-medium cursor-pointer"
+            className="p-1.5 sm:px-2.5 sm:py-1.5 rounded-xl bg-[#2A050A] hover:bg-[#3B090D] text-[#E5C368]/90 text-xs border border-[#E5C368]/40 flex items-center gap-1 transition-colors font-serif font-medium cursor-pointer"
           >
-            <Download className="w-3.5 h-3.5 text-[#C4715A]" />
+            <Download className="w-3.5 h-3.5 text-[#BA1B22]" />
             <span className="hidden xl:inline">Xuất Code</span>
           </button>
         </div>
@@ -642,9 +642,9 @@ function StudioContent() {
       {/* ── MAIN STUDIO BODY (SPLIT EDITOR & PREVIEW) ── */}
       <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
         {/* Left Side: Sidebar Tabs + Form Content */}
-        <div className="w-full lg:w-[480px] xl:w-[540px] bg-[#FFFDF9] border-r border-[#E8D5CF] flex flex-col h-[calc(100vh-56px)] sm:h-[calc(100vh-64px)] overflow-hidden shrink-0">
+        <div className="w-full lg:w-[480px] xl:w-[540px] bg-[#FFFDF9] border-r border-[#E5C368]/30 flex flex-col h-[calc(100vh-56px)] sm:h-[calc(100vh-64px)] overflow-hidden shrink-0">
           {/* Tabs 4x2 Grid (Luôn hiển thị đầy đủ 8 tab, không bị cuộn mất) */}
-          <div className="p-2.5 border-b border-[#E8D5CF] bg-[#FDFAF5] shrink-0 shadow-2xs">
+          <div className="p-2.5 border-b border-[#E5C368]/30 bg-gradient-to-r from-[#1A0305] via-[#2A050A] to-[#1A0305] shrink-0 shadow-sm">
             <div className="grid grid-cols-4 gap-1.5">
               {ADMIN_TABS.map((tab) => {
                 const Icon = tab.icon;
@@ -656,11 +656,11 @@ function StudioContent() {
                     onClick={() => setActiveTab(tab.id)}
                     className={`py-2 px-1 rounded-xl text-[11px] font-serif font-bold flex flex-col items-center justify-center gap-1 transition-all cursor-pointer text-center ${
                       isActive
-                        ? "bg-[#4A6741] text-[#FDFAF5] shadow-xs"
-                        : "bg-[#FFFDF9] text-[#5C4033] hover:bg-[#F0F5EE] border border-[#E8D5CF]/60 hover:border-[#A8BCA1]"
+                        ? "bg-[#BA1B22] text-[#FDFAF5] shadow-xs"
+                        : "bg-[#FFFDF9] text-[#4A0E13] hover:bg-[#FDF5F2] border border-[#E8D5CF]/60 hover:border-[#E5C368]"
                     }`}
                   >
-                    <Icon className={`w-3.5 h-3.5 ${isActive ? "text-[#C9A84C]" : "text-[#4A6741]"}`} />
+                    <Icon className={`w-3.5 h-3.5 ${isActive ? "text-[#E5C368]" : "text-[#BA1B22]"}`} />
                     <span className="leading-tight line-clamp-1">{tab.label}</span>
                   </button>
                 );
@@ -677,17 +677,17 @@ function StudioContent() {
                 <div className="bg-[#FDFAF5] border border-[#E8D5CF] p-4 rounded-2xl space-y-3 shadow-2xs">
                   <div className="flex items-center justify-between pb-2 border-b border-[#E8D5CF]">
                     <div className="flex items-center gap-2">
-                      <Sparkles className="w-4 h-4 text-[#C9A84C]" />
-                      <h3 className="font-serif font-bold text-sm text-[#354D2E]">
+                      <Sparkles className="w-4 h-4 text-[#E5C368]" />
+                      <h3 className="font-serif font-bold text-sm text-[#3B090D]">
                         Kiểu Mở Đầu Thiệp Cưới
                       </h3>
                     </div>
-                    <span className="text-[10px] text-[#4A6741] bg-[#F0F5EE] px-2 py-0.5 rounded-full uppercase font-bold tracking-wider">
+                    <span className="text-[10px] text-[#BA1B22] bg-[#FDF5F2] px-2 py-0.5 rounded-full uppercase font-bold tracking-wider">
                       Cài Đặt Mở Màn
                     </span>
                   </div>
 
-                  <p className="text-xs text-[#8C6A58] leading-relaxed">
+                  <p className="text-xs text-[#78350F] leading-relaxed">
                     Tùy chọn cách khách mời bắt đầu khám phá thiệp cưới khi truy cập liên kết:
                   </p>
 
@@ -704,32 +704,32 @@ function StudioContent() {
                       }}
                       className={`p-3.5 rounded-2xl border text-left transition-all cursor-pointer relative flex flex-col justify-between ${
                         (data.openingStyle ?? "video") === "video"
-                          ? "bg-[#F0F5EE] border-[#4A6741] ring-2 ring-[#4A6741]/30 shadow-xs"
-                          : "bg-[#FFFDF9] border-[#E8D5CF] hover:border-[#A8BCA1]"
+                          ? "bg-[#FDF5F2] border-[#BA1B22] ring-2 ring-[#BA1B22]/30 shadow-xs"
+                          : "bg-[#FFFDF9] border-[#E8D5CF] hover:border-[#E5C368]"
                       }`}
                     >
                       <div>
                         <div className="flex items-center justify-between mb-2">
                           <span className="text-2xl">🐉</span>
                           {(data.openingStyle ?? "video") === "video" ? (
-                            <span className="text-[10px] font-bold text-[#4A6741] bg-white px-2 py-0.5 rounded-full border border-[#A8BCA1]/60 flex items-center gap-1 shadow-2xs">
-                              <Check className="w-3 h-3 text-[#4A6741]" /> Đang Dùng
+                            <span className="text-[10px] font-bold text-[#BA1B22] bg-white px-2 py-0.5 rounded-full border border-[#E5C368]/60 flex items-center gap-1 shadow-2xs">
+                              <Check className="w-3 h-3 text-[#BA1B22]" /> Đang Dùng
                             </span>
                           ) : (
-                            <span className="text-[10px] text-[#8C6A58] bg-[#FDFAF5] px-2 py-0.5 rounded-full border border-[#E8D5CF]">
+                            <span className="text-[10px] text-[#78350F] bg-[#FDFAF5] px-2 py-0.5 rounded-full border border-[#E8D5CF]">
                               Chọn kiểu này
                             </span>
                           )}
                         </div>
-                        <h4 className="font-serif font-bold text-xs sm:text-sm text-[#354D2E]">
+                        <h4 className="font-serif font-bold text-xs sm:text-sm text-[#3B090D]">
                           Video Rồng - Phượng
                         </h4>
-                        <p className="text-[11px] text-[#5C4033] mt-1.5 leading-relaxed">
-                          Mở màn bằng Cinematic Video Long Phụng uốn lượn cổ phong. Bấm "Mở Thiệp" mở thẳng vào nội dung (không hiện bìa thiệp cũ).
+                        <p className="text-[11px] text-[#4A0E13] mt-1.5 leading-relaxed">
+                          Mở màn bằng Cinematic Video Long Phụng uốn lượn cổ phong. Chiếu Thư Hoàng Cung tự động mở mượt mà hiển lộ đại tự và nghênh đón khách quý.
                         </p>
                       </div>
-                      <div className="mt-3 pt-2 border-t border-[#E8D5CF]/60 text-[10px] font-sans font-semibold text-[#C4715A] flex items-center gap-1">
-                        <Sparkles className="w-3 h-3 text-[#C9A84C]" />
+                      <div className="mt-3 pt-2 border-t border-[#E8D5CF]/60 text-[10px] font-sans font-semibold text-[#BA1B22] flex items-center gap-1">
+                        <Sparkles className="w-3 h-3 text-[#E5C368]" />
                         <span>Hoàng gia, sống động, ấn tượng</span>
                       </div>
                     </button>
@@ -746,32 +746,32 @@ function StudioContent() {
                       }}
                       className={`p-3.5 rounded-2xl border text-left transition-all cursor-pointer relative flex flex-col justify-between ${
                         data.openingStyle === "envelope"
-                          ? "bg-[#FDF0EC] border-[#C4715A] ring-2 ring-[#C4715A]/30 shadow-xs"
-                          : "bg-[#FFFDF9] border-[#E8D5CF] hover:border-[#A8BCA1]"
+                          ? "bg-[#FDF0EC] border-[#BA1B22] ring-2 ring-[#BA1B22]/30 shadow-xs"
+                          : "bg-[#FFFDF9] border-[#E8D5CF] hover:border-[#E5C368]"
                       }`}
                     >
                       <div>
                         <div className="flex items-center justify-between mb-2">
                           <span className="text-2xl">✉️</span>
                           {data.openingStyle === "envelope" ? (
-                            <span className="text-[10px] font-bold text-[#C4715A] bg-white px-2 py-0.5 rounded-full border border-[#E8D5CF] flex items-center gap-1 shadow-2xs">
-                              <Check className="w-3 h-3 text-[#C4715A]" /> Đang Dùng
+                            <span className="text-[10px] font-bold text-[#BA1B22] bg-white px-2 py-0.5 rounded-full border border-[#E8D5CF] flex items-center gap-1 shadow-2xs">
+                              <Check className="w-3 h-3 text-[#BA1B22]" /> Đang Dùng
                             </span>
                           ) : (
-                            <span className="text-[10px] text-[#8C6A58] bg-[#FDFAF5] px-2 py-0.5 rounded-full border border-[#E8D5CF]">
+                            <span className="text-[10px] text-[#78350F] bg-[#FDFAF5] px-2 py-0.5 rounded-full border border-[#E8D5CF]">
                               Chọn kiểu này
                             </span>
                           )}
                         </div>
-                        <h4 className="font-serif font-bold text-xs sm:text-sm text-[#354D2E]">
+                        <h4 className="font-serif font-bold text-xs sm:text-sm text-[#3B090D]">
                           Mở Thiệp Như Cũ (Phong Thư)
                         </h4>
-                        <p className="text-[11px] text-[#5C4033] mt-1.5 leading-relaxed">
+                        <p className="text-[11px] text-[#4A0E13] mt-1.5 leading-relaxed">
                           Bìa thiệp hồng truyền thống mô phỏng phong thư nắp sáp đỏ. Khách bấm "Mở Thiệp Chúc Mừng" để mở và xem ảnh dâu rể (không phát video).
                         </p>
                       </div>
-                      <div className="mt-3 pt-2 border-t border-[#E8D5CF]/60 text-[10px] font-sans font-semibold text-[#8C6A58] flex items-center gap-1">
-                        <Mail className="w-3 h-3 text-[#8C6A58]" />
+                      <div className="mt-3 pt-2 border-t border-[#E8D5CF]/60 text-[10px] font-sans font-semibold text-[#78350F] flex items-center gap-1">
+                        <Mail className="w-3 h-3 text-[#78350F]" />
                         <span>Cổ điển, ấm cúng, thân thuộc</span>
                       </div>
                     </button>
@@ -781,15 +781,15 @@ function StudioContent() {
                 {/* Chú Rể */}
                 <div className="bg-[#FDFAF5] border border-[#E8D5CF] p-4 rounded-2xl space-y-3 shadow-2xs">
                   <div className="flex items-center justify-between pb-2 border-b border-[#E8D5CF]">
-                    <h3 className="font-serif font-bold text-sm text-[#354D2E]">Thông Tin Chú Rể</h3>
-                    <span className="text-[10px] text-[#4A6741] bg-[#F0F5EE] px-2 py-0.5 rounded-full uppercase font-bold tracking-wider">
+                    <h3 className="font-serif font-bold text-sm text-[#3B090D]">Thông Tin Chú Rể</h3>
+                    <span className="text-[10px] text-[#BA1B22] bg-[#FDF5F2] px-2 py-0.5 rounded-full uppercase font-bold tracking-wider">
                       Nhà Trai
                     </span>
                   </div>
 
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="text-xs text-[#8C6A58] block mb-1 font-medium">Họ Và Tên</label>
+                      <label className="text-xs text-[#78350F] block mb-1 font-medium">Họ Và Tên</label>
                       <input
                         type="text"
                         value={data.groom.fullName}
@@ -799,12 +799,12 @@ function StudioContent() {
                             groom: { ...prev.groom, fullName: e.target.value },
                           }))
                         }
-                        className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs text-[#354D2E] font-serif focus:outline-none focus:border-[#4A6741]"
+                        className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs text-[#3B090D] font-serif focus:outline-none focus:border-[#BA1B22]"
                       />
                     </div>
 
                     <div>
-                      <label className="text-xs text-[#8C6A58] block mb-1 font-medium">Tên Thân Mật</label>
+                      <label className="text-xs text-[#78350F] block mb-1 font-medium">Tên Thân Mật</label>
                       <input
                         type="text"
                         value={data.groom.shortName}
@@ -814,13 +814,13 @@ function StudioContent() {
                             groom: { ...prev.groom, shortName: e.target.value },
                           }))
                         }
-                        className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs text-[#354D2E] font-serif focus:outline-none focus:border-[#4A6741]"
+                        className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs text-[#3B090D] font-serif focus:outline-none focus:border-[#BA1B22]"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="text-xs text-[#8C6A58] block mb-1 font-medium">Phụ Mẫu Chú Rể</label>
+                    <label className="text-xs text-[#78350F] block mb-1 font-medium">Phụ Mẫu Chú Rể</label>
                     <input
                       type="text"
                       value={data.groom.parents}
@@ -830,14 +830,14 @@ function StudioContent() {
                           groom: { ...prev.groom, parents: e.target.value },
                         }))
                       }
-                      className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs text-[#354D2E] focus:outline-none focus:border-[#4A6741]"
+                      className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs text-[#3B090D] focus:outline-none focus:border-[#BA1B22]"
                     />
                   </div>
 
                   <div>
-                    <label className="text-xs text-[#8C6A58] block mb-1 font-medium">Ảnh Chú Rể</label>
+                    <label className="text-xs text-[#78350F] block mb-1 font-medium">Ảnh Chú Rể</label>
                     <div className="flex items-center gap-3">
-                      <div className="relative w-12 h-12 rounded-full overflow-hidden border-2 border-[#4A6741] bg-white shrink-0 shadow-2xs">
+                      <div className="relative w-12 h-12 rounded-full overflow-hidden border-2 border-[#BA1B22] bg-white shrink-0 shadow-2xs">
                         {data.groom.avatarUrl && (
                           <Image src={data.groom.avatarUrl} alt="Chú rể" fill className="object-cover" />
                         )}
@@ -849,7 +849,7 @@ function StudioContent() {
                       </div>
 
                       <div className="flex-1 flex gap-2">
-                        <label className="flex items-center gap-1 px-3 py-2 rounded-xl bg-[#F0F5EE] hover:bg-[#E2EBDD] text-xs font-semibold text-[#4A6741] border border-[#A8BCA1]/40 cursor-pointer transition-all">
+                        <label className="flex items-center gap-1 px-3 py-2 rounded-xl bg-[#FDF5F2] hover:bg-[#E2EBDD] text-xs font-semibold text-[#BA1B22] border border-[#E5C368]/40 cursor-pointer transition-all">
                           <Upload className="w-3.5 h-3.5" />
                           <span>Tải ảnh</span>
                           <input type="file" accept="image/*" onChange={handleUploadGroomAvatar} className="hidden" />
@@ -864,7 +864,7 @@ function StudioContent() {
                               groom: { ...prev.groom, avatarUrl: e.target.value },
                             }))
                           }
-                          className="flex-1 bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs text-[#354D2E] focus:outline-none focus:border-[#4A6741]"
+                          className="flex-1 bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs text-[#3B090D] focus:outline-none focus:border-[#BA1B22]"
                         />
                       </div>
                     </div>
@@ -874,15 +874,15 @@ function StudioContent() {
                 {/* Cô Dâu */}
                 <div className="bg-[#FDFAF5] border border-[#E8D5CF] p-4 rounded-2xl space-y-3 shadow-2xs">
                   <div className="flex items-center justify-between pb-2 border-b border-[#E8D5CF]">
-                    <h3 className="font-serif font-bold text-sm text-[#354D2E]">Thông Tin Cô Dâu</h3>
-                    <span className="text-[10px] text-[#C4715A] bg-[#FDF0EC] px-2 py-0.5 rounded-full uppercase font-bold tracking-wider">
+                    <h3 className="font-serif font-bold text-sm text-[#3B090D]">Thông Tin Cô Dâu</h3>
+                    <span className="text-[10px] text-[#BA1B22] bg-[#FDF0EC] px-2 py-0.5 rounded-full uppercase font-bold tracking-wider">
                       Nhà Gái
                     </span>
                   </div>
 
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="text-xs text-[#8C6A58] block mb-1 font-medium">Họ Và Tên</label>
+                      <label className="text-xs text-[#78350F] block mb-1 font-medium">Họ Và Tên</label>
                       <input
                         type="text"
                         value={data.bride.fullName}
@@ -892,12 +892,12 @@ function StudioContent() {
                             bride: { ...prev.bride, fullName: e.target.value },
                           }))
                         }
-                        className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs text-[#354D2E] font-serif focus:outline-none focus:border-[#4A6741]"
+                        className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs text-[#3B090D] font-serif focus:outline-none focus:border-[#BA1B22]"
                       />
                     </div>
 
                     <div>
-                      <label className="text-xs text-[#8C6A58] block mb-1 font-medium">Tên Thân Mật</label>
+                      <label className="text-xs text-[#78350F] block mb-1 font-medium">Tên Thân Mật</label>
                       <input
                         type="text"
                         value={data.bride.shortName}
@@ -907,13 +907,13 @@ function StudioContent() {
                             bride: { ...prev.bride, shortName: e.target.value },
                           }))
                         }
-                        className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs text-[#354D2E] font-serif focus:outline-none focus:border-[#4A6741]"
+                        className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs text-[#3B090D] font-serif focus:outline-none focus:border-[#BA1B22]"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="text-xs text-[#8C6A58] block mb-1 font-medium">Phụ Mẫu Cô Dâu</label>
+                    <label className="text-xs text-[#78350F] block mb-1 font-medium">Phụ Mẫu Cô Dâu</label>
                     <input
                       type="text"
                       value={data.bride.parents}
@@ -923,14 +923,14 @@ function StudioContent() {
                           bride: { ...prev.bride, parents: e.target.value },
                         }))
                       }
-                      className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs text-[#354D2E] focus:outline-none focus:border-[#4A6741]"
+                      className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs text-[#3B090D] focus:outline-none focus:border-[#BA1B22]"
                     />
                   </div>
 
                   <div>
-                    <label className="text-xs text-[#8C6A58] block mb-1 font-medium">Ảnh Cô Dâu</label>
+                    <label className="text-xs text-[#78350F] block mb-1 font-medium">Ảnh Cô Dâu</label>
                     <div className="flex items-center gap-3">
-                      <div className="relative w-12 h-12 rounded-full overflow-hidden border-2 border-[#C4715A] bg-white shrink-0 shadow-2xs">
+                      <div className="relative w-12 h-12 rounded-full overflow-hidden border-2 border-[#BA1B22] bg-white shrink-0 shadow-2xs">
                         {data.bride.avatarUrl && (
                           <Image src={data.bride.avatarUrl} alt="Cô dâu" fill className="object-cover" />
                         )}
@@ -942,7 +942,7 @@ function StudioContent() {
                       </div>
 
                       <div className="flex-1 flex gap-2">
-                        <label className="flex items-center gap-1 px-3 py-2 rounded-xl bg-[#FDF0EC] hover:bg-[#F5E2DB] text-xs font-semibold text-[#C4715A] border border-[#E8D5CF] cursor-pointer transition-all">
+                        <label className="flex items-center gap-1 px-3 py-2 rounded-xl bg-[#FDF0EC] hover:bg-[#F5E2DB] text-xs font-semibold text-[#BA1B22] border border-[#E8D5CF] cursor-pointer transition-all">
                           <Upload className="w-3.5 h-3.5" />
                           <span>Tải ảnh</span>
                           <input type="file" accept="image/*" onChange={handleUploadBrideAvatar} className="hidden" />
@@ -957,7 +957,7 @@ function StudioContent() {
                               bride: { ...prev.bride, avatarUrl: e.target.value },
                             }))
                           }
-                          className="flex-1 bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs text-[#354D2E] focus:outline-none focus:border-[#4A6741]"
+                          className="flex-1 bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs text-[#3B090D] focus:outline-none focus:border-[#BA1B22]"
                         />
                       </div>
                     </div>
@@ -970,29 +970,29 @@ function StudioContent() {
             {activeTab === "email" && (
               <div className="space-y-5 animate-in fade-in duration-300">
                 {/* 1. THÔNG BÁO TỨC THÌ QUA TELEGRAM BOT (KHUYÊN DÙNG) */}
-                <div className="bg-[#FDFAF5] border-2 border-[#4A6741]/40 p-4 sm:p-5 rounded-2xl space-y-4 shadow-xs">
+                <div className="bg-[#FDFAF5] border-2 border-[#BA1B22]/40 p-4 sm:p-5 rounded-2xl space-y-4 shadow-xs">
                   <div className="flex items-center justify-between pb-2 border-b border-[#E8D5CF]">
                     <div className="flex items-center gap-2">
                       <div className="w-8 h-8 rounded-full bg-[#0088cc]/10 flex items-center justify-center text-[#0088cc]">
                         <Send className="w-4 h-4" />
                       </div>
                       <div>
-                        <h3 className="font-serif font-bold text-sm text-[#354D2E]">
+                        <h3 className="font-serif font-bold text-sm text-[#3B090D]">
                           Tin Nhắn Báo Về Điện Thoại (Telegram Bot)
                         </h3>
-                        <p className="text-[11px] text-[#8C6A58]">
+                        <p className="text-[11px] text-[#78350F]">
                           Nhận chuông báo tức thì mỗi khi có khách phản hồi RSVP hoặc gửi lời chúc
                         </p>
                       </div>
                     </div>
-                    <span className="text-[10px] text-[#4A6741] bg-[#F0F5EE] font-bold px-2 py-0.5 rounded-full border border-[#A8BCA1]/40 uppercase tracking-wider shrink-0">
+                    <span className="text-[10px] text-[#BA1B22] bg-[#FDF5F2] font-bold px-2 py-0.5 rounded-full border border-[#E5C368]/40 uppercase tracking-wider shrink-0">
                       Khuyên Dùng • Miễn Phí
                     </span>
                   </div>
 
                   <div className="space-y-3">
                     <div>
-                      <label className="text-xs text-[#8C6A58] block mb-1 font-bold">
+                      <label className="text-xs text-[#78350F] block mb-1 font-bold">
                         Telegram Bot Token
                       </label>
                       <input
@@ -1011,12 +1011,12 @@ function StudioContent() {
                           }))
                         }
                         placeholder="Ví dụ: 7891234567:AAHxyz..."
-                        className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs text-[#354D2E] font-mono focus:outline-none focus:border-[#4A6741]"
+                        className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs text-[#3B090D] font-mono focus:outline-none focus:border-[#BA1B22]"
                       />
                     </div>
 
                     <div>
-                      <label className="text-xs text-[#8C6A58] block mb-1 font-bold">
+                      <label className="text-xs text-[#78350F] block mb-1 font-bold">
                         Telegram Chat ID (Cá Nhân hoặc Nhóm 2 Vợ Chồng)
                       </label>
                       <input
@@ -1035,7 +1035,7 @@ function StudioContent() {
                           }))
                         }
                         placeholder="Ví dụ: 123456789 (Cá nhân) hoặc -1001234567890 (Nhóm)"
-                        className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs text-[#354D2E] font-mono focus:outline-none focus:border-[#4A6741]"
+                        className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs text-[#3B090D] font-mono focus:outline-none focus:border-[#BA1B22]"
                       />
                     </div>
 
@@ -1058,17 +1058,17 @@ function StudioContent() {
                       <button
                         type="button"
                         onClick={() => setShowTelegramGuide(!showTelegramGuide)}
-                        className="px-3 py-2 rounded-xl bg-[#FFFDF9] hover:bg-[#F0F5EE] border border-[#E8D5CF] text-[#5C4033] text-xs font-medium flex items-center gap-1 transition-colors cursor-pointer"
+                        className="px-3 py-2 rounded-xl bg-[#FFFDF9] hover:bg-[#FDF5F2] border border-[#E8D5CF] text-[#4A0E13] text-xs font-medium flex items-center gap-1 transition-colors cursor-pointer"
                       >
-                        <HelpCircle className="w-3.5 h-3.5 text-[#C4715A]" />
+                        <HelpCircle className="w-3.5 h-3.5 text-[#BA1B22]" />
                         <span>{showTelegramGuide ? "Thu gọn hướng dẫn" : "Xem cách lấy Token & Chat ID (1 phút)"}</span>
                       </button>
                     </div>
 
                     {/* Collapsible Guide */}
                     {showTelegramGuide && (
-                      <div className="p-3.5 bg-[#F0F5EE] border border-[#A8BCA1]/50 rounded-xl text-xs space-y-2 text-[#354D2E] animate-in fade-in">
-                        <div className="font-bold text-[#2C3E28] pb-1 border-b border-[#A8BCA1]/40">
+                      <div className="p-3.5 bg-[#FDF5F2] border border-[#E5C368]/50 rounded-xl text-xs space-y-2 text-[#3B090D] animate-in fade-in">
+                        <div className="font-bold text-[#090102] pb-1 border-b border-[#E5C368]/40">
                           📌 3 Bước Kích Hoạt Nhận Tin Nhắn Telegram:
                         </div>
                         <ol className="list-decimal list-inside space-y-1.5 leading-relaxed">
@@ -1115,10 +1115,10 @@ function StudioContent() {
                         <FileSpreadsheet className="w-4 h-4" />
                       </div>
                       <div>
-                        <h3 className="font-serif font-bold text-sm text-[#354D2E]">
+                        <h3 className="font-serif font-bold text-sm text-[#3B090D]">
                           Tự Động Ghi Vào Google Sheets
                         </h3>
-                        <p className="text-[11px] text-[#8C6A58]">
+                        <p className="text-[11px] text-[#78350F]">
                           Tự động thêm mỗi phản hồi của khách thành 1 dòng trong file Excel Google Drive
                         </p>
                       </div>
@@ -1130,7 +1130,7 @@ function StudioContent() {
 
                   <div className="space-y-3">
                     <div>
-                      <label className="text-xs text-[#8C6A58] block mb-1 font-bold">
+                      <label className="text-xs text-[#78350F] block mb-1 font-bold">
                         Google Apps Script Webhook URL
                       </label>
                       <input
@@ -1149,7 +1149,7 @@ function StudioContent() {
                           }))
                         }
                         placeholder="https://script.google.com/macros/s/.../exec"
-                        className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs text-[#354D2E] font-mono focus:outline-none focus:border-[#4A6741]"
+                        className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs text-[#3B090D] font-mono focus:outline-none focus:border-[#BA1B22]"
                       />
                     </div>
 
@@ -1163,7 +1163,7 @@ function StudioContent() {
                         {testingSheet ? (
                           <Loader2 className="w-3.5 h-3.5 animate-spin" />
                         ) : (
-                          <FileSpreadsheet className="w-3.5 h-3.5 text-[#C9A84C]" />
+                          <FileSpreadsheet className="w-3.5 h-3.5 text-[#E5C368]" />
                         )}
                         <span>{testingSheet ? "Đang gửi thử..." : "Gửi Thử Sang Google Sheet"}</span>
                       </button>
@@ -1171,16 +1171,16 @@ function StudioContent() {
                       <button
                         type="button"
                         onClick={() => setShowSheetGuide(!showSheetGuide)}
-                        className="px-3 py-2 rounded-xl bg-[#FFFDF9] hover:bg-[#F0F5EE] border border-[#E8D5CF] text-[#5C4033] text-xs font-medium flex items-center gap-1 transition-colors cursor-pointer"
+                        className="px-3 py-2 rounded-xl bg-[#FFFDF9] hover:bg-[#FDF5F2] border border-[#E8D5CF] text-[#4A0E13] text-xs font-medium flex items-center gap-1 transition-colors cursor-pointer"
                       >
-                        <HelpCircle className="w-3.5 h-3.5 text-[#4A6741]" />
+                        <HelpCircle className="w-3.5 h-3.5 text-[#BA1B22]" />
                         <span>{showSheetGuide ? "Đóng hướng dẫn" : "Lấy mã Google Apps Script"}</span>
                       </button>
                     </div>
 
                     {showSheetGuide && (
-                      <div className="p-3.5 bg-[#F0F5EE] border border-[#A8BCA1]/50 rounded-xl text-xs space-y-2 text-[#354D2E] animate-in fade-in">
-                        <div className="font-bold text-[#2C3E28]">
+                      <div className="p-3.5 bg-[#FDF5F2] border border-[#E5C368]/50 rounded-xl text-xs space-y-2 text-[#3B090D] animate-in fade-in">
+                        <div className="font-bold text-[#090102]">
                           📋 Cách cấu hình Google Sheet nhận phản hồi:
                         </div>
                         <ol className="list-decimal list-inside space-y-1 leading-relaxed">
@@ -1189,7 +1189,7 @@ function StudioContent() {
                           <li>Xóa hết mã cũ và dán đoạn mã ngắn sau:</li>
                         </ol>
                         <div className="relative">
-                          <pre className="p-2.5 bg-[#1C2919] text-[#A8BCA1] rounded-lg text-[11px] overflow-x-auto font-mono">
+                          <pre className="p-2.5 bg-[#1C0306] text-[#E5C368] rounded-lg text-[11px] overflow-x-auto font-mono">
 {`function doPost(e) {
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
   var d = JSON.parse(e.postData.contents);
@@ -1213,7 +1213,7 @@ function StudioContent() {
                               await copyToClipboard(code);
                               showToast("Đã sao chép mã Apps Script vào bộ nhớ tạm!", "success");
                             }}
-                            className="absolute top-2 right-2 px-2 py-1 rounded bg-[#4A6741] hover:bg-[#354D2E] text-white text-[10px] font-bold flex items-center gap-1 cursor-pointer"
+                            className="absolute top-2 right-2 px-2 py-1 rounded bg-[#BA1B22] hover:bg-[#3B090D] text-white text-[10px] font-bold flex items-center gap-1 cursor-pointer"
                           >
                             <Copy className="w-3 h-3" />
                             <span>Sao chép</span>
@@ -1232,19 +1232,19 @@ function StudioContent() {
                 {/* 3. PHÂN LUỒNG EMAIL NHẬN PHẢN HỒI (RSVP) */}
                 <div className="bg-[#FDFAF5] border border-[#E8D5CF] p-4 sm:p-5 rounded-2xl space-y-3 shadow-2xs">
                   <div className="flex items-center gap-2 pb-2 border-b border-[#E8D5CF]">
-                    <Mail className="w-4 h-4 text-[#4A6741]" />
-                    <h3 className="font-serif font-bold text-sm text-[#354D2E]">
+                    <Mail className="w-4 h-4 text-[#BA1B22]" />
+                    <h3 className="font-serif font-bold text-sm text-[#3B090D]">
                       Email Phân Luồng Nhận Phản Hồi RSVP
                     </h3>
                   </div>
 
-                  <p className="text-xs text-[#5C4033]">
+                  <p className="text-xs text-[#4A0E13]">
                     Phản hồi từ khách Nhà Trai gửi về mail Chú Rể; Nhà Gái về mail Cô Dâu; Cả Hai gửi tới cả hai mail.
                   </p>
 
                   <div className="space-y-3">
                     <div>
-                      <label className="text-xs text-[#8C6A58] block mb-1 font-bold">
+                      <label className="text-xs text-[#78350F] block mb-1 font-bold">
                         Email Chú Rể (Khách Nhà Trai)
                       </label>
                       <input
@@ -1257,12 +1257,12 @@ function StudioContent() {
                           }))
                         }
                         placeholder="chure@gmail.com"
-                        className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs text-[#354D2E] font-mono focus:outline-none focus:border-[#4A6741]"
+                        className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs text-[#3B090D] font-mono focus:outline-none focus:border-[#BA1B22]"
                       />
                     </div>
 
                     <div>
-                      <label className="text-xs text-[#8C6A58] block mb-1 font-bold">
+                      <label className="text-xs text-[#78350F] block mb-1 font-bold">
                         Email Cô Dâu (Khách Nhà Gái)
                       </label>
                       <input
@@ -1275,12 +1275,12 @@ function StudioContent() {
                           }))
                         }
                         placeholder="codau@gmail.com"
-                        className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs text-[#354D2E] font-mono focus:outline-none focus:border-[#4A6741]"
+                        className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs text-[#3B090D] font-mono focus:outline-none focus:border-[#BA1B22]"
                       />
                     </div>
 
                     <div>
-                      <label className="text-xs text-[#8C6A58] block mb-1 font-bold">
+                      <label className="text-xs text-[#78350F] block mb-1 font-bold">
                         Resend API Key (Tùy chọn - Gửi email HTML tự động)
                       </label>
                       <input
@@ -1299,7 +1299,7 @@ function StudioContent() {
                           }))
                         }
                         placeholder="re_123456789..."
-                        className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs text-[#354D2E] font-mono focus:outline-none focus:border-[#4A6741]"
+                        className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs text-[#3B090D] font-mono focus:outline-none focus:border-[#BA1B22]"
                       />
                     </div>
                   </div>
@@ -1309,8 +1309,8 @@ function StudioContent() {
                 <div className="bg-[#FDFAF5] border border-[#E8D5CF] p-4 sm:p-5 rounded-2xl space-y-3 shadow-2xs">
                   <div className="flex items-center justify-between pb-2 border-b border-[#E8D5CF]">
                     <div className="flex items-center gap-2">
-                      <Share2 className="w-4 h-4 text-[#C4715A]" />
-                      <h3 className="font-serif font-bold text-sm text-[#354D2E]">
+                      <Share2 className="w-4 h-4 text-[#BA1B22]" />
+                      <h3 className="font-serif font-bold text-sm text-[#3B090D]">
                         Đường Dẫn Rút Gọn (Short Link)
                       </h3>
                     </div>
@@ -1320,16 +1320,16 @@ function StudioContent() {
                     </span>
                   </div>
 
-                  <p className="text-xs text-[#5C4033] leading-relaxed">
+                  <p className="text-xs text-[#4A0E13] leading-relaxed">
                     Link rút gọn chia sẻ cho khách qua Zalo / Facebook. Link này <strong>ẩn toàn bộ nút Admin</strong> và <strong>không thể chỉnh sửa</strong>.
                   </p>
 
                   <div className="space-y-1.5">
-                    <label className="text-xs text-[#8C6A58] block font-bold">
+                    <label className="text-xs text-[#78350F] block font-bold">
                       Tùy Chỉnh Định Danh (Slug)
                     </label>
                     <div className="flex items-center">
-                      <span className="bg-[#F0F5EE] text-[#4A6741] px-3 py-2 rounded-l-xl text-xs font-mono font-bold border border-r-0 border-[#E8D5CF]">
+                      <span className="bg-[#FDF5F2] text-[#BA1B22] px-3 py-2 rounded-l-xl text-xs font-mono font-bold border border-r-0 border-[#E8D5CF]">
                         /i/
                       </span>
                       <input
@@ -1341,17 +1341,17 @@ function StudioContent() {
                           })
                         }
                         placeholder="quyet-han"
-                        className="flex-1 bg-[#FFFDF9] border border-[#E8D5CF] rounded-r-xl px-3 py-2 text-xs text-[#354D2E] font-mono font-bold focus:outline-none focus:border-[#4A6741]"
+                        className="flex-1 bg-[#FFFDF9] border border-[#E8D5CF] rounded-r-xl px-3 py-2 text-xs text-[#3B090D] font-mono font-bold focus:outline-none focus:border-[#BA1B22]"
                       />
                     </div>
                   </div>
 
                   <div className="p-3 bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl space-y-2">
-                    <div className="text-[10px] uppercase font-bold tracking-wider text-[#8C6A58]">
+                    <div className="text-[10px] uppercase font-bold tracking-wider text-[#78350F]">
                       Link gửi khách thực tế:
                     </div>
                     <div className="flex items-center justify-between gap-2">
-                      <span className="font-mono text-xs font-bold text-[#C4715A] truncate">
+                      <span className="font-mono text-xs font-bold text-[#BA1B22] truncate">
                         {`${origin}/i/${data.slug || "quyet-han"}`}
                       </span>
                       <button
@@ -1366,7 +1366,7 @@ function StudioContent() {
                             showToast("Vui lòng bôi đen và sao chép thủ công", "info");
                           }
                         }}
-                        className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#4A6741] hover:bg-[#354D2E] text-[#FDFAF5] text-xs font-medium transition-all active:scale-95 shrink-0 cursor-pointer"
+                        className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#BA1B22] hover:bg-[#3B090D] text-[#FDFAF5] text-xs font-medium transition-all active:scale-95 shrink-0 cursor-pointer"
                       >
                         <Copy className="w-3.5 h-3.5" />
                         <span>Sao Chép</span>
@@ -1378,7 +1378,7 @@ function StudioContent() {
                     <button
                       type="button"
                       onClick={() => setIsShareModalOpen(true)}
-                      className="flex-1 py-2 px-3 rounded-xl bg-[#C4715A] hover:bg-[#A4503B] text-[#FDFAF5] text-xs font-semibold flex items-center justify-center gap-1.5 shadow-2xs transition-all active:scale-95 cursor-pointer"
+                      className="flex-1 py-2 px-3 rounded-xl bg-[#BA1B22] hover:bg-[#A4503B] text-[#FDFAF5] text-xs font-semibold flex items-center justify-center gap-1.5 shadow-2xs transition-all active:scale-95 cursor-pointer"
                     >
                       <QrCode className="w-3.5 h-3.5" />
                       <span>Mở Mã QR &amp; Chia Sẻ</span>
@@ -1388,9 +1388,9 @@ function StudioContent() {
                       href={`/i/${data.slug || "quyet-han"}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="py-2 px-3 rounded-xl bg-[#FFFDF9] hover:bg-[#F0F5EE] border border-[#E8D5CF] text-[#354D2E] text-xs font-medium flex items-center justify-center gap-1.5 transition-colors"
+                      className="py-2 px-3 rounded-xl bg-[#FFFDF9] hover:bg-[#FDF5F2] border border-[#E8D5CF] text-[#3B090D] text-xs font-medium flex items-center justify-center gap-1.5 transition-colors"
                     >
-                      <ExternalLink className="w-3.5 h-3.5 text-[#4A6741]" />
+                      <ExternalLink className="w-3.5 h-3.5 text-[#BA1B22]" />
                       <span>Xem Thử</span>
                     </a>
                   </div>
@@ -1404,7 +1404,7 @@ function StudioContent() {
                 {/* Thời gian hôn lễ */}
                 <div className="bg-[#FDFAF5] border border-[#E8D5CF] p-4 sm:p-5 rounded-2xl space-y-4 shadow-2xs">
                   <div className="flex items-center justify-between pb-2 border-b border-[#E8D5CF]">
-                    <h3 className="font-serif font-bold text-sm text-[#354D2E]">
+                    <h3 className="font-serif font-bold text-sm text-[#3B090D]">
                       Thời Gian Hôn Lễ &amp; Lời Mở Đầu
                     </h3>
                     <button
@@ -1417,9 +1417,9 @@ function StudioContent() {
                         updateData({ events: updated });
                         showToast(`Đã đồng bộ ngày "${data.weddingDateFormatted}" sang tất cả ${data.events.length} sự kiện cưới!`, "success");
                       }}
-                      className="text-[11px] text-[#4A6741] hover:text-[#354D2E] font-medium underline flex items-center gap-1 cursor-pointer"
+                      className="text-[11px] text-[#BA1B22] hover:text-[#3B090D] font-medium underline flex items-center gap-1 cursor-pointer"
                     >
-                      <Sparkles className="w-3.5 h-3.5 text-[#C9A84C]" />
+                      <Sparkles className="w-3.5 h-3.5 text-[#E5C368]" />
                       <span>Đồng bộ ngày sang tất cả Sự Kiện</span>
                     </button>
                   </div>
@@ -1427,7 +1427,7 @@ function StudioContent() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
                       <div className="flex items-center justify-between mb-1">
-                        <label className="text-xs text-[#8C6A58] font-bold">Ngày Dương Lịch (Chính)</label>
+                        <label className="text-xs text-[#78350F] font-bold">Ngày Dương Lịch (Chính)</label>
                       </div>
                       <input
                         type="text"
@@ -1446,31 +1446,31 @@ function StudioContent() {
                             };
                           });
                         }}
-                        className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs font-serif text-[#354D2E] font-bold focus:outline-none focus:border-[#4A6741]"
+                        className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs font-serif text-[#3B090D] font-bold focus:outline-none focus:border-[#BA1B22]"
                         placeholder="Ví dụ: Chủ Nhật, 24 Tháng 01 Năm 2027"
                       />
                     </div>
 
                     <div>
-                      <label className="text-xs text-[#8C6A58] block mb-1 font-bold">Ngày Âm Lịch</label>
+                      <label className="text-xs text-[#78350F] block mb-1 font-bold">Ngày Âm Lịch</label>
                       <input
                         type="text"
                         value={data.lunarDateFormatted}
                         onChange={(e) => updateData({ lunarDateFormatted: e.target.value })}
-                        className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs text-[#354D2E] focus:outline-none focus:border-[#4A6741]"
+                        className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs text-[#3B090D] focus:outline-none focus:border-[#BA1B22]"
                         placeholder="Ví dụ: Nhằm ngày 17 tháng Chạp năm Bính Ngọ"
                       />
                     </div>
                   </div>
 
                   {/* Tiện ích chọn lịch nhanh tự động định dạng */}
-                  <div className="p-3 bg-[#F0F5EE] border border-[#A8BCA1]/40 rounded-xl space-y-2">
+                  <div className="p-3 bg-[#FDF5F2] border border-[#E5C368]/40 rounded-xl space-y-2">
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold text-[#354D2E] flex items-center gap-1.5">
-                        <Calendar className="w-3.5 h-3.5 text-[#4A6741]" />
+                      <span className="text-xs font-bold text-[#3B090D] flex items-center gap-1.5">
+                        <Calendar className="w-3.5 h-3.5 text-[#BA1B22]" />
                         <span>Bộ Chọn Lịch Tự Động:</span>
                       </span>
-                      <span className="text-[10px] text-[#8C6A58]">Tự điền Ngày Dương + Đếm Ngược + Sự Kiện</span>
+                      <span className="text-[10px] text-[#78350F]">Tự điền Ngày Dương + Đếm Ngược + Sự Kiện</span>
                     </div>
                     <div className="flex flex-wrap items-center gap-2">
                       <input
@@ -1510,63 +1510,63 @@ function StudioContent() {
                           });
                           showToast(`Đã cập nhật ngày: ${formattedDate} và đồng bộ các sự kiện!`, "success");
                         }}
-                        className="bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-1.5 text-xs text-[#354D2E] focus:outline-none focus:border-[#4A6741] cursor-pointer"
+                        className="bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-1.5 text-xs text-[#3B090D] focus:outline-none focus:border-[#BA1B22] cursor-pointer"
                       />
-                      <span className="text-[11px] text-[#5C4033] italic">
+                      <span className="text-[11px] text-[#4A0E13] italic">
                         Bấm biểu tượng lịch để chọn ngày, hệ thống sẽ tự động cập nhật đồng bộ!
                       </span>
                     </div>
                   </div>
 
                   <div>
-                    <label className="text-xs text-[#8C6A58] block mb-1 font-medium">Chuỗi ISO Cho Đồng Hồ Đếm Ngược</label>
+                    <label className="text-xs text-[#78350F] block mb-1 font-medium">Chuỗi ISO Cho Đồng Hồ Đếm Ngược</label>
                     <input
                       type="text"
                       value={data.weddingDate}
                       onChange={(e) => updateData({ weddingDate: e.target.value })}
-                      className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs font-mono text-[#354D2E]"
+                      className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs font-mono text-[#3B090D]"
                     />
                   </div>
 
                   <div>
-                    <label className="text-xs text-[#8C6A58] block mb-1 font-medium">Câu Châm Ngôn Bìa Thiệp</label>
+                    <label className="text-xs text-[#78350F] block mb-1 font-medium">Câu Châm Ngôn Bìa Thiệp</label>
                     <input
                       type="text"
                       value={data.welcomeQuote}
                       onChange={(e) => updateData({ welcomeQuote: e.target.value })}
-                      className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs font-serif italic text-[#354D2E]"
+                      className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs font-serif italic text-[#3B090D]"
                     />
                   </div>
                 </div>
 
                 {/* Hộp Nhạc Nền YouTube & MP3 */}
-                <div className="bg-[#FDFAF5] border-2 border-[#C4715A]/40 p-4 sm:p-5 rounded-2xl space-y-4 shadow-2xs">
+                <div className="bg-[#FDFAF5] border-2 border-[#BA1B22]/40 p-4 sm:p-5 rounded-2xl space-y-4 shadow-2xs">
                   <div className="flex items-center justify-between pb-2 border-b border-[#E8D5CF]">
                     <div className="flex items-center gap-2">
-                      <YouTubeIcon className="w-5 h-5 text-[#C4715A]" />
-                      <h3 className="font-serif font-bold text-sm text-[#354D2E]">
+                      <YouTubeIcon className="w-5 h-5 text-[#BA1B22]" />
+                      <h3 className="font-serif font-bold text-sm text-[#3B090D]">
                         Nhạc Nền Thiệp Cưới (Hỗ trợ YouTube &amp; MP3)
                       </h3>
                     </div>
-                    <span className="text-[10px] text-[#C4715A] bg-[#FDF0EC] px-2.5 py-0.5 rounded-full font-bold uppercase">
+                    <span className="text-[10px] text-[#BA1B22] bg-[#FDF0EC] px-2.5 py-0.5 rounded-full font-bold uppercase">
                       YouTube Audio
                     </span>
                   </div>
 
-                  <p className="text-xs text-[#5C4033] leading-relaxed">
+                  <p className="text-xs text-[#4A0E13] leading-relaxed">
                     Bạn có thể dán bất kỳ link bài hát nào từ <strong>YouTube</strong> (ví dụ: <code>https://www.youtube.com/watch?v=...</code> hoặc <code>https://youtu.be/...</code>) hoặc đường dẫn file <code>.mp3</code>. Khi khách chạm nút <strong>Nhạc</strong> trên thiệp, nhạc sẽ tự động phát!
                   </p>
 
                   <div>
-                    <label className="text-xs text-[#8C6A58] block mb-1 font-bold">
+                    <label className="text-xs text-[#78350F] block mb-1 font-bold">
                       Đường Dẫn Link Nhạc
                     </label>
                     <div className="flex items-center gap-2">
-                      <div className="p-2 rounded-xl bg-[#F0F5EE] border border-[#E8D5CF]">
+                      <div className="p-2 rounded-xl bg-[#FDF5F2] border border-[#E8D5CF]">
                         {currentYtId ? (
-                          <YouTubeIcon className="w-4 h-4 text-[#C4715A]" />
+                          <YouTubeIcon className="w-4 h-4 text-[#BA1B22]" />
                         ) : (
-                          <Music className="w-4 h-4 text-[#4A6741]" />
+                          <Music className="w-4 h-4 text-[#BA1B22]" />
                         )}
                       </div>
                       <input
@@ -1574,7 +1574,7 @@ function StudioContent() {
                         value={data.musicUrl}
                         placeholder="Dán link YouTube (https://www.youtube.com/watch?v=...) hoặc file .mp3..."
                         onChange={(e) => updateData({ musicUrl: e.target.value })}
-                        className="flex-1 bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs text-[#354D2E] font-mono focus:outline-none focus:border-[#4A6741]"
+                        className="flex-1 bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs text-[#3B090D] font-mono focus:outline-none focus:border-[#BA1B22]"
                       />
                       <button
                         type="button"
@@ -1582,8 +1582,8 @@ function StudioContent() {
                         title={isMusicPlaying ? "Dừng nghe thử" : "Nghe thử nhạc ngay"}
                         className={`px-3 py-2 rounded-xl text-xs font-serif font-semibold flex items-center gap-1.5 transition-all cursor-pointer shrink-0 ${
                           isMusicPlaying
-                            ? "bg-[#4A6741] text-[#FDFAF5] border border-[#4A6741] shadow-2xs animate-pulse"
-                            : "bg-[#FDF0EC] text-[#C4715A] border border-[#E8D5CF] hover:bg-[#F5E2DB]"
+                            ? "bg-[#BA1B22] text-[#FDFAF5] border border-[#BA1B22] shadow-2xs animate-pulse"
+                            : "bg-[#FDF0EC] text-[#BA1B22] border border-[#E8D5CF] hover:bg-[#F5E2DB]"
                         }`}
                       >
                         {isMusicPlaying ? (
@@ -1602,7 +1602,7 @@ function StudioContent() {
 
                     {/* Trạng thái nhận diện link YouTube */}
                     {currentYtId && (
-                      <div className="mt-2 p-2.5 rounded-xl bg-[#F0F5EE] border border-[#A8BCA1]/40 flex items-center justify-between text-xs text-[#4A6741]">
+                      <div className="mt-2 p-2.5 rounded-xl bg-[#FDF5F2] border border-[#E5C368]/40 flex items-center justify-between text-xs text-[#BA1B22]">
                         <span className="flex items-center gap-1.5 font-medium">
                           <Check className="w-3.5 h-3.5 text-emerald-600" />
                           <span>Đã nhận diện video YouTube:</span>
@@ -1612,7 +1612,7 @@ function StudioContent() {
                           href={`https://www.youtube.com/watch?v=${currentYtId}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-[11px] text-[#C4715A] hover:underline flex items-center gap-1"
+                          className="text-[11px] text-[#BA1B22] hover:underline flex items-center gap-1"
                         >
                           <ExternalLink className="w-3 h-3" />
                           <span>Nghe thử trên YT</span>
@@ -1623,7 +1623,7 @@ function StudioContent() {
 
                   {/* Danh sách gợi ý bài hát cưới 1-click */}
                   <div className="pt-2 border-t border-[#E8D5CF]">
-                    <div className="text-[11px] font-bold text-[#8C6A58] uppercase tracking-wider mb-2">
+                    <div className="text-[11px] font-bold text-[#78350F] uppercase tracking-wider mb-2">
                       Gợi Ý Bài Hát Cưới Lãng Mạn (Bấm để chọn nhanh):
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -1637,18 +1637,18 @@ function StudioContent() {
                           }}
                           className={`p-2 rounded-xl border text-left flex items-center gap-2 transition-all cursor-pointer ${
                             data.musicUrl === song.url
-                              ? "bg-[#4A6741] text-[#FDFAF5] border-[#4A6741] shadow-2xs"
-                              : "bg-[#FFFDF9] text-[#5C4033] border-[#E8D5CF] hover:border-[#A8BCA1] hover:bg-[#F0F5EE]"
+                              ? "bg-[#BA1B22] text-[#FDFAF5] border-[#BA1B22] shadow-2xs"
+                              : "bg-[#FFFDF9] text-[#4A0E13] border-[#E8D5CF] hover:border-[#E5C368] hover:bg-[#FDF5F2]"
                           }`}
                         >
                           {song.type === "youtube" ? (
-                            <YouTubeIcon className={`w-3.5 h-3.5 shrink-0 ${data.musicUrl === song.url ? "text-[#C9A84C]" : "text-[#C4715A]"}`} />
+                            <YouTubeIcon className={`w-3.5 h-3.5 shrink-0 ${data.musicUrl === song.url ? "text-[#E5C368]" : "text-[#BA1B22]"}`} />
                           ) : (
-                            <Music className={`w-3.5 h-3.5 shrink-0 ${data.musicUrl === song.url ? "text-[#C9A84C]" : "text-[#4A6741]"}`} />
+                            <Music className={`w-3.5 h-3.5 shrink-0 ${data.musicUrl === song.url ? "text-[#E5C368]" : "text-[#BA1B22]"}`} />
                           )}
                           <div className="truncate">
                             <div className="text-xs font-serif font-bold truncate">{song.title}</div>
-                            <div className={`text-[10px] ${data.musicUrl === song.url ? "text-[#FDFAF5]/80" : "text-[#8C6A58]"}`}>
+                            <div className={`text-[10px] ${data.musicUrl === song.url ? "text-[#FDFAF5]/80" : "text-[#78350F]"}`}>
                               {song.artist} • {song.type.toUpperCase()}
                             </div>
                           </div>
@@ -1664,7 +1664,7 @@ function StudioContent() {
             {activeTab === "events" && (
               <div className="space-y-4 animate-in fade-in duration-300">
                 <div className="flex items-center justify-between">
-                  <h3 className="font-serif font-bold text-sm text-[#354D2E]">
+                  <h3 className="font-serif font-bold text-sm text-[#3B090D]">
                     Sự Kiện Hôn Lễ ({data.events.length})
                   </h3>
                   <button
@@ -1684,7 +1684,7 @@ function StudioContent() {
                       };
                       updateData((prev) => ({ ...prev, events: [...prev.events, newEvt] }));
                     }}
-                    className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-[#4A6741] hover:bg-[#354D2E] text-white text-xs font-semibold shadow-2xs cursor-pointer"
+                    className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-[#BA1B22] hover:bg-[#3B090D] text-white text-xs font-semibold shadow-2xs cursor-pointer"
                   >
                     <Plus className="w-3.5 h-3.5" />
                     <span>Thêm sự kiện</span>
@@ -1692,9 +1692,9 @@ function StudioContent() {
                 </div>
 
                 {/* Thanh đồng bộ ngày nhanh */}
-                <div className="p-3 bg-[#F0F5EE] border border-[#A8BCA1]/40 rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 shadow-2xs">
-                  <div className="text-xs text-[#354D2E]">
-                    <span className="text-[#8C6A58]">Ngày cưới chính: </span>
+                <div className="p-3 bg-[#FDF5F2] border border-[#E5C368]/40 rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 shadow-2xs">
+                  <div className="text-xs text-[#3B090D]">
+                    <span className="text-[#78350F]">Ngày cưới chính: </span>
                     <strong className="font-serif font-bold">{data.weddingDateFormatted}</strong>
                   </div>
                   <button
@@ -1707,9 +1707,9 @@ function StudioContent() {
                       updateData({ events: updated });
                       showToast(`Đã đồng bộ ngày "${data.weddingDateFormatted}" sang tất cả ${data.events.length} sự kiện!`, "success");
                     }}
-                    className="px-3 py-1.5 bg-[#4A6741] hover:bg-[#354D2E] text-white text-xs font-bold rounded-lg transition-all flex items-center gap-1 cursor-pointer shrink-0 shadow-2xs active:scale-95"
+                    className="px-3 py-1.5 bg-[#BA1B22] hover:bg-[#3B090D] text-white text-xs font-bold rounded-lg transition-all flex items-center gap-1 cursor-pointer shrink-0 shadow-2xs active:scale-95"
                   >
-                    <Sparkles className="w-3.5 h-3.5 text-[#C9A84C]" />
+                    <Sparkles className="w-3.5 h-3.5 text-[#E5C368]" />
                     <span>Đồng bộ tất cả theo Ngày Cưới Chính</span>
                   </button>
                 </div>
@@ -1718,10 +1718,10 @@ function StudioContent() {
                   <div key={evt.id} className="bg-[#FDFAF5] border border-[#E8D5CF] p-4 rounded-2xl space-y-3 relative shadow-2xs">
                     <div className="flex items-center justify-between pb-2 border-b border-[#E8D5CF]">
                       <div className="flex items-center gap-2">
-                        <span className="w-5 h-5 rounded-full bg-[#4A6741] text-white text-[11px] font-serif font-bold flex items-center justify-center">
+                        <span className="w-5 h-5 rounded-full bg-[#BA1B22] text-white text-[11px] font-serif font-bold flex items-center justify-center">
                           {idx + 1}
                         </span>
-                        <span className="text-xs font-serif font-bold text-[#354D2E]">
+                        <span className="text-xs font-serif font-bold text-[#3B090D]">
                           {evt.title || `Sự kiện #${idx + 1}`}
                         </span>
                       </div>
@@ -1733,7 +1733,7 @@ function StudioContent() {
                             events: prev.events.filter((e) => e.id !== evt.id),
                           }));
                         }}
-                        className="text-zinc-400 hover:text-[#C4715A] p-1 cursor-pointer transition-colors"
+                        className="text-zinc-400 hover:text-[#BA1B22] p-1 cursor-pointer transition-colors"
                         title="Xóa sự kiện này"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -1743,7 +1743,7 @@ function StudioContent() {
                     {/* Tiêu đề chính & Tiêu đề phụ (Subtitle) */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                       <div>
-                        <label className="text-[10px] text-[#8C6A58] block mb-1 font-bold uppercase tracking-wider">
+                        <label className="text-[10px] text-[#78350F] block mb-1 font-bold uppercase tracking-wider">
                           Tiêu Đề Sự Kiện
                         </label>
                         <input
@@ -1755,11 +1755,11 @@ function StudioContent() {
                             evts[idx].title = e.target.value;
                             updateData({ events: evts });
                           }}
-                          className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs font-serif font-bold text-[#354D2E] focus:outline-none focus:border-[#4A6741]"
+                          className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs font-serif font-bold text-[#3B090D] focus:outline-none focus:border-[#BA1B22]"
                         />
                       </div>
                       <div>
-                        <label className="text-[10px] text-[#8C6A58] block mb-1 font-bold uppercase tracking-wider">
+                        <label className="text-[10px] text-[#78350F] block mb-1 font-bold uppercase tracking-wider">
                           Dòng Phụ Đề (Dòng Chữ Hoa Trên Cùng)
                         </label>
                         <input
@@ -1771,7 +1771,7 @@ function StudioContent() {
                             evts[idx].subtitle = e.target.value;
                             updateData({ events: evts });
                           }}
-                          className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs font-medium text-[#C4715A] focus:outline-none focus:border-[#C4715A]"
+                          className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs font-medium text-[#BA1B22] focus:outline-none focus:border-[#BA1B22]"
                         />
                       </div>
                     </div>
@@ -1780,7 +1780,7 @@ function StudioContent() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                       <div>
                         <div className="flex items-center justify-between mb-1">
-                          <label className="text-[10px] text-[#8C6A58] font-bold uppercase tracking-wider">
+                          <label className="text-[10px] text-[#78350F] font-bold uppercase tracking-wider">
                             Ngày Diễn Ra Sự Kiện
                           </label>
                           <button
@@ -1791,7 +1791,7 @@ function StudioContent() {
                               updateData({ events: evts });
                               showToast("Đã lấy ngày cưới chính!", "success");
                             }}
-                            className="text-[10px] text-[#4A6741] hover:underline font-medium cursor-pointer"
+                            className="text-[10px] text-[#BA1B22] hover:underline font-medium cursor-pointer"
                           >
                             ⚡ Lấy ngày cưới chính
                           </button>
@@ -1805,11 +1805,11 @@ function StudioContent() {
                             evts[idx].date = e.target.value;
                             updateData({ events: evts });
                           }}
-                          className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs text-[#354D2E] focus:outline-none focus:border-[#4A6741]"
+                          className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs text-[#3B090D] focus:outline-none focus:border-[#BA1B22]"
                         />
                       </div>
                       <div>
-                        <label className="text-[10px] text-[#8C6A58] block mb-1 font-bold uppercase tracking-wider">
+                        <label className="text-[10px] text-[#78350F] block mb-1 font-bold uppercase tracking-wider">
                           Giờ Tổ Chức / Đón Khách
                         </label>
                         <input
@@ -1821,7 +1821,7 @@ function StudioContent() {
                             evts[idx].time = e.target.value;
                             updateData({ events: evts });
                           }}
-                          className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs text-[#354D2E] focus:outline-none focus:border-[#4A6741]"
+                          className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs text-[#3B090D] focus:outline-none focus:border-[#BA1B22]"
                         />
                       </div>
                     </div>
@@ -1829,7 +1829,7 @@ function StudioContent() {
                     {/* Tên Hôn Trường & Địa Chỉ Cụ Thể */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                       <div>
-                        <label className="text-[10px] text-[#8C6A58] block mb-1 font-bold uppercase tracking-wider">
+                        <label className="text-[10px] text-[#78350F] block mb-1 font-bold uppercase tracking-wider">
                           Tên Hôn Trường / Địa Điểm
                         </label>
                         <input
@@ -1841,11 +1841,11 @@ function StudioContent() {
                             evts[idx].venue = e.target.value;
                             updateData({ events: evts });
                           }}
-                          className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs text-[#354D2E] focus:outline-none focus:border-[#4A6741]"
+                          className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs text-[#3B090D] focus:outline-none focus:border-[#BA1B22]"
                         />
                       </div>
                       <div>
-                        <label className="text-[10px] text-[#8C6A58] block mb-1 font-bold uppercase tracking-wider">
+                        <label className="text-[10px] text-[#78350F] block mb-1 font-bold uppercase tracking-wider">
                           Địa Chỉ Cụ Thể
                         </label>
                         <input
@@ -1857,14 +1857,14 @@ function StudioContent() {
                             evts[idx].address = e.target.value;
                             updateData({ events: evts });
                           }}
-                          className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs text-[#5C4033] focus:outline-none focus:border-[#4A6741]"
+                          className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs text-[#4A0E13] focus:outline-none focus:border-[#BA1B22]"
                         />
                       </div>
                     </div>
 
                     {/* Lời nhắn / Ghi chú cho khách */}
                     <div>
-                      <label className="text-[10px] text-[#8C6A58] block mb-1 font-bold uppercase tracking-wider">
+                      <label className="text-[10px] text-[#78350F] block mb-1 font-bold uppercase tracking-wider">
                         Lời Nhắn / Lời Dặn Cho Khách
                       </label>
                       <input
@@ -1876,13 +1876,13 @@ function StudioContent() {
                           evts[idx].notes = e.target.value;
                           updateData({ events: evts });
                         }}
-                        className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs italic font-serif text-[#8C6A58] focus:outline-none focus:border-[#4A6741]"
+                        className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs italic font-serif text-[#78350F] focus:outline-none focus:border-[#BA1B22]"
                       />
                     </div>
 
                     {/* Đường dẫn Google Maps */}
                     <div>
-                      <label className="text-[10px] text-[#8C6A58] block mb-1 font-bold uppercase tracking-wider">
+                      <label className="text-[10px] text-[#78350F] block mb-1 font-bold uppercase tracking-wider">
                         Đường Dẫn Bản Đồ Google Maps
                       </label>
                       <input
@@ -1894,7 +1894,7 @@ function StudioContent() {
                           evts[idx].mapUrl = e.target.value;
                           updateData({ events: evts });
                         }}
-                        className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs font-mono text-[#4A6741] focus:outline-none focus:border-[#4A6741]"
+                        className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs font-mono text-[#BA1B22] focus:outline-none focus:border-[#BA1B22]"
                       />
                     </div>
                   </div>
@@ -1906,7 +1906,7 @@ function StudioContent() {
             {activeTab === "story" && (
               <div className="space-y-4 animate-in fade-in duration-300">
                 <div className="flex items-center justify-between">
-                  <h3 className="font-serif font-bold text-sm text-[#354D2E]">
+                  <h3 className="font-serif font-bold text-sm text-[#3B090D]">
                     Cột Mốc Kỷ Niệm ({data.story.length})
                   </h3>
                   <button
@@ -1922,7 +1922,7 @@ function StudioContent() {
                       };
                       updateData((prev) => ({ ...prev, story: [...prev.story, newMilestone] }));
                     }}
-                    className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-[#4A6741] hover:bg-[#354D2E] text-white text-xs font-semibold shadow-2xs cursor-pointer"
+                    className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-[#BA1B22] hover:bg-[#3B090D] text-white text-xs font-semibold shadow-2xs cursor-pointer"
                   >
                     <Plus className="w-3.5 h-3.5" />
                     <span>Thêm mốc</span>
@@ -1941,7 +1941,7 @@ function StudioContent() {
                             story[idx].title = e.target.value;
                             updateData({ story });
                           }}
-                          className="w-36 bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-2.5 py-1 text-xs font-serif font-bold text-[#354D2E]"
+                          className="w-36 bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-2.5 py-1 text-xs font-serif font-bold text-[#3B090D]"
                         />
                         <input
                           type="text"
@@ -1951,7 +1951,7 @@ function StudioContent() {
                             story[idx].yearOrDate = e.target.value;
                             updateData({ story });
                           }}
-                          className="w-20 bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-2.5 py-1 text-xs font-mono font-bold text-[#C4715A]"
+                          className="w-20 bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-2.5 py-1 text-xs font-mono font-bold text-[#BA1B22]"
                         />
                       </div>
 
@@ -1963,7 +1963,7 @@ function StudioContent() {
                             story: prev.story.filter((_, i) => i !== idx),
                           }));
                         }}
-                        className="text-zinc-400 hover:text-[#C4715A] p-1 cursor-pointer"
+                        className="text-zinc-400 hover:text-[#BA1B22] p-1 cursor-pointer"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
@@ -1977,12 +1977,12 @@ function StudioContent() {
                         story[idx].description = e.target.value;
                         updateData({ story });
                       }}
-                      className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl p-2.5 text-xs text-[#5C4033] resize-none"
+                      className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl p-2.5 text-xs text-[#4A0E13] resize-none"
                     />
 
                     {/* Ảnh kỷ niệm */}
                     <div className="flex items-center gap-3">
-                      <div className="relative w-12 h-12 rounded-full overflow-hidden border-2 border-[#C9A84C] bg-white shrink-0 shadow-2xs">
+                      <div className="relative w-12 h-12 rounded-full overflow-hidden border-2 border-[#E5C368] bg-white shrink-0 shadow-2xs">
                         <Image src={item.imageUrl} alt={item.title} fill className="object-cover" />
                         {uploadingStoryIdx === idx && (
                           <div className="absolute inset-0 bg-black/60 flex items-center justify-center text-white">
@@ -1992,8 +1992,8 @@ function StudioContent() {
                       </div>
 
                       <div className="flex-1 flex gap-2">
-                        <label className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-[#F0F5EE] hover:bg-[#E2EBDD] text-[11px] font-semibold text-[#4A6741] border border-[#A8BCA1]/40 cursor-pointer">
-                          <Upload className="w-3 h-3 text-[#4A6741]" />
+                        <label className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-[#FDF5F2] hover:bg-[#E2EBDD] text-[11px] font-semibold text-[#BA1B22] border border-[#E5C368]/40 cursor-pointer">
+                          <Upload className="w-3 h-3 text-[#BA1B22]" />
                           <span>Tải ảnh</span>
                           <input
                             type="file"
@@ -2024,12 +2024,12 @@ function StudioContent() {
             {activeTab === "gallery" && (
               <div className="space-y-4 animate-in fade-in duration-300">
                 <div className="flex items-center justify-between flex-wrap gap-2">
-                  <h3 className="font-serif font-bold text-sm text-[#354D2E]">
+                  <h3 className="font-serif font-bold text-sm text-[#3B090D]">
                     Album Ảnh Cưới ({data.gallery.length})
                   </h3>
 
                   <div className="flex items-center gap-2">
-                    <label className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#C4715A] hover:bg-[#A4503B] text-white text-xs font-semibold cursor-pointer shadow-xs transition-all">
+                    <label className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#BA1B22] hover:bg-[#A4503B] text-white text-xs font-semibold cursor-pointer shadow-xs transition-all">
                       {uploadingGallery ? (
                         <Loader2 className="w-3.5 h-3.5 animate-spin" />
                       ) : (
@@ -2058,10 +2058,10 @@ function StudioContent() {
                         };
                         updateData((prev) => ({ ...prev, gallery: [...prev.gallery, newPhoto] }));
                       }}
-                      className="p-2 rounded-xl bg-[#FFFDF9] border border-[#E8D5CF] hover:bg-[#F0F5EE] text-xs cursor-pointer"
+                      className="p-2 rounded-xl bg-[#FFFDF9] border border-[#E8D5CF] hover:bg-[#FDF5F2] text-xs cursor-pointer"
                       title="Thêm ảnh qua URL"
                     >
-                      <Plus className="w-4 h-4 text-[#4A6741]" />
+                      <Plus className="w-4 h-4 text-[#BA1B22]" />
                     </button>
                   </div>
                 </div>
@@ -2104,23 +2104,23 @@ function StudioContent() {
             {/* 7. MỪNG CƯỚI & QR */}
             {activeTab === "bank" && (
               <div className="space-y-4 animate-in fade-in duration-300">
-                <h3 className="font-serif font-bold text-sm text-[#354D2E] pb-1 border-b border-[#E8D5CF]">
+                <h3 className="font-serif font-bold text-sm text-[#3B090D] pb-1 border-b border-[#E8D5CF]">
                   Tài Khoản Mừng Cưới &amp; Mã VietQR
                 </h3>
 
                 {data.bankAccounts.map((acc, idx) => (
                   <div key={idx} className="bg-[#FDFAF5] border border-[#E8D5CF] p-4 rounded-2xl space-y-2.5 shadow-2xs">
                     <div className="flex items-center justify-between pb-1.5 border-b border-[#E8D5CF]">
-                      <span className="font-serif font-bold text-xs text-[#354D2E]">
+                      <span className="font-serif font-bold text-xs text-[#3B090D]">
                         {acc.ownerType === "groom" ? "Tài khoản Chú Rể" : "Tài khoản Cô Dâu"}
                       </span>
-                      <span className="text-[11px] text-[#C4715A] uppercase font-bold">
+                      <span className="text-[11px] text-[#BA1B22] uppercase font-bold">
                         {acc.ownerType === "groom" ? data.groom.shortName : data.bride.shortName}
                       </span>
                     </div>
 
                     <div>
-                      <label className="text-xs text-[#8C6A58] block mb-1 font-medium">Tên Ngân Hàng</label>
+                      <label className="text-xs text-[#78350F] block mb-1 font-medium">Tên Ngân Hàng</label>
                       <input
                         type="text"
                         value={acc.bankName}
@@ -2129,13 +2129,13 @@ function StudioContent() {
                           accs[idx].bankName = e.target.value;
                           updateData({ bankAccounts: accs });
                         }}
-                        className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-1.5 text-xs text-[#354D2E]"
+                        className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-1.5 text-xs text-[#3B090D]"
                       />
                     </div>
 
                     <div className="grid grid-cols-2 gap-2">
                       <div>
-                        <label className="text-xs text-[#8C6A58] block mb-1 font-medium">Số Tài Khoản</label>
+                        <label className="text-xs text-[#78350F] block mb-1 font-medium">Số Tài Khoản</label>
                         <input
                           type="text"
                           value={acc.accountNumber}
@@ -2149,12 +2149,12 @@ function StudioContent() {
                             }
                             updateData({ bankAccounts: accs });
                           }}
-                          className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-1.5 text-xs font-mono font-bold text-[#C4715A]"
+                          className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-1.5 text-xs font-mono font-bold text-[#BA1B22]"
                         />
                       </div>
 
                       <div>
-                        <label className="text-xs text-[#8C6A58] block mb-1 font-medium">Chủ Tài Khoản</label>
+                        <label className="text-xs text-[#78350F] block mb-1 font-medium">Chủ Tài Khoản</label>
                         <input
                           type="text"
                           value={acc.accountHolder}
@@ -2163,7 +2163,7 @@ function StudioContent() {
                             accs[idx].accountHolder = e.target.value.toUpperCase();
                             updateData({ bankAccounts: accs });
                           }}
-                          className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-1.5 text-xs uppercase text-[#354D2E]"
+                          className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-1.5 text-xs uppercase text-[#3B090D]"
                         />
                       </div>
                     </div>
@@ -2187,7 +2187,7 @@ function StudioContent() {
                             updateData({ bankAccounts: accs });
                             showToast("Đã tự động tạo mã VietQR!", "success");
                           }}
-                          className="text-[11px] text-[#C4715A] hover:underline block font-semibold cursor-pointer"
+                          className="text-[11px] text-[#BA1B22] hover:underline block font-semibold cursor-pointer"
                         >
                           ⚡ Tự động tạo VietQR
                         </button>
@@ -2212,32 +2212,32 @@ function StudioContent() {
             {activeTab === "rsvps" && (
               <div className="space-y-5 animate-in fade-in duration-300">
                 {/* 1. TẠO LINK MỜI ĐÍCH DANH TỪNG KHÁCH (IN TÊN LÊN BÌA THIỆP) */}
-                <div className="bg-[#FDFAF5] border-2 border-[#C4715A]/40 p-4 sm:p-5 rounded-2xl space-y-3.5 shadow-2xs">
+                <div className="bg-[#FDFAF5] border-2 border-[#BA1B22]/40 p-4 sm:p-5 rounded-2xl space-y-3.5 shadow-2xs">
                   <div className="flex items-center justify-between pb-2 border-b border-[#E8D5CF]">
                     <div className="flex items-center gap-2">
-                      <Sparkles className="w-4 h-4 text-[#C4715A]" />
-                      <h3 className="font-serif font-bold text-sm text-[#354D2E]">
+                      <Sparkles className="w-4 h-4 text-[#BA1B22]" />
+                      <h3 className="font-serif font-bold text-sm text-[#3B090D]">
                         Tạo Link Mời Đích Danh Cho Từng Khách
                       </h3>
                     </div>
-                    <span className="text-[10px] text-[#C4715A] bg-[#FDF0EC] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">
+                    <span className="text-[10px] text-[#BA1B22] bg-[#FDF0EC] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">
                       In Tên Lên Thiệp
                     </span>
                   </div>
 
-                  <p className="text-xs text-[#5C4033] leading-relaxed">
+                  <p className="text-xs text-[#4A0E13] leading-relaxed">
                     Nhập tên khách mời để tạo đường link riêng. Khi khách mở thiệp, tên khách sẽ hiện trang trọng trên <strong>CẢ 2 KIỂU MỞ ĐẦU</strong> (Thẻ bài hoàng gia trên Video Rồng Phượng &amp; Bìa Phong Thư truyền thống) và tự động điền sẵn vào form xác nhận tham dự (RSVP)!
                   </p>
 
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                     <div>
-                      <label className="text-[10px] text-[#8C6A58] block mb-1 font-bold uppercase">
+                      <label className="text-[10px] text-[#78350F] block mb-1 font-bold uppercase">
                         Xưng hô
                       </label>
                       <select
                         value={guestInvitePrefix}
                         onChange={(e) => setGuestInvitePrefix(e.target.value)}
-                        className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-2.5 py-2 text-xs text-[#354D2E] focus:outline-none focus:border-[#4A6741]"
+                        className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-2.5 py-2 text-xs text-[#3B090D] focus:outline-none focus:border-[#BA1B22]"
                       >
                         <option value="Kính mời">Kính mời</option>
                         <option value="Thân gửi">Thân gửi</option>
@@ -2247,7 +2247,7 @@ function StudioContent() {
                     </div>
 
                     <div className="sm:col-span-2">
-                      <label className="text-[10px] text-[#8C6A58] block mb-1 font-bold uppercase">
+                      <label className="text-[10px] text-[#78350F] block mb-1 font-bold uppercase">
                         Tên Khách Mời / Đại Gia Đình
                       </label>
                       <input
@@ -2255,18 +2255,18 @@ function StudioContent() {
                         value={guestInviteName}
                         onChange={(e) => setGuestInviteName(e.target.value)}
                         placeholder="Ví dụ: Bác Tuấn &amp; Gia Đình, Bạn Lan C3, Anh Hoàng..."
-                        className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs text-[#354D2E] font-medium focus:outline-none focus:border-[#4A6741]"
+                        className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs text-[#3B090D] font-medium focus:outline-none focus:border-[#BA1B22]"
                       />
                     </div>
                   </div>
 
                   {/* Xem trước link và nút sao chép */}
                   <div className="p-3 bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl space-y-2.5">
-                    <div className="text-[10px] uppercase font-bold tracking-wider text-[#8C6A58]">
+                    <div className="text-[10px] uppercase font-bold tracking-wider text-[#78350F]">
                       Link Mời Dành Riêng Cho Khách Này:
                     </div>
                     <div className="flex items-center justify-between gap-2">
-                      <span className="font-mono text-xs text-[#C4715A] font-bold truncate select-all">
+                      <span className="font-mono text-xs text-[#BA1B22] font-bold truncate select-all">
                         {`${origin}/i/${data.slug || "quyet-han"}${
                           guestInviteName.trim()
                             ? `?to=${encodeURIComponent(guestInviteName.trim())}`
@@ -2292,16 +2292,16 @@ function StudioContent() {
                             showToast("Vui lòng sao chép thủ công", "info");
                           }
                         }}
-                        className="w-full py-2 px-3 rounded-xl bg-[#4A6741] hover:bg-[#354D2E] text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-all active:scale-95 cursor-pointer shadow-2xs"
+                        className="w-full py-2 px-3 rounded-xl bg-[#BA1B22] hover:bg-[#3B090D] text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-all active:scale-95 cursor-pointer shadow-2xs"
                       >
-                        <Copy className="w-3.5 h-3.5 text-[#C9A84C]" />
+                        <Copy className="w-3.5 h-3.5 text-[#E5C368]" />
                         <span>Sao Chép Lời Mời Kèm Link (Gửi Zalo / Tin Nhắn)</span>
                       </button>
                     </div>
 
                     {/* Các nút xem thử trực tiếp cả 2 loại mở đầu */}
                     <div className="pt-2 border-t border-[#E8D5CF]/60 space-y-1.5">
-                      <div className="text-[10px] text-[#8C6A58] uppercase font-bold">
+                      <div className="text-[10px] text-[#78350F] uppercase font-bold">
                         Xem Thử Giao Diện Đích Danh Khách Này:
                       </div>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -2323,7 +2323,7 @@ function StudioContent() {
                           }`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="py-2 px-3 rounded-xl bg-[#FDFAF5] hover:bg-[#FDF0EC] border border-[#E8D5CF] text-[#4A6741] text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
+                          className="py-2 px-3 rounded-xl bg-[#FDFAF5] hover:bg-[#FDF0EC] border border-[#E8D5CF] text-[#BA1B22] text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
                         >
                           <span>✉️ Xem Thử Kiểu Phong Bì</span>
                           <ExternalLink className="w-3 h-3 opacity-60" />
@@ -2337,13 +2337,13 @@ function StudioContent() {
                 <div className="bg-[#FDFAF5] border border-[#E8D5CF] p-4 sm:p-5 rounded-2xl space-y-3.5 shadow-2xs">
                   <div className="flex items-center justify-between pb-2 border-b border-[#E8D5CF]">
                     <div className="flex items-center gap-2">
-                      <Users className="w-4 h-4 text-[#4A6741]" />
-                      <h3 className="font-serif font-bold text-sm text-[#354D2E]">
+                      <Users className="w-4 h-4 text-[#BA1B22]" />
+                      <h3 className="font-serif font-bold text-sm text-[#3B090D]">
                         Tùy Chỉnh Form Khách Mời (RSVP)
                       </h3>
                     </div>
                     <label className="flex items-center gap-2 cursor-pointer select-none">
-                      <span className="text-xs font-bold text-[#5C4033]">
+                      <span className="text-xs font-bold text-[#4A0E13]">
                         {data.rsvpSettings?.enabled !== false ? "Đang bật" : "Đã tắt"}
                       </span>
                       <input
@@ -2358,7 +2358,7 @@ function StudioContent() {
                             },
                           }))
                         }
-                        className="w-4 h-4 accent-[#4A6741] cursor-pointer"
+                        className="w-4 h-4 accent-[#BA1B22] cursor-pointer"
                       />
                     </label>
                   </div>
@@ -2367,7 +2367,7 @@ function StudioContent() {
                     <div className="space-y-3">
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                         <div>
-                          <label className="text-[10px] text-[#8C6A58] block mb-1 font-bold uppercase">
+                          <label className="text-[10px] text-[#78350F] block mb-1 font-bold uppercase">
                             Tiêu Đề Mục Trên Thiệp
                           </label>
                           <input
@@ -2380,12 +2380,12 @@ function StudioContent() {
                               }))
                             }
                             placeholder="Sự Hiện Diện Của Bạn"
-                            className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-1.5 text-xs text-[#354D2E]"
+                            className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-1.5 text-xs text-[#3B090D]"
                           />
                         </div>
 
                         <div>
-                          <label className="text-[10px] text-[#8C6A58] block mb-1 font-bold uppercase">
+                          <label className="text-[10px] text-[#78350F] block mb-1 font-bold uppercase">
                             Phụ Đề Mục
                           </label>
                           <input
@@ -2398,14 +2398,14 @@ function StudioContent() {
                               }))
                             }
                             placeholder="Xác Nhận Tham Dự"
-                            className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-1.5 text-xs text-[#C4715A]"
+                            className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-1.5 text-xs text-[#BA1B22]"
                           />
                         </div>
                       </div>
 
                       <div>
                         <div className="flex items-center justify-between mb-1">
-                          <label className="text-[10px] text-[#8C6A58] font-bold uppercase">
+                          <label className="text-[10px] text-[#78350F] font-bold uppercase">
                             Lời Dặn / Hạn Chót Xác Nhận
                           </label>
                           <button
@@ -2420,7 +2420,7 @@ function StudioContent() {
                               }));
                               showToast("Đã cập nhật theo ngày cưới chính!", "success");
                             }}
-                            className="text-[10px] text-[#4A6741] hover:underline font-medium cursor-pointer"
+                            className="text-[10px] text-[#BA1B22] hover:underline font-medium cursor-pointer"
                           >
                             ⚡ Lấy theo ngày cưới chính
                           </button>
@@ -2437,12 +2437,12 @@ function StudioContent() {
                               rsvpSettings: { ...prev.rsvpSettings, deadlineText: e.target.value },
                             }))
                           }
-                          className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-1.5 text-xs text-[#354D2E]"
+                          className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-1.5 text-xs text-[#3B090D]"
                         />
                       </div>
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 border-t border-[#E8D5CF]/60">
-                        <label className="flex items-center gap-2 text-xs text-[#5C4033] cursor-pointer">
+                        <label className="flex items-center gap-2 text-xs text-[#4A0E13] cursor-pointer">
                           <input
                             type="checkbox"
                             checked={data.rsvpSettings?.allowGuestCount !== false}
@@ -2452,13 +2452,13 @@ function StudioContent() {
                                 rsvpSettings: { ...prev.rsvpSettings, allowGuestCount: e.target.checked },
                               }))
                             }
-                            className="w-3.5 h-3.5 accent-[#4A6741] cursor-pointer"
+                            className="w-3.5 h-3.5 accent-[#BA1B22] cursor-pointer"
                           />
                           <span>Cho phép chọn số lượng người đi cùng</span>
                         </label>
 
                         <div className="flex items-center gap-2">
-                          <span className="text-xs text-[#8C6A58]">Số người tối đa:</span>
+                          <span className="text-xs text-[#78350F]">Số người tối đa:</span>
                           <select
                             value={data.rsvpSettings?.maxGuests || 4}
                             onChange={(e) =>
@@ -2467,7 +2467,7 @@ function StudioContent() {
                                 rsvpSettings: { ...prev.rsvpSettings, maxGuests: Number(e.target.value) },
                               }))
                             }
-                            className="bg-[#FFFDF9] border border-[#E8D5CF] rounded-lg px-2 py-1 text-xs text-[#354D2E]"
+                            className="bg-[#FFFDF9] border border-[#E8D5CF] rounded-lg px-2 py-1 text-xs text-[#3B090D]"
                           >
                             <option value={2}>2 Người</option>
                             <option value={3}>3 Người</option>
@@ -2480,7 +2480,7 @@ function StudioContent() {
                       </div>
                     </div>
                   ) : (
-                    <div className="p-3 bg-[#F0F5EE] rounded-xl text-xs text-[#4A6741]">
+                    <div className="p-3 bg-[#FDF5F2] rounded-xl text-xs text-[#BA1B22]">
                       Mục Xác Nhận Tham Dự đang tạm ẩn trên thiệp cưới của bạn. Khách sẽ chỉ xem thông tin cưới và sổ lời chúc.
                     </div>
                   )}
@@ -2490,8 +2490,8 @@ function StudioContent() {
                 <div className="space-y-3">
                   <div className="grid grid-cols-3 gap-2">
                     <div className="bg-[#FDFAF5] border border-[#E8D5CF] p-3 rounded-2xl text-center shadow-2xs">
-                      <div className="text-[10px] uppercase text-[#8C6A58] font-semibold">Phản Hồi</div>
-                      <div className="font-serif font-bold text-lg text-[#354D2E]">{rsvps.length}</div>
+                      <div className="text-[10px] uppercase text-[#78350F] font-semibold">Phản Hồi</div>
+                      <div className="font-serif font-bold text-lg text-[#3B090D]">{rsvps.length}</div>
                     </div>
                     <div className="bg-[#FDFAF5] border border-[#E8D5CF] p-3 rounded-2xl text-center shadow-2xs">
                       <div className="text-[10px] uppercase text-emerald-700 font-semibold">Tham Dự</div>
@@ -2500,8 +2500,8 @@ function StudioContent() {
                       </div>
                     </div>
                     <div className="bg-[#FDFAF5] border border-[#E8D5CF] p-3 rounded-2xl text-center shadow-2xs">
-                      <div className="text-[10px] uppercase text-[#C4715A] font-semibold">Tổng Khách</div>
-                      <div className="font-serif font-bold text-lg text-[#C4715A]">
+                      <div className="text-[10px] uppercase text-[#BA1B22] font-semibold">Tổng Khách</div>
+                      <div className="font-serif font-bold text-lg text-[#BA1B22]">
                         {rsvps
                           .filter((r) => r.attendance === "attending")
                           .reduce((sum, r) => sum + (r.guestCount || 1), 0)}
@@ -2510,14 +2510,14 @@ function StudioContent() {
                   </div>
 
                   <div className="flex items-center justify-between pt-1">
-                    <h4 className="font-serif font-bold text-xs text-[#354D2E]">
+                    <h4 className="font-serif font-bold text-xs text-[#3B090D]">
                       Danh Sách Khách Phản Hồi ({rsvps.length})
                     </h4>
                     <div className="flex items-center gap-1.5">
                       <button
                         type="button"
                         onClick={() => setShowAddGuestPanel(!showAddGuestPanel)}
-                        className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-[#FDFAF5] hover:bg-[#F0F5EE] text-[#4A6741] text-xs font-semibold border border-[#A8BCA1]/40 cursor-pointer transition-colors"
+                        className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-[#FDFAF5] hover:bg-[#FDF5F2] text-[#BA1B22] text-xs font-semibold border border-[#E5C368]/40 cursor-pointer transition-colors"
                       >
                         <Plus className="w-3.5 h-3.5" />
                         <span>Thêm Khách</span>
@@ -2526,9 +2526,9 @@ function StudioContent() {
                       <button
                         type="button"
                         onClick={exportRsvpsToCSV}
-                        className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-[#4A6741] hover:bg-[#354D2E] text-[#FDFAF5] text-xs font-semibold shadow-2xs cursor-pointer transition-all"
+                        className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-[#BA1B22] hover:bg-[#3B090D] text-[#FDFAF5] text-xs font-semibold shadow-2xs cursor-pointer transition-all"
                       >
-                        <FileSpreadsheet className="w-3.5 h-3.5 text-[#C9A84C]" />
+                        <FileSpreadsheet className="w-3.5 h-3.5 text-[#E5C368]" />
                         <span>Xuất Excel</span>
                       </button>
                     </div>
@@ -2538,9 +2538,9 @@ function StudioContent() {
                   {showAddGuestPanel && (
                     <form
                       onSubmit={handleAddManualGuest}
-                      className="p-3.5 bg-[#F0F5EE] border border-[#A8BCA1]/50 rounded-2xl space-y-2.5 text-xs animate-in fade-in"
+                      className="p-3.5 bg-[#FDF5F2] border border-[#E5C368]/50 rounded-2xl space-y-2.5 text-xs animate-in fade-in"
                     >
-                      <div className="font-serif font-bold text-xs text-[#354D2E] pb-1 border-b border-[#A8BCA1]/30">
+                      <div className="font-serif font-bold text-xs text-[#3B090D] pb-1 border-b border-[#E5C368]/30">
                         Thêm Khách Mời Thủ Công (Báo trực tiếp)
                       </div>
                       <div className="grid grid-cols-2 gap-2">
@@ -2596,7 +2596,7 @@ function StudioContent() {
                         </select>
 
                         <div className="flex items-center gap-1">
-                          <span className="text-[11px] text-[#8C6A58] shrink-0">Đi cùng:</span>
+                          <span className="text-[11px] text-[#78350F] shrink-0">Đi cùng:</span>
                           <input
                             type="number"
                             min={1}
@@ -2634,7 +2634,7 @@ function StudioContent() {
                         <button
                           type="submit"
                           disabled={submittingManualGuest}
-                          className="px-3 py-1 rounded-xl bg-[#4A6741] text-white text-xs font-bold cursor-pointer disabled:opacity-60"
+                          className="px-3 py-1 rounded-xl bg-[#BA1B22] text-white text-xs font-bold cursor-pointer disabled:opacity-60"
                         >
                           {submittingManualGuest ? "Đang lưu..." : "Lưu Khách Mời"}
                         </button>
@@ -2645,51 +2645,51 @@ function StudioContent() {
                   {/* Danh sách phản hồi */}
                   <div className="space-y-2 max-h-80 overflow-y-auto pr-1">
                     {loadingGuests ? (
-                      <div className="text-center py-6 text-xs text-[#8C6A58]">Đang tải phản hồi...</div>
+                      <div className="text-center py-6 text-xs text-[#78350F]">Đang tải phản hồi...</div>
                     ) : rsvps.length === 0 ? (
-                      <div className="text-center py-6 text-xs text-[#8C6A58] bg-[#FDFAF5] rounded-2xl p-4 border border-[#E8D5CF]">
+                      <div className="text-center py-6 text-xs text-[#78350F] bg-[#FDFAF5] rounded-2xl p-4 border border-[#E8D5CF]">
                         Chưa có phản hồi nào.
                       </div>
                     ) : (
                       rsvps.map((r, i) => (
                         <div key={r.id || i} className="p-3 bg-[#FDFAF5] border border-[#E8D5CF] rounded-2xl text-xs space-y-1 relative group shadow-2xs">
                           <div className="flex items-center justify-between">
-                            <span className="font-bold text-[#354D2E] text-sm">{r.fullName}</span>
+                            <span className="font-bold text-[#3B090D] text-sm">{r.fullName}</span>
                             <div className="flex items-center gap-2">
-                              <span className="font-mono text-[11px] text-[#C4715A]">{r.phone}</span>
+                              <span className="font-mono text-[11px] text-[#BA1B22]">{r.phone}</span>
                               <button
                                 type="button"
                                 onClick={() => handleDeleteRSVP(r.id)}
                                 title="Xóa phản hồi này"
-                                className="text-zinc-400 hover:text-[#C4715A] p-1 cursor-pointer transition-colors"
+                                className="text-zinc-400 hover:text-[#BA1B22] p-1 cursor-pointer transition-colors"
                               >
                                 <Trash2 className="w-3.5 h-3.5" />
                               </button>
                             </div>
                           </div>
-                          <div className="flex items-center justify-between text-[11px] text-[#5C4033]">
+                          <div className="flex items-center justify-between text-[11px] text-[#4A0E13]">
                             <span>
                               {r.guestOf === "groom"
                                 ? "Khách Nhà Trai"
                                 : r.guestOf === "bride"
                                 ? "Khách Nhà Gái"
                                 : "Khách Cả Hai"}{" "}
-                              • <strong className="text-[#354D2E]">{r.guestCount || 1} người</strong>
+                              • <strong className="text-[#3B090D]">{r.guestCount || 1} người</strong>
                             </span>
-                            <span className={r.attendance === "attending" ? "text-emerald-700 font-bold" : "text-[#8C6A58]"}>
+                            <span className={r.attendance === "attending" ? "text-emerald-700 font-bold" : "text-[#78350F]"}>
                               {r.attendance === "attending" ? "Tham dự" : "Vắng mặt"}
                             </span>
                           </div>
 
                           {r.dietaryOrNote && (
-                            <p className="text-[11px] text-[#8C6A58] italic font-serif pt-0.5">
+                            <p className="text-[11px] text-[#78350F] italic font-serif pt-0.5">
                               &ldquo;{r.dietaryOrNote}&rdquo;
                             </p>
                           )}
 
                           {r.emailSentTo && r.emailSentTo.length > 0 && (
-                            <div className="text-[10px] text-[#8C6A58] flex items-center gap-1 pt-0.5 border-t border-[#E8D5CF]/40">
-                              <Send className="w-2.5 h-2.5 text-[#4A6741]" />
+                            <div className="text-[10px] text-[#78350F] flex items-center gap-1 pt-0.5 border-t border-[#E8D5CF]/40">
+                              <Send className="w-2.5 h-2.5 text-[#BA1B22]" />
                               <span>Đã gửi tới: {r.emailSentTo.join(", ")}</span>
                             </div>
                           )}
@@ -2701,15 +2701,15 @@ function StudioContent() {
                   {/* Danh sách lời chúc từ Sổ Lưu Bút */}
                   <div className="pt-4 border-t border-[#E8D5CF]">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-xs uppercase tracking-wider font-bold text-[#354D2E] flex items-center gap-1.5">
-                        <MessageSquare className="w-3.5 h-3.5 text-[#C4715A]" />
+                      <span className="text-xs uppercase tracking-wider font-bold text-[#3B090D] flex items-center gap-1.5">
+                        <MessageSquare className="w-3.5 h-3.5 text-[#BA1B22]" />
                         Sổ Lưu Bút ({wishes.length})
                       </span>
                     </div>
 
                     <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
                       {wishes.length === 0 ? (
-                        <div className="text-center py-5 text-xs text-[#8C6A58] bg-[#FDFAF5] rounded-2xl p-4 border border-[#E8D5CF]">
+                        <div className="text-center py-5 text-xs text-[#78350F] bg-[#FDFAF5] rounded-2xl p-4 border border-[#E8D5CF]">
                           Chưa có lời chúc nào từ khách.
                         </div>
                       ) : (
@@ -2719,25 +2719,25 @@ function StudioContent() {
                             className="p-3 bg-[#FDFAF5] border border-[#E8D5CF] rounded-2xl text-xs space-y-1 relative group shadow-2xs"
                           >
                             <div className="flex items-center justify-between">
-                              <span className="font-bold text-[#354D2E] text-sm">{w.name}</span>
+                              <span className="font-bold text-[#3B090D] text-sm">{w.name}</span>
                               <div className="flex items-center gap-2">
-                                <span className="text-[10px] text-[#8C6A58] font-mono">
+                                <span className="text-[10px] text-[#78350F] font-mono">
                                   {new Date(w.createdAt).toLocaleDateString("vi-VN")}
                                 </span>
                                 <button
                                   type="button"
                                   onClick={() => handleDeleteWish(w.id)}
                                   title="Xóa lời chúc này"
-                                  className="text-zinc-400 hover:text-[#C4715A] p-1 cursor-pointer transition-colors"
+                                  className="text-zinc-400 hover:text-[#BA1B22] p-1 cursor-pointer transition-colors"
                                 >
                                   <Trash2 className="w-3.5 h-3.5" />
                                 </button>
                               </div>
                             </div>
                             {w.relationship && (
-                              <p className="text-[10px] text-[#C4715A] font-semibold">{w.relationship}</p>
+                              <p className="text-[10px] text-[#BA1B22] font-semibold">{w.relationship}</p>
                             )}
-                            <p className="text-[11px] text-[#5C4033] italic font-serif leading-relaxed">
+                            <p className="text-[11px] text-[#4A0E13] italic font-serif leading-relaxed">
                               &ldquo;{w.content}&rdquo;
                             </p>
                           </div>
@@ -2751,7 +2751,7 @@ function StudioContent() {
           </div>
 
           {/* Bottom Sticky Action Bar */}
-          <div className="p-3 bg-[#FDFAF5] border-t border-[#E8D5CF] flex items-center justify-between shrink-0 shadow-xs">
+          <div className="p-3 bg-gradient-to-r from-[#1A0305] via-[#2A050A] to-[#1A0305] border-t border-[#E5C368]/40 flex items-center justify-between shrink-0 shadow-lg text-[#FFF8D6]">
             <div className="flex items-center gap-2">
               <span
                 className={`w-2.5 h-2.5 rounded-full ${
@@ -2762,7 +2762,7 @@ function StudioContent() {
                     : "bg-emerald-500"
                 }`}
               />
-              <span className="text-xs text-[#5C4033] font-medium">
+              <span className="text-xs text-[#4A0E13] font-medium">
                 {autoSaveStatus === "saving"
                   ? "Đang lưu máy chủ..."
                   : isModified
@@ -2774,12 +2774,12 @@ function StudioContent() {
               type="button"
               onClick={handleManualSave}
               disabled={isManualSaving}
-              className="px-4 py-2 rounded-xl bg-[#4A6741] hover:bg-[#354D2E] text-white text-xs font-bold shadow-xs flex items-center gap-1.5 transition-all cursor-pointer disabled:opacity-60"
+              className="px-4 py-2 rounded-xl bg-gradient-to-r from-[#D4AF37] via-[#F3E5AB] to-[#C59B27] hover:brightness-110 text-[#1A0305] text-xs font-serif font-bold shadow-[0_0_15px_rgba(212,175,55,0.4)] border border-[#FFF8D6] flex items-center gap-1.5 transition-all cursor-pointer disabled:opacity-60"
             >
               {isManualSaving ? (
                 <Loader2 className="w-3.5 h-3.5 animate-spin text-white" />
               ) : (
-                <Save className="w-3.5 h-3.5 text-[#C9A84C]" />
+                <Save className="w-3.5 h-3.5 text-[#E5C368]" />
               )}
               <span>{isManualSaving ? "Đang lưu..." : "Lưu Thay Đổi Này"}</span>
             </button>
@@ -2787,12 +2787,20 @@ function StudioContent() {
         </div>
 
         {/* Right Side: Real-time Live Interactive Preview */}
-        <div className="flex-1 bg-[#2C3E28] p-3 sm:p-5 flex items-center justify-center overflow-hidden relative">
+        <div className="flex-1 bg-[#090102] p-3 sm:p-5 flex items-center justify-center overflow-hidden relative">
+          {/* Hào quang nền hoàng cung huyền bí */}
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background:
+                "radial-gradient(circle at 50% 50%, #280509 0%, #0D0103 60%, #050001 100%)",
+            }}
+          />
           {previewDevice === "mobile" ? (
             /* Khung điện thoại thông minh viền cong cao cấp */
-            <div className="w-[375px] max-w-full h-[700px] max-h-[calc(100vh-80px)] rounded-[44px] border-[10px] border-[#1C2919] shadow-2xl overflow-hidden relative bg-[#FDFAF5] flex flex-col ring-1 ring-[#C9A84C]/30">
+            <div className="w-[375px] max-w-full h-[700px] max-h-[calc(100vh-80px)] rounded-[44px] border-[10px] border-[#1C0306] shadow-[0_25px_60px_-15px_rgba(0,0,0,0.95),0_0_35px_rgba(229,195,104,0.25)] overflow-hidden relative bg-[#FDFAF5] flex flex-col ring-2 ring-[#E5C368]/60">
               {/* Phone Notch */}
-              <div className="h-6 bg-[#1C2919] w-36 mx-auto rounded-b-2xl z-40 shrink-0 flex items-center justify-center">
+              <div className="h-6 bg-[#1C0306] w-36 mx-auto rounded-b-2xl z-40 shrink-0 flex items-center justify-center">
                 <div className="w-10 h-1 rounded-full bg-zinc-700" />
               </div>
 
@@ -2807,14 +2815,14 @@ function StudioContent() {
             </div>
           ) : (
             /* Khung máy tính với thanh trình duyệt */
-            <div className="w-full h-full max-h-[calc(100vh-80px)] rounded-2xl border-2 border-[#1C2919] shadow-2xl overflow-hidden flex flex-col bg-[#FDFAF5]">
-              <div className="h-9 bg-[#1C2919] px-4 flex items-center gap-2 z-30 shrink-0">
+            <div className="w-full h-full max-h-[calc(100vh-80px)] rounded-2xl border-2 border-[#E5C368]/40 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.95),0_0_30px_rgba(229,195,104,0.2)] overflow-hidden flex flex-col bg-[#FDFAF5]">
+              <div className="h-9 bg-[#1C0306] px-4 flex items-center gap-2 z-30 shrink-0 border-b border-[#E5C368]/30">
                 <div className="flex items-center gap-1.5">
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#C4715A]" />
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#C9A84C]" />
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#4A6741]" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#BA1B22]" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#E5C368]" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#BA1B22]" />
                 </div>
-                <div className="flex-1 max-w-sm mx-auto bg-[#2C3E28] rounded-md py-0.5 px-3 text-[11px] text-[#A8BCA1] font-mono text-center truncate">
+                <div className="flex-1 max-w-sm mx-auto bg-[#2E0508] border border-[#E5C368]/30 rounded-md py-0.5 px-3 text-[11px] text-[#FDE68A] font-mono text-center truncate">
                   https://an-minh.vn/i/{data.slug || "quyet-han"}
                 </div>
               </div>
