@@ -201,23 +201,13 @@ export const CinematicOpeningVideo: React.FC<CinematicOpeningVideoProps> = ({
       // trực tiếp tại sự kiện chạm của người dùng, không được để trong setTimeout!
       playMusic();
 
-      // 3. Sau hiệu ứng ánh sáng hoàng kim 700ms, chuyển sang hoạt ảnh mở chiếu thư
+      // 3. Sau hiệu ứng ánh sáng hoàng kim 750ms, mở thẳng vào nội dung thiệp cưới chính
       setTimeout(() => {
         onOpenInvitation();
-      }, 700);
+      }, 750);
     },
     [isTransitioning, onOpenInvitation, playMusic]
   );
-
-  // Sau khi xem trọn vẹn màn mở đầu (~7.2s), nếu khách chưa ấn thì tự động mở chiếu thư
-  useEffect(() => {
-    const autoOpenTimer = setTimeout(() => {
-      if (!openedRef.current) {
-        handleOpenClick();
-      }
-    }, 7200);
-    return () => clearTimeout(autoOpenTimer);
-  }, [handleOpenClick]);
 
   // Chạm vào màn hình để bật âm thanh hoặc phát video nếu bị trình duyệt chặn
   const handleContainerClick = () => {

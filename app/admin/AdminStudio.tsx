@@ -725,7 +725,7 @@ function StudioContent() {
                           Video Rồng - Phượng
                         </h4>
                         <p className="text-[11px] text-[#4A0E13] mt-1.5 leading-relaxed">
-                          Mở màn bằng Cinematic Video Long Phụng uốn lượn cổ phong. Chiếu Thư Hoàng Cung tự động mở mượt mà hiển lộ đại tự và nghênh đón khách quý.
+                          Mở màn bằng Cinematic Video Long Phụng uốn lượn cổ phong. Ấn chữ Hỷ mở thẳng vào thiệp cưới hoàng gia lộng lẫy.
                         </p>
                       </div>
                       <div className="mt-3 pt-2 border-t border-[#E8D5CF]/60 text-[10px] font-sans font-semibold text-[#BA1B22] flex items-center gap-1">
