@@ -57,10 +57,13 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const ytPlayerRef = useRef<any>(null);
   const pendingPlayRef = useRef(false);
-  const unlockListenerAttachedRef = useRef(false);
+  const prevMusicUrlRef = useRef(data.musicUrl);
+  const audioCtxRef = useRef<any>(null);
+  const mediaSourceConnectedRef = useRef<boolean>(false);
 
-  // Cấu hình âm thanh chuẩn Media Playback cho iOS Safari để không bị ngắt bởi nút gạt rung/im lặng
-  useEffect(() => {
+  // Mở khóa toàn diện Audio Hardware trên iOS & Android
+  const unlockAudioEngine = useCallback(() => {
+    // 1. Cấu hình AudioSession cho iOS 16.4+ để âm thanh phát qua kênh Playback (không phụ thuộc nút gạt rung)
     if (typeof navigator !== "undefined" && "audioSession" in navigator) {
       try {
         (navigator as any).audioSession.type = "playback";
@@ -68,7 +71,67 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({
         // ignore
       }
     }
+
+    // 2. Kích hoạt Web Audio Context (đánh thức hệ thống CoreAudio trên iOS)
+    try {
+      if (typeof window !== "undefined") {
+        const AudioContextClass =
+          window.AudioContext || (window as any).webkitAudioContext;
+        if (AudioContextClass) {
+          if (!audioCtxRef.current) {
+            audioCtxRef.current = new AudioContextClass();
+          }
+          const ctx = audioCtxRef.current;
+          if (ctx.state === "suspended") {
+            ctx.resume().catch(() => {});
+          }
+          if (ctx.state === "running") {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            gain.gain.value = 0.0001;
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(0);
+            osc.stop(0.02);
+          }
+        }
+      }
+    } catch {
+      // ignore
+    }
+
+    // 3. Kích hoạt buffer nạp trước cho file nhạc
+    if (audioRef.current) {
+      try {
+        audioRef.current.load();
+      } catch {
+        // ignore
+      }
+    }
   }, []);
+
+  // Đăng ký mở khóa âm thanh ngay từ cử chỉ chạm đầu tiên trên màn hình điện thoại
+  useEffect(() => {
+    const handleFirstUserInteraction = () => {
+      unlockAudioEngine();
+      window.removeEventListener("touchstart", handleFirstUserInteraction);
+      window.removeEventListener("touchend", handleFirstUserInteraction);
+      window.removeEventListener("click", handleFirstUserInteraction);
+      window.removeEventListener("pointerdown", handleFirstUserInteraction);
+    };
+
+    window.addEventListener("touchstart", handleFirstUserInteraction, { passive: true });
+    window.addEventListener("touchend", handleFirstUserInteraction, { passive: true });
+    window.addEventListener("click", handleFirstUserInteraction, { passive: true });
+    window.addEventListener("pointerdown", handleFirstUserInteraction, { passive: true });
+
+    return () => {
+      window.removeEventListener("touchstart", handleFirstUserInteraction);
+      window.removeEventListener("touchend", handleFirstUserInteraction);
+      window.removeEventListener("click", handleFirstUserInteraction);
+      window.removeEventListener("pointerdown", handleFirstUserInteraction);
+    };
+  }, [unlockAudioEngine]);
 
   const rawMusicUrl = data.musicUrl || LOCAL_FALLBACK_AUDIO;
   const isYt = !useFallbackAudio && isYouTubeUrl(rawMusicUrl);
@@ -95,19 +158,22 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   }, [rawMusicUrl, isYt, useFallbackAudio]);
 
-  // Reset khi thay đổi link nhạc
+  // Reset CHỈ KHI link nhạc thực sự thay đổi giá trị
   useEffect(() => {
-    setIsPlaying(false);
-    setUseFallbackAudio(false);
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.currentTime = 0;
-    }
-    if (ytPlayerRef.current && typeof ytPlayerRef.current.pauseVideo === "function") {
-      try {
-        ytPlayerRef.current.pauseVideo();
-      } catch {
-        // ignore
+    if (prevMusicUrlRef.current !== data.musicUrl) {
+      prevMusicUrlRef.current = data.musicUrl;
+      setIsPlaying(false);
+      setUseFallbackAudio(false);
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+      }
+      if (ytPlayerRef.current && typeof ytPlayerRef.current.pauseVideo === "function") {
+        try {
+          ytPlayerRef.current.pauseVideo();
+        } catch {
+          // ignore
+        }
       }
     }
   }, [data.musicUrl]);
@@ -229,10 +295,32 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({
     };
   }, [isYt, ytId, showToast]);
 
-  // Phát âm thanh HTML5 nội bộ (.mp3) với cơ chế mở khóa tự động trên mobile
+  // Phát âm thanh HTML5 nội bộ (.mp3) với cơ chế mở khóa và bypass chế độ im lặng trên iPhone
   const playLocalAudio = useCallback(() => {
     const audio = audioRef.current;
     if (!audio) return;
+
+    // Đánh thức engine âm thanh Web Audio và cấu hình AudioSession
+    unlockAudioEngine();
+
+    // Thử kết nối audio element với Web Audio Context để vượt qua nút gạt rung (Silent Switch) trên iPhone
+    try {
+      if (audioCtxRef.current && !mediaSourceConnectedRef.current) {
+        const ctx = audioCtxRef.current;
+        if (ctx.state === "suspended") {
+          ctx.resume().catch(() => {});
+        }
+        const source = ctx.createMediaElementSource(audio);
+        source.connect(ctx.destination);
+        mediaSourceConnectedRef.current = true;
+      }
+    } catch {
+      // ignore
+    }
+
+    if (audioCtxRef.current && audioCtxRef.current.state === "suspended") {
+      audioCtxRef.current.resume().catch(() => {});
+    }
 
     audio.muted = false;
     audio.volume = 1.0;
@@ -242,56 +330,52 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({
       playPromise
         .then(() => {
           setIsPlaying(true);
-          showToast(`Đang phát: ${currentSongTitle} 🎵`, "success");
+          showToast(
+            `Đang phát: ${currentSongTitle} 🎵`,
+            "success"
+          );
         })
         .catch((err) => {
-          console.warn("Audio play prevented on mobile, registering touch unlocker:", err);
+          console.warn("Audio play blocked by mobile policy, attaching instant retry:", err);
 
-          // Cơ chế mở khóa tự động: Ngay khi người dùng chạm hoặc cuộn trang lần đầu, âm thanh sẽ phát ngay
-          if (!unlockListenerAttachedRef.current) {
-            unlockListenerAttachedRef.current = true;
+          // Cơ chế mở khóa tự động dự phòng: Ngay khi người dùng chạm màn hình, phát ngay
+          const unlockOnNextTouch = () => {
+            if (audioRef.current) {
+              unlockAudioEngine();
+              audioRef.current.muted = false;
+              audioRef.current.volume = 1.0;
+              audioRef.current
+                .play()
+                .then(() => {
+                  setIsPlaying(true);
+                  removeListeners();
+                })
+                .catch(() => {});
+            }
+          };
 
-            const unlockAudio = () => {
-              if (audioRef.current) {
-                audioRef.current.muted = false;
-                audioRef.current.volume = 1.0;
-                audioRef.current
-                  .play()
-                  .then(() => {
-                    setIsPlaying(true);
-                    cleanup();
-                  })
-                  .catch(() => {});
-              }
-            };
+          const removeListeners = () => {
+            window.removeEventListener("touchstart", unlockOnNextTouch);
+            window.removeEventListener("touchend", unlockOnNextTouch);
+            window.removeEventListener("click", unlockOnNextTouch);
+          };
 
-            const cleanup = () => {
-              unlockListenerAttachedRef.current = false;
-              window.removeEventListener("touchstart", unlockAudio);
-              window.removeEventListener("touchend", unlockAudio);
-              window.removeEventListener("click", unlockAudio);
-              window.removeEventListener("scroll", unlockAudio);
-            };
-
-            window.addEventListener("touchstart", unlockAudio, { passive: true });
-            window.addEventListener("touchend", unlockAudio, { passive: true });
-            window.addEventListener("click", unlockAudio, { passive: true });
-            window.addEventListener("scroll", unlockAudio, { passive: true });
-          }
+          window.addEventListener("touchstart", unlockOnNextTouch, { passive: true, once: true });
+          window.addEventListener("touchend", unlockOnNextTouch, { passive: true, once: true });
+          window.addEventListener("click", unlockOnNextTouch, { passive: true, once: true });
 
           showToast("Chạm nhẹ vào màn hình để bật nhạc cưới 🎵", "info");
         });
     }
-  }, [currentSongTitle, showToast]);
+  }, [currentSongTitle, showToast, unlockAudioEngine]);
 
   const playMusic = useCallback(() => {
-    if (typeof navigator !== "undefined" && "audioSession" in navigator) {
-      try {
-        (navigator as any).audioSession.type = "playback";
-      } catch {
-        // ignore
-      }
+    // Nếu nhạc đang chạy êm rồi thì giữ nguyên, tránh giật nhạc
+    if (audioRef.current && !audioRef.current.paused && isPlaying) {
+      return;
     }
+
+    unlockAudioEngine();
 
     const isMobileDevice =
       typeof window !== "undefined" &&
@@ -327,9 +411,9 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({
       }
       playLocalAudio();
     }
-  }, [isYt, ytId, useFallbackAudio, currentSongTitle, showToast, playLocalAudio]);
+  }, [isYt, ytId, useFallbackAudio, currentSongTitle, showToast, playLocalAudio, unlockAudioEngine, isPlaying]);
 
-  const pauseMusic = useCallback(() => {
+  const pauseMusic = useCallback((notify = false) => {
     if (isYt && ytId && !useFallbackAudio) {
       if (ytPlayerRef.current && typeof ytPlayerRef.current.pauseVideo === "function") {
         try {
@@ -344,7 +428,9 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({
       }
     }
     setIsPlaying(false);
-    showToast("Đã tạm dừng nhạc nền", "info");
+    if (notify) {
+      showToast("Đã tạm dừng nhạc nền", "info");
+    }
   }, [isYt, ytId, useFallbackAudio, showToast]);
 
   const toggleMusic = useCallback(() => {

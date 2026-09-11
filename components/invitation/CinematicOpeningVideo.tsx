@@ -33,11 +33,10 @@ export const CinematicOpeningVideo: React.FC<CinematicOpeningVideoProps> = ({
 
   // Khi màn hình video mở đầu đang hiển thị, tạm dừng nhạc thiệp cưới để nhường chỗ cho âm thanh rồng phượng
   useEffect(() => {
-    if (!isOpen) {
+    if (!isOpen && !openedRef.current) {
       pauseMusic();
-      openedRef.current = false;
     }
-  }, [isOpen, pauseMusic]);
+  }, [isOpen]);
 
   useEffect(() => {
     setGuestName(getGuestNameFromUrl());
@@ -188,18 +187,16 @@ export const CinematicOpeningVideo: React.FC<CinematicOpeningVideoProps> = ({
       openedRef.current = true;
       setIsTransitioning(true);
 
-      // 1. Tạm dừng video mở màn rồng phượng
+      // 1. KÍCH HOẠT PHÁT NHẠC CƯỚI TRỰC TIẾP TẠI GESTURE NGƯỜI DÙNG (TRƯỚC KHI PAUSE VIDEO)
+      playMusic();
+
+      // 2. Sau đó mới tạm dừng video mở màn rồng phượng
       if (videoRef.current) {
         videoRef.current.pause();
       }
       if (loopVideoRef.current) {
         loopVideoRef.current.pause();
       }
-
-      // 2. KÍCH HOẠT NHẠC NỀN THIỆP CƯỚI ĐỒNG BỘ NGAY TẠI USER GESTURE (KHÔNG CHỜ SETTIMEOUT)
-      // Đây là mấu chốt kỹ thuật: iOS Safari & Android Chrome yêu cầu audio.play() phải kích hoạt
-      // trực tiếp tại sự kiện chạm của người dùng, không được để trong setTimeout!
-      playMusic();
 
       // 3. Sau hiệu ứng ánh sáng hoàng kim 750ms, mở thẳng vào nội dung thiệp cưới chính
       setTimeout(() => {
@@ -209,8 +206,8 @@ export const CinematicOpeningVideo: React.FC<CinematicOpeningVideoProps> = ({
     [isTransitioning, onOpenInvitation, playMusic]
   );
 
-  // Chạm vào màn hình để bật âm thanh hoặc phát video nếu bị trình duyệt chặn
-  const handleContainerClick = () => {
+  // Mở khóa toàn diện âm thanh khi chạm bất cứ đâu trên màn hình mở đầu
+  const handleContainerInteraction = (e?: React.SyntheticEvent) => {
     const video = videoRef.current;
     if (video) {
       if (video.muted) {
@@ -228,7 +225,8 @@ export const CinematicOpeningVideo: React.FC<CinematicOpeningVideoProps> = ({
   return (
     <div
       ref={containerRef}
-      onClick={handleContainerClick}
+      onClick={handleContainerInteraction}
+      onTouchEnd={handleContainerInteraction}
       className={`fixed inset-0 z-50 w-full h-[100dvh] flex items-center justify-center overflow-hidden transition-all duration-1000 select-none ${
         isTransitioning ? "opacity-0 scale-105 pointer-events-none" : "opacity-100 scale-100"
       }`}
@@ -236,26 +234,52 @@ export const CinematicOpeningVideo: React.FC<CinematicOpeningVideoProps> = ({
         backgroundColor: "#0C0C0C",
       }}
     >
-      {/* ── NÚT BẬT / TẮT ÂM THANH MỞ ĐẦU HOÀNG GIA ── */}
+      {/* ── NÚT BẬT / TẮT ÂM THANH MỞ ĐẦU HOÀNG GIA (GÓC PHẢI) ── */}
       <button
         type="button"
         onClick={toggleAudio}
-        className="absolute top-5 sm:top-7 right-5 sm:right-7 z-40 p-2.5 sm:p-3 rounded-full bg-black/45 backdrop-blur-md border border-[#E5C368]/70 text-[#FDE68A] hover:bg-black/65 transition-all cursor-pointer shadow-xl active:scale-95 flex items-center gap-1.5"
+        onTouchEnd={(e) => {
+          e.stopPropagation();
+          toggleAudio();
+        }}
+        className="absolute top-5 sm:top-7 right-5 sm:right-7 z-40 px-3 py-2 sm:px-4 sm:py-2.5 rounded-full bg-black/60 backdrop-blur-md border border-[#E5C368] text-[#FDE68A] hover:bg-black/80 transition-all cursor-pointer shadow-xl active:scale-95 flex items-center gap-1.5"
         title={isAudioMuted ? "Bật âm thanh" : "Tắt âm thanh"}
         aria-label="Bật tắt âm thanh"
       >
         {isAudioMuted ? (
           <>
             <VolumeX className="w-4 h-4 text-[#FDE68A]" />
-            <span className="text-[10px] font-serif uppercase tracking-widest hidden sm:inline">Chạm bật tiếng</span>
+            <span className="text-[10px] sm:text-xs font-serif font-bold uppercase tracking-wider text-[#FFF8D6]">Bật Tiếng 🔊</span>
           </>
         ) : (
           <>
             <Volume2 className="w-4 h-4 text-[#FDE68A] animate-pulse" />
-            <span className="text-[10px] font-serif uppercase tracking-widest hidden sm:inline">Âm thanh</span>
+            <span className="text-[10px] sm:text-xs font-serif font-bold uppercase tracking-wider text-[#FFF8D6]">Âm Thanh</span>
           </>
         )}
       </button>
+
+      {/* ── BANNER NHẮC BẬT ÂM THANH RỒNG PHƯỢNG KHI MỞ TRÊN ĐIỆN THOẠI ── */}
+      <AnimatePresence>
+        {isAudioMuted && !isTransitioning && !showSongHySeal && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="absolute top-20 sm:top-24 left-1/2 -translate-x-1/2 z-40 pointer-events-auto max-w-[92vw]"
+          >
+            <button
+              type="button"
+              onClick={handleContainerInteraction}
+              onTouchEnd={handleContainerInteraction}
+              className="px-4 py-2 sm:px-5 sm:py-2.5 rounded-full bg-gradient-to-r from-[#BA1B22] via-[#8C1217] to-[#4F0609] border-2 border-[#FDE68A] shadow-[0_0_25px_rgba(229,195,104,0.7)] text-[#FFF8D6] text-xs sm:text-sm font-serif font-bold flex items-center gap-2 cursor-pointer active:scale-95 animate-bounce"
+            >
+              <Volume2 className="w-4 h-4 text-[#FDE68A] animate-pulse" />
+              <span>Chạm để bật âm thanh rồng phượng 🔊</span>
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* ── VIDEO RỒNG - PHƯỢNG CHÍNH (CÓ ÂM THANH GỐC) ── */}
       <video
