@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { Sparkles, Heart } from "lucide-react";
 import { useWeddingData } from "@/context/WeddingDataContext";
@@ -194,14 +195,29 @@ export const ImperialLongPhungInvitation: React.FC = () => {
             </div>
 
             {/* NHÀ TRAI */}
-            <div className="flex flex-col items-center text-center space-y-1 sm:pr-4">
+            <div className="flex flex-col items-center text-center space-y-2 sm:pr-4">
               <span className="text-[10px] sm:text-[11px] uppercase tracking-[0.25em] text-[#E5C368] font-serif font-bold">
                 NHÀ TRAI
               </span>
               <p className="text-xs text-[#E8D5CF] font-serif max-w-[240px] leading-relaxed">
                 {weddingData.groom.parents}
               </p>
-              <div className="pt-2">
+
+              {/* Avatar Tân Lang Hoàng Gia */}
+              <div className="pt-2 flex flex-col items-center">
+                {weddingData.groom.avatarUrl && (
+                  <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-full p-1 bg-gradient-to-tr from-[#996515] via-[#FDE68A] to-[#C99B26] shadow-[0_0_20px_rgba(229,195,104,0.55)] border border-[#FFF8D6] mb-2 group">
+                    <div className="relative w-full h-full rounded-full overflow-hidden border-2 border-[#1A0305]">
+                      <Image
+                        src={weddingData.groom.avatarUrl}
+                        alt={weddingData.groom.fullName}
+                        fill
+                        className="object-cover transition-transform duration-500 group-hover:scale-110"
+                        sizes="(max-width: 640px) 96px, 112px"
+                      />
+                    </div>
+                  </div>
+                )}
                 <span className="text-[10px] uppercase tracking-wider text-[#E5C368]/80 block font-sans font-semibold">
                   Tân Lang (Chú Rể)
                 </span>
@@ -212,14 +228,29 @@ export const ImperialLongPhungInvitation: React.FC = () => {
             </div>
 
             {/* NHÀ GÁI */}
-            <div className="flex flex-col items-center text-center space-y-1 sm:pl-4">
+            <div className="flex flex-col items-center text-center space-y-2 sm:pl-4">
               <span className="text-[10px] sm:text-[11px] uppercase tracking-[0.25em] text-[#E5C368] font-serif font-bold">
                 NHÀ GÁI
               </span>
               <p className="text-xs text-[#E8D5CF] font-serif max-w-[240px] leading-relaxed">
                 {weddingData.bride.parents}
               </p>
-              <div className="pt-2">
+
+              {/* Avatar Tân Nương Hoàng Gia */}
+              <div className="pt-2 flex flex-col items-center">
+                {weddingData.bride.avatarUrl && (
+                  <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-full p-1 bg-gradient-to-tr from-[#C99B26] via-[#FDE68A] to-[#996515] shadow-[0_0_20px_rgba(229,195,104,0.55)] border border-[#FFF8D6] mb-2 group">
+                    <div className="relative w-full h-full rounded-full overflow-hidden border-2 border-[#1A0305]">
+                      <Image
+                        src={weddingData.bride.avatarUrl}
+                        alt={weddingData.bride.fullName}
+                        fill
+                        className="object-cover transition-transform duration-500 group-hover:scale-110"
+                        sizes="(max-width: 640px) 96px, 112px"
+                      />
+                    </div>
+                  </div>
+                )}
                 <span className="text-[10px] uppercase tracking-wider text-[#E5C368]/80 block font-sans font-semibold">
                   Tân Nương (Cô Dâu)
                 </span>

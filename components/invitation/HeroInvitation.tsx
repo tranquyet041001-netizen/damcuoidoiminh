@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles, Heart } from "lucide-react";
 import { useWeddingData } from "@/context/WeddingDataContext";
@@ -174,6 +175,53 @@ export const HeroInvitation: React.FC<HeroInvitationProps> = ({
               <p className="text-[11px] sm:text-xs uppercase tracking-[0.25em] text-[#E5C368]/90 font-serif font-semibold my-1">
                 {guestName ? "TỚI DỰ ĐẠI LỄ HÔN PHỐI CỦA" : "TRÂN TRỌNG KÍNH MỜI QUÝ QUAN KHÁCH"}
               </p>
+
+              {/* Cặp Avatar Tân Lang & Tân Nương Hoàng Gia */}
+              {(weddingData.groom.avatarUrl || weddingData.bride.avatarUrl) && (
+                <div className="flex items-center justify-center gap-3 sm:gap-5 my-3">
+                  {weddingData.groom.avatarUrl && (
+                    <div className="flex flex-col items-center group">
+                      <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-full p-1 bg-gradient-to-tr from-[#996515] via-[#FDE68A] to-[#C99B26] shadow-[0_0_18px_rgba(229,195,104,0.6)] border border-[#FFF8D6]">
+                        <div className="relative w-full h-full rounded-full overflow-hidden border-2 border-[#1A0305]">
+                          <Image
+                            src={weddingData.groom.avatarUrl}
+                            alt={weddingData.groom.fullName}
+                            fill
+                            className="object-cover transition-transform duration-500 group-hover:scale-110"
+                            sizes="(max-width: 640px) 64px, 80px"
+                          />
+                        </div>
+                      </div>
+                      <span className="text-[9px] uppercase tracking-wider text-[#E5C368] font-serif font-bold mt-1">
+                        Tân Lang
+                      </span>
+                    </div>
+                  )}
+
+                  <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-[#D32F2F] to-[#7F1D1D] border border-[#FFF8D6] flex items-center justify-center shadow-[0_0_12px_rgba(229,195,104,0.5)] self-center mb-4">
+                    <Heart className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#FFF8D6] fill-[#FFF8D6] animate-pulse" />
+                  </div>
+
+                  {weddingData.bride.avatarUrl && (
+                    <div className="flex flex-col items-center group">
+                      <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-full p-1 bg-gradient-to-tr from-[#C99B26] via-[#FDE68A] to-[#996515] shadow-[0_0_18px_rgba(229,195,104,0.6)] border border-[#FFF8D6]">
+                        <div className="relative w-full h-full rounded-full overflow-hidden border-2 border-[#1A0305]">
+                          <Image
+                            src={weddingData.bride.avatarUrl}
+                            alt={weddingData.bride.fullName}
+                            fill
+                            className="object-cover transition-transform duration-500 group-hover:scale-110"
+                            sizes="(max-width: 640px) 64px, 80px"
+                          />
+                        </div>
+                      </div>
+                      <span className="text-[9px] uppercase tracking-wider text-[#E5C368] font-serif font-bold mt-1">
+                        Tân Nương
+                      </span>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Tên dâu rể thư pháp thếp vàng */}
               <div className="my-2 sm:my-3 flex items-center justify-center gap-3 sm:gap-4 flex-wrap">
