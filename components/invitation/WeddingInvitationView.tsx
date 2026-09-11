@@ -15,6 +15,8 @@ import { PhotoGallery } from "@/components/invitation/PhotoGallery";
 import { WishBook } from "@/components/invitation/WishBook";
 import { GiftCard } from "@/components/invitation/GiftCard";
 import { CinematicOpeningVideo } from "@/components/invitation/CinematicOpeningVideo";
+import { SectionDivider } from "@/components/ui/SectionDivider";
+import { FloatingPetals } from "@/components/ui/FloatingPetals";
 import { useWeddingData } from "@/context/WeddingDataContext";
 import { useMusic } from "@/context/MusicContext";
 
@@ -113,6 +115,9 @@ export const WeddingInvitationView: React.FC<WeddingInvitationViewProps> = ({
       {/* Thanh tiêu đề cuộn nhẹ */}
       <Header isGuestView={isGuestView} isPreview={isPreview} />
 
+      {/* ── AMBIENT FLOATING PETALS (chỉ sau khi mở thiệp, desktop only) ── */}
+      {isEnvelopeOpen && <FloatingPetals />}
+
       <main className="flex-1">
         {/* 1. Màn hình mở thiệp (Thiệp Báo Hỷ / Bìa Thiệp Phong Thư Cũ)
             CHỈ hiển thị khi người dùng chọn phong cách "envelope".
@@ -134,29 +139,53 @@ export const WeddingInvitationView: React.FC<WeddingInvitationViewProps> = ({
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.15, ease: "easeOut" }}
             >
-              {/* 2. Lời ngỏ từ hai bên gia đình (Hiển thị thiệp kính mời đích danh nếu ở chế độ video) */}
+              {/* 2. Lời ngỏ từ hai bên gia đình */}
               <OpeningLetter showGuestGreeting={isVideoOpening} isTopSection={isVideoOpening} />
+
+              {/* ── DIVIDER: ivory → sage ── */}
+              <SectionDivider fromColor="#FDFAF5" toColor="#F0F5EE" variant="wave" />
 
               {/* 3. Dòng thời gian chuyện tình yêu */}
               <CoupleStory />
 
+              {/* ── DIVIDER: sage → ivory ── */}
+              <SectionDivider fromColor="#F0F5EE" toColor="#FDFAF5" variant="botanical" />
+
               {/* 4. Thông tin Lễ Thành Hôn & Tiệc Cưới */}
               <WeddingDetails />
+
+              {/* ── DIVIDER: ivory → dark green (for countdown dark bg) ── */}
+              <SectionDivider fromColor="#FDFAF5" toColor="#1C2919" variant="wave-reverse" />
 
               {/* 5. Bộ đếm ngược thời gian */}
               <Countdown />
 
+              {/* ── DIVIDER: dark green → peach ── */}
+              <SectionDivider fromColor="#1C2919" toColor="#FDF0EC" variant="wave" />
+
               {/* 6. Form xác nhận tham dự */}
               <RSVPForm />
+
+              {/* ── DIVIDER: peach → sage ── */}
+              <SectionDivider fromColor="#FDF0EC" toColor="#F0F5EE" variant="botanical" />
 
               {/* 7. Album ảnh cưới & Lightbox */}
               <PhotoGallery />
 
+              {/* ── DIVIDER: sage → peach ── */}
+              <SectionDivider fromColor="#F0F5EE" toColor="#FDF0EC" variant="wave-reverse" />
+
               {/* 8. Sổ lưu bút */}
               <WishBook />
 
+              {/* ── DIVIDER: peach → ivory ── */}
+              <SectionDivider fromColor="#FDF0EC" toColor="#FDFAF5" variant="lotus" />
+
               {/* 9. Mừng cưới kín đáo / QR ngân hàng */}
               <GiftCard />
+
+              {/* ── DIVIDER: ivory → dark green (footer) ── */}
+              <SectionDivider fromColor="#FDFAF5" toColor="#354D2E" variant="botanical" />
 
               {/* 10. Lời cảm ơn & Chữ ký */}
               <Footer isGuestView={isGuestView} />

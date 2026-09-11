@@ -40,12 +40,15 @@ export const OpeningLetter: React.FC<OpeningLetterProps> = ({
       } px-4 bg-ivory-texture relative overflow-hidden`}
     >
       <div className="max-w-xl md:max-w-2xl lg:max-w-3xl mx-auto relative z-10">
-        {/* Header section */}
+        {/* Header section — stagger reveal từng dòng */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-40px" }}
+          variants={{
+            hidden: {},
+            visible: { transition: { staggerChildren: 0.12 } },
+          }}
           className="text-center mb-8 sm:mb-10"
         >
           {/* Badge kính mời đích danh khi dùng video mở đầu */}
@@ -64,18 +67,36 @@ export const OpeningLetter: React.FC<OpeningLetterProps> = ({
             </motion.div>
           )}
 
-          <div className="inline-flex items-center justify-center mb-3">
+          <motion.div
+            variants={{ hidden: { opacity: 0, y: 12 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } }}
+            className="inline-flex items-center justify-center mb-3"
+          >
             <VietnameseLotus size={38} color="#4A6741" opacity={0.9} />
-          </div>
-          <p className="text-[11px] uppercase tracking-[0.3em] text-[#C4715A] font-sans font-semibold mb-1">
+          </motion.div>
+          <motion.p
+            variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } }}
+            className="text-[11px] uppercase tracking-[0.35em] text-[#C4715A] font-sans font-semibold mb-1"
+          >
             Thiệp Hồng Báo Hỷ
-          </p>
-          <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl font-bold text-[#354D2E] tracking-wide">
+          </motion.p>
+          <motion.h2
+            variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0, transition: { duration: 0.55 } } }}
+            className="font-serif text-2xl sm:text-3xl md:text-4xl font-bold text-[#354D2E] tracking-wide"
+          >
             {weddingData.openingLetter.title || "Lời Ngỏ Yêu Thương"}
-          </h2>
-          <div className="flex items-center justify-center my-3">
+          </motion.h2>
+          {/* Animated gold underline */}
+          <motion.div
+            variants={{ hidden: { scaleX: 0, opacity: 0 }, visible: { scaleX: 1, opacity: 1, transition: { duration: 0.7, delay: 0.1 } } }}
+            className="mx-auto mt-2 mb-3 h-[1.5px] w-20 origin-center"
+            style={{ background: "linear-gradient(to right, transparent, #C9A84C, transparent)" }}
+          />
+          <motion.div
+            variants={{ hidden: { opacity: 0 }, visible: { opacity: 1, transition: { duration: 0.4 } } }}
+            className="flex items-center justify-center my-3"
+          >
             <BotanicalBranch size={52} color="#C9A84C" opacity={0.7} />
-          </div>
+          </motion.div>
         </motion.div>
 
         {/* Khung thư chính phong cách giấy cao cấp */}

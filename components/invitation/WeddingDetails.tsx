@@ -22,27 +22,47 @@ export const WeddingDetails: React.FC = () => {
       <div className="max-w-xl md:max-w-4xl lg:max-w-5xl mx-auto relative z-10">
         {/* Header */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-40px" }}
+          variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.1 } } }}
           className="text-center mb-10 sm:mb-12"
         >
-          <div className="inline-flex items-center justify-center mb-2">
+          <motion.div
+            variants={{ hidden: { opacity: 0, scale: 0.8 }, visible: { opacity: 1, scale: 1, transition: { duration: 0.4 } } }}
+            className="inline-flex items-center justify-center mb-2"
+          >
             <VietnameseLotus size={36} color="#4A6741" opacity={0.85} />
-          </div>
-          <p className="text-[11px] uppercase tracking-[0.3em] text-[#C4715A] font-sans font-semibold mb-1">
+          </motion.div>
+          <motion.p
+            variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } }}
+            className="text-[11px] uppercase tracking-[0.35em] text-[#C4715A] font-sans font-semibold mb-1"
+          >
             Chương Trình Hôn Lễ
-          </p>
-          <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl font-bold text-[#354D2E] tracking-wide">
+          </motion.p>
+          <motion.h2
+            variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0, transition: { duration: 0.55 } } }}
+            className="font-serif text-2xl sm:text-3xl md:text-4xl font-bold text-[#354D2E] tracking-wide"
+          >
             Thông Tin Tiệc Cưới
-          </h2>
-          <div className="flex items-center justify-center my-3">
+          </motion.h2>
+          <motion.div
+            variants={{ hidden: { scaleX: 0, opacity: 0 }, visible: { scaleX: 1, opacity: 1, transition: { duration: 0.7, delay: 0.1 } } }}
+            className="mx-auto mt-2 mb-3 h-[1.5px] w-20 origin-center"
+            style={{ background: "linear-gradient(to right, transparent, #C9A84C, transparent)" }}
+          />
+          <motion.div
+            variants={{ hidden: { opacity: 0 }, visible: { opacity: 1, transition: { duration: 0.4 } } }}
+            className="flex items-center justify-center my-3"
+          >
             <BotanicalBranch size={52} color="#C9A84C" opacity={0.7} />
-          </div>
-          <p className="text-xs sm:text-sm text-[#8C6A58] italic font-serif max-w-md mx-auto leading-relaxed">
+          </motion.div>
+          <motion.p
+            variants={{ hidden: { opacity: 0, y: 8 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } }}
+            className="text-xs sm:text-sm text-[#8C6A58] italic font-serif max-w-md mx-auto leading-relaxed"
+          >
             Sự hiện diện và chúc phúc của quý khách là niềm vinh hạnh lớn nhất của gia đình chúng tôi.
-          </p>
+          </motion.p>
         </motion.div>
 
         {/* Cards danh sách sự kiện - 2 Cột trên Desktop, 1 Cột trên Điện thoại */}
@@ -50,14 +70,13 @@ export const WeddingDetails: React.FC = () => {
           {weddingData.events.map((event, index) => (
             <motion.div
               key={event.id || index}
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, scale: 0.93, y: 20 }}
+              whileInView={{ opacity: 1, scale: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: index * 0.1 }}
-              className="rounded-3xl p-6 sm:p-8 bg-[#FFFDF9] border border-[#E8D5CF] shadow-xs relative overflow-hidden flex flex-col justify-between hover:shadow-md transition-shadow"
-              style={{
-                boxShadow: "0 12px 32px -8px rgba(74, 103, 65, 0.08)",
-              }}
+              transition={{ duration: 0.55, delay: index * 0.12, type: "spring", stiffness: 120, damping: 18 }}
+              whileHover={{ y: -4, boxShadow: "0 18px 48px -8px rgba(74, 103, 65, 0.15)" }}
+              className="rounded-3xl p-6 sm:p-8 bg-[#FFFDF9] border border-[#E8D5CF] shadow-xs relative overflow-hidden flex flex-col justify-between"
+              style={{ boxShadow: "0 12px 32px -8px rgba(74, 103, 65, 0.08)" }}
             >
               {/* Badge Tiêu đề & Subtitle */}
               <div className="flex flex-wrap items-center justify-between gap-2 mb-4 pb-3 border-b border-[#E8D5CF]/60">
