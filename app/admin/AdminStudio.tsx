@@ -46,6 +46,7 @@ import { WeddingInvitationView } from "@/components/invitation/WeddingInvitation
 import { ShareModal } from "@/components/invitation/ShareModal";
 import { processAndUploadImage } from "@/utils/imageUpload";
 import { copyToClipboard } from "@/utils/clipboard";
+import { VIETNAM_BANKS, findBank, generateVietQrUrl } from "@/utils/vietnamBanks";
 import {
   extractYouTubeId,
   isYouTubeUrl,
@@ -125,6 +126,7 @@ function StudioContent() {
   const [uploadingBrideAvatar, setUploadingBrideAvatar] = useState(false);
   const [uploadingStoryIdx, setUploadingStoryIdx] = useState<number | null>(null);
   const [uploadingGallery, setUploadingGallery] = useState(false);
+  const [uploadingQrIdx, setUploadingQrIdx] = useState<number | null>(null);
 
   // Debounced auto-save: chỉ tự động lưu khi người dùng thực sự thay đổi dữ liệu (isModified === true)
   useEffect(() => {
@@ -328,6 +330,24 @@ function StudioContent() {
       alert(err.message || "Lỗi tải ảnh");
     } finally {
       setUploadingGallery(false);
+      e.target.value = "";
+    }
+  };
+
+  const handleUploadQrImage = async (idx: number, e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      setUploadingQrIdx(idx);
+      const url = await processAndUploadImage(file, { maxWidth: 800, maxHeight: 800, quality: 0.9 });
+      const accs = [...data.bankAccounts];
+      accs[idx].qrImageUrl = url;
+      updateData({ bankAccounts: accs });
+      showToast("Đã tải lên ảnh mã QR thành công!", "success");
+    } catch (err: any) {
+      showToast(err.message || "Lỗi tải ảnh mã QR", "info");
+    } finally {
+      setUploadingQrIdx(null);
       e.target.value = "";
     }
   };
@@ -2104,107 +2124,284 @@ function StudioContent() {
             {/* 7. MỪNG CƯỚI & QR */}
             {activeTab === "bank" && (
               <div className="space-y-4 animate-in fade-in duration-300">
-                <h3 className="font-serif font-bold text-sm text-[#3B090D] pb-1 border-b border-[#E8D5CF]">
-                  Tài Khoản Mừng Cưới &amp; Mã VietQR
-                </h3>
+                <div className="pb-2 border-b border-[#E8D5CF]">
+                  <h3 className="font-serif font-bold text-sm text-[#3B090D]">
+                    Tài Khoản Mừng Cưới &amp; Mã QR Thanh Toán
+                  </h3>
+                  <p className="text-xs text-[#78350F] mt-0.5">
+                    Hỗ trợ chọn danh sách ngân hàng Việt Nam, tải ảnh QR từ điện thoại/máy tính hoặc tạo mã VietQR tự động.
+                  </p>
+                </div>
 
-                {data.bankAccounts.map((acc, idx) => (
-                  <div key={idx} className="bg-[#FDFAF5] border border-[#E8D5CF] p-4 rounded-2xl space-y-2.5 shadow-2xs">
-                    <div className="flex items-center justify-between pb-1.5 border-b border-[#E8D5CF]">
-                      <span className="font-serif font-bold text-xs text-[#3B090D]">
-                        {acc.ownerType === "groom" ? "Tài khoản Chú Rể" : "Tài khoản Cô Dâu"}
-                      </span>
-                      <span className="text-[11px] text-[#BA1B22] uppercase font-bold">
-                        {acc.ownerType === "groom" ? data.groom.shortName : data.bride.shortName}
-                      </span>
-                    </div>
+                {data.bankAccounts.map((acc, idx) => {
+                  const currentBank = findBank(acc.bankCode || acc.bankBin || acc.bankName);
+                  const isUploadedImage = acc.qrImageUrl?.startsWith("data:image/") || acc.qrImageUrl?.startsWith("blob:");
 
-                    <div>
-                      <label className="text-xs text-[#78350F] block mb-1 font-medium">Tên Ngân Hàng</label>
-                      <input
-                        type="text"
-                        value={acc.bankName}
-                        onChange={(e) => {
-                          const accs = [...data.bankAccounts];
-                          accs[idx].bankName = e.target.value;
-                          updateData({ bankAccounts: accs });
-                        }}
-                        className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-1.5 text-xs text-[#3B090D]"
-                      />
-                    </div>
+                  return (
+                    <div key={idx} className="bg-[#FDFAF5] border border-[#E8D5CF] p-4 sm:p-5 rounded-2xl space-y-3.5 shadow-2xs">
+                      {/* Tiêu đề tài khoản */}
+                      <div className="flex items-center justify-between pb-2 border-b border-[#E8D5CF]">
+                        <div className="flex items-center gap-2">
+                          <span className="w-2.5 h-2.5 rounded-full bg-[#BA1B22]" />
+                          <span className="font-serif font-bold text-sm text-[#3B090D]">
+                            {acc.ownerType === "groom" ? "Tài khoản Chú Rể" : "Tài khoản Cô Dâu"}
+                          </span>
+                        </div>
+                        <span className="text-xs text-[#BA1B22] uppercase font-bold bg-[#FDF0EC] px-2.5 py-0.5 rounded-full border border-[#FAD2C9]">
+                          {acc.ownerType === "groom" ? data.groom.fullName : data.bride.fullName}
+                        </span>
+                      </div>
 
-                    <div className="grid grid-cols-2 gap-2">
+                      {/* 1. CHỌN NGÂN HÀNG TỪ DANH SÁCH */}
                       <div>
-                        <label className="text-xs text-[#78350F] block mb-1 font-medium">Số Tài Khoản</label>
-                        <input
-                          type="text"
-                          value={acc.accountNumber}
+                        <div className="flex items-center justify-between mb-1">
+                          <label className="text-xs text-[#78350F] font-bold">
+                            1. Chọn Ngân Hàng Tiếp Nhận <span className="text-[#BA1B22]">*</span>
+                          </label>
+                          {acc.bankCode && (
+                            <span className="text-[10px] text-[#BA1B22] font-mono font-bold bg-white px-2 py-0.5 rounded border border-[#E8D5CF]">
+                              Mã: {acc.bankCode}
+                            </span>
+                          )}
+                        </div>
+                        <select
+                          value={currentBank?.code || acc.bankCode || ""}
                           onChange={(e) => {
+                            const selectedCode = e.target.value;
+                            const bank = VIETNAM_BANKS.find((b) => b.code === selectedCode);
                             const accs = [...data.bankAccounts];
-                            accs[idx].accountNumber = e.target.value;
-                            if (accs[idx].qrImageUrl.includes("api.vietqr.io")) {
-                              accs[idx].qrImageUrl = `https://api.vietqr.io/image/970436-${e.target.value}-compact.jpg?accountName=${encodeURIComponent(
-                                accs[idx].accountHolder
-                              )}&amount=0`;
+                            if (bank) {
+                              accs[idx].bankCode = bank.code;
+                              accs[idx].bankName = `${bank.name} (${bank.shortName})`;
+                              accs[idx].bankBin = bank.bin;
+                              // Nếu đang dùng VietQR tự động hoặc chưa có ảnh tải lên, cập nhật URL VietQR theo mã BIN ngân hàng mới
+                              if (!accs[idx].qrImageUrl || accs[idx].qrImageUrl.includes("vietqr.io")) {
+                                accs[idx].qrImageUrl = generateVietQrUrl(
+                                  bank.bin,
+                                  accs[idx].accountNumber,
+                                  accs[idx].accountHolder,
+                                  accs[idx].customNote || `Mung cuoi ${acc.ownerType === "groom" ? data.groom.shortName : data.bride.shortName}`
+                                );
+                              }
                             }
                             updateData({ bankAccounts: accs });
                           }}
-                          className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-1.5 text-xs font-mono font-bold text-[#BA1B22]"
-                        />
+                          className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs text-[#3B090D] font-medium focus:ring-1 focus:ring-[#BA1B22] focus:border-[#BA1B22]"
+                        >
+                          <option value="">-- Bấm để chọn ngân hàng tiếp nhận --</option>
+                          {VIETNAM_BANKS.map((b) => (
+                            <option key={b.code} value={b.code}>
+                              [{b.code}] {b.shortName} - {b.name}
+                            </option>
+                          ))}
+                        </select>
                       </div>
 
+                      {/* Tên ngân hàng tùy chỉnh / Chi nhánh */}
                       <div>
-                        <label className="text-xs text-[#78350F] block mb-1 font-medium">Chủ Tài Khoản</label>
+                        <label className="text-[11px] text-[#78350F] block mb-1 font-medium">
+                          Tên Ngân Hàng Hiển Thị (hoặc ghi rõ chi nhánh nếu muốn)
+                        </label>
                         <input
                           type="text"
-                          value={acc.accountHolder}
+                          value={acc.bankName}
                           onChange={(e) => {
                             const accs = [...data.bankAccounts];
-                            accs[idx].accountHolder = e.target.value.toUpperCase();
+                            accs[idx].bankName = e.target.value;
                             updateData({ bankAccounts: accs });
                           }}
-                          className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-1.5 text-xs uppercase text-[#3B090D]"
+                          placeholder="Ví dụ: Ngân hàng Quân Đội (MB Bank)"
+                          className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-1.5 text-xs text-[#3B090D]"
                         />
                       </div>
-                    </div>
 
-                    {/* QR Code preview & auto generator */}
-                    <div className="flex items-center gap-3 pt-1">
-                      <div className="relative w-16 h-16 bg-white p-1 rounded-xl border border-[#E8D5CF] shrink-0">
-                        {acc.qrImageUrl && (
-                          <Image src={acc.qrImageUrl} alt="QR" fill className="object-contain p-1" />
-                        )}
+                      {/* 2. SỐ TÀI KHOẢN & CHỦ TÀI KHOẢN */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                        <div>
+                          <label className="text-xs text-[#78350F] block mb-1 font-bold">
+                            2. Số Tài Khoản <span className="text-[#BA1B22]">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            value={acc.accountNumber}
+                            onChange={(e) => {
+                              const newAccNum = e.target.value;
+                              const accs = [...data.bankAccounts];
+                              accs[idx].accountNumber = newAccNum;
+                              // Tự động cập nhật link VietQR nếu đang dùng mã tự động
+                              if (accs[idx].qrImageUrl && accs[idx].qrImageUrl.includes("vietqr.io")) {
+                                const bin = acc.bankBin || currentBank?.bin || "970436";
+                                accs[idx].qrImageUrl = generateVietQrUrl(
+                                  bin,
+                                  newAccNum,
+                                  accs[idx].accountHolder,
+                                  accs[idx].customNote || ""
+                                );
+                              }
+                              updateData({ bankAccounts: accs });
+                            }}
+                            placeholder="Nhập số tài khoản ngân hàng"
+                            className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs font-mono font-bold text-[#BA1B22] focus:ring-1 focus:ring-[#BA1B22]"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="text-xs text-[#78350F] block mb-1 font-bold">
+                            Chủ Tài Khoản (Không dấu) <span className="text-[#BA1B22]">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            value={acc.accountHolder}
+                            onChange={(e) => {
+                              const newHolder = e.target.value.toUpperCase();
+                              const accs = [...data.bankAccounts];
+                              accs[idx].accountHolder = newHolder;
+                              if (accs[idx].qrImageUrl && accs[idx].qrImageUrl.includes("vietqr.io")) {
+                                const bin = acc.bankBin || currentBank?.bin || "970436";
+                                accs[idx].qrImageUrl = generateVietQrUrl(
+                                  bin,
+                                  accs[idx].accountNumber,
+                                  newHolder,
+                                  accs[idx].customNote || ""
+                                );
+                              }
+                              updateData({ bankAccounts: accs });
+                            }}
+                            placeholder="Ví dụ: NGUYEN VAN A"
+                            className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs uppercase text-[#3B090D] font-semibold focus:ring-1 focus:ring-[#BA1B22]"
+                          />
+                        </div>
                       </div>
 
-                      <div className="flex-1 space-y-1">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const accs = [...data.bankAccounts];
-                            accs[idx].qrImageUrl = `https://api.vietqr.io/image/970436-${acc.accountNumber}-compact.jpg?accountName=${encodeURIComponent(
-                              acc.accountHolder
-                            )}&amount=0`;
-                            updateData({ bankAccounts: accs });
-                            showToast("Đã tự động tạo mã VietQR!", "success");
-                          }}
-                          className="text-[11px] text-[#BA1B22] hover:underline block font-semibold cursor-pointer"
-                        >
-                          ⚡ Tự động tạo VietQR
-                        </button>
-                        <input
-                          type="url"
-                          value={acc.qrImageUrl}
-                          onChange={(e) => {
-                            const accs = [...data.bankAccounts];
-                            accs[idx].qrImageUrl = e.target.value;
-                            updateData({ bankAccounts: accs });
-                          }}
-                          className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-2.5 py-1 text-[11px] font-mono"
-                        />
+                      {/* 3. KHU VỰC QUẢN LÝ MÃ QR */}
+                      <div className="pt-2 border-t border-[#E8D5CF] space-y-2.5">
+                        <div className="flex items-center justify-between">
+                          <label className="text-xs text-[#78350F] font-bold">
+                            3. Ảnh Mã QR Thanh Toán
+                          </label>
+                          <span
+                            className={`text-[10px] px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider ${
+                              isUploadedImage
+                                ? "bg-[#DEF7EC] text-[#03543F] border border-[#BCF0DA]"
+                                : "bg-[#E1EFFE] text-[#1E429F] border border-[#B4C6FC]"
+                            }`}
+                          >
+                            {isUploadedImage ? "Ảnh bạn tự tải lên" : "Mã VietQR tự động"}
+                          </span>
+                        </div>
+
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 bg-white p-3 rounded-xl border border-[#E8D5CF]">
+                          {/* Khung xem trước mã QR */}
+                          <div className="relative w-20 h-20 bg-white p-1 rounded-xl border-2 border-[#E5C368] shrink-0 shadow-xs flex items-center justify-center overflow-hidden">
+                            {acc.qrImageUrl ? (
+                              <Image
+                                src={acc.qrImageUrl}
+                                alt="Mã QR"
+                                fill
+                                unoptimized
+                                className="object-contain p-1"
+                              />
+                            ) : (
+                              <div className="flex flex-col items-center justify-center text-center p-1 text-gray-400">
+                                <QrCode className="w-6 h-6 mb-1 text-gray-300" />
+                                <span className="text-[8px] leading-tight">Chưa có QR</span>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Các nút thao tác */}
+                          <div className="flex-1 space-y-2 w-full">
+                            <div className="flex flex-wrap items-center gap-2">
+                              {/* Nút tải ảnh QR từ máy */}
+                              <label className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#BA1B22] hover:bg-[#9B1218] text-white text-xs font-bold shadow-xs cursor-pointer active:scale-95 transition-all">
+                                {uploadingQrIdx === idx ? (
+                                  <>
+                                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                    <span>Đang nạp ảnh...</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <Upload className="w-3.5 h-3.5" />
+                                    <span>Tải Lên Ảnh QR</span>
+                                  </>
+                                )}
+                                <input
+                                  type="file"
+                                  accept="image/*"
+                                  disabled={uploadingQrIdx === idx}
+                                  onChange={(e) => handleUploadQrImage(idx, e)}
+                                  className="hidden"
+                                />
+                              </label>
+
+                              {/* Nút tự động tạo VietQR */}
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const bin = acc.bankBin || currentBank?.bin || "970436";
+                                  if (!acc.accountNumber) {
+                                    showToast("Vui lòng nhập số tài khoản trước!", "info");
+                                    return;
+                                  }
+                                  const accs = [...data.bankAccounts];
+                                  accs[idx].qrImageUrl = generateVietQrUrl(
+                                    bin,
+                                    acc.accountNumber,
+                                    acc.accountHolder,
+                                    acc.customNote || `Mung cuoi ${acc.ownerType === "groom" ? data.groom.shortName : data.bride.shortName}`
+                                  );
+                                  updateData({ bankAccounts: accs });
+                                  showToast("Đã tạo mã VietQR tự động thành công!", "success");
+                                }}
+                                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#FFFDF9] hover:bg-[#FEF2F2] border border-[#BA1B22] text-[#BA1B22] text-xs font-bold shadow-xs cursor-pointer active:scale-95 transition-all"
+                              >
+                                <span>⚡ Tự Động Tạo VietQR</span>
+                              </button>
+
+                              {/* Nút xóa mã QR */}
+                              {acc.qrImageUrl && (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const accs = [...data.bankAccounts];
+                                    accs[idx].qrImageUrl = "";
+                                    updateData({ bankAccounts: accs });
+                                    showToast("Đã xóa mã QR!", "info");
+                                  }}
+                                  className="text-[11px] text-gray-500 hover:text-red-600 underline cursor-pointer ml-auto"
+                                >
+                                  Xóa ảnh
+                                </button>
+                              )}
+                            </div>
+
+                            {/* Hoặc dán link ảnh */}
+                            <div className="space-y-1">
+                              <label className="text-[10px] text-gray-500 block">
+                                Hoặc dán trực tiếp link ảnh QR (URL):
+                              </label>
+                              <input
+                                type="url"
+                                value={acc.qrImageUrl}
+                                placeholder="https://... hoặc data:image/..."
+                                onChange={(e) => {
+                                  const accs = [...data.bankAccounts];
+                                  accs[idx].qrImageUrl = e.target.value;
+                                  updateData({ bankAccounts: accs });
+                                }}
+                                className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-lg px-2.5 py-1 text-[11px] font-mono text-gray-700 focus:ring-1 focus:ring-[#BA1B22]"
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        <p className="text-[11px] text-[#78350F] italic bg-[#FEFBF6] p-2 rounded-lg border border-[#F3ECE1]">
+                          💡 <strong>Mẹo:</strong> Bạn có thể mở ứng dụng ngân hàng (Vietcombank, MB, Techcombank...), chọn chức năng &ldquo;Mã QR nhận tiền&rdquo;, lưu hoặc chụp màn hình rồi bấm <strong>&ldquo;Tải Lên Ảnh QR&rdquo;</strong> để có mã QR chuẩn nhất của riêng bạn!
+                        </p>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
 

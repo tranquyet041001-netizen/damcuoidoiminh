@@ -157,10 +157,11 @@ export const weddingData: WeddingData = {
       "label": "Mừng Cưới Chú Rể (Công Quyết)",
       "bankName": "Ngân hàng Ngoại thương (Vietcombank)",
       "bankCode": "VCB",
+      "bankBin": "970436",
       "accountNumber": "1012345678",
       "accountHolder": "TRAN CONG QUYET",
       "branch": "Chi nhánh Hà Nội",
-      "qrImageUrl": "https://api.vietqr.io/image/970436-1012345678-compact.jpg?accountName=TRAN%20CONG%20QUYET&amount=0",
+      "qrImageUrl": "https://img.vietqr.io/image/970436-1012345678-compact2.jpg?accountName=TRAN%20CONG%20QUYET&amount=0",
       "customNote": "Mừng cưới Công Quyết"
     },
     {
@@ -168,10 +169,11 @@ export const weddingData: WeddingData = {
       "label": "Mừng Cưới Cô Dâu (Ngọc Hân)",
       "bankName": "Ngân hàng Quân Đội (MB Bank)",
       "bankCode": "MB",
+      "bankBin": "970422",
       "accountNumber": "0987654321",
       "accountHolder": "LE NGOC HAN",
       "branch": "Chi nhánh Hà Nội",
-      "qrImageUrl": "https://api.vietqr.io/image/970422-0987654321-compact.jpg?accountName=LE%20NGOC%20HAN&amount=0",
+      "qrImageUrl": "https://img.vietqr.io/image/970422-0987654321-compact2.jpg?accountName=LE%20NGOC%20HAN&amount=0",
       "customNote": "Mừng cưới Ngọc Hân"
     }
   ],

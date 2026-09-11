@@ -102,9 +102,10 @@ export const GiftCard: React.FC = () => {
             <div className="flex flex-col items-center justify-center">
               <div className="relative w-48 h-48 sm:w-56 sm:h-56 bg-white p-3 rounded-2xl border-2 border-[#C9A84C]/40 shadow-xs">
                 <Image
-                  src={currentAccount.qrImageUrl}
+                  src={currentAccount.qrImageUrl?.replace("api.vietqr.io/image/", "img.vietqr.io/image/") || ""}
                   alt={`Mã QR ${currentAccount.label}`}
                   fill
+                  unoptimized
                   className="object-contain p-2"
                   sizes="250px"
                 />

@@ -44,6 +44,7 @@ export interface BankAccount {
   label: string;
   bankName: string;
   bankCode?: string;
+  bankBin?: string;
   accountNumber: string;
   accountHolder: string;
   branch?: string;

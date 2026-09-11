@@ -13,6 +13,10 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
+        hostname: "img.vietqr.io",
+      },
+      {
+        protocol: "https",
         hostname: "api.qrserver.com",
       },
     ],
