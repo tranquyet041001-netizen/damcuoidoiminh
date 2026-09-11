@@ -58,8 +58,8 @@ export const HeroInvitation: React.FC<HeroInvitationProps> = ({
     <section
       id="hero"
       className={`relative ${
-        isEnvelopeOpen ? "min-h-[92vh] py-16" : "min-h-[100dvh] py-8 sm:py-12"
-      } flex flex-col items-center justify-center px-4 overflow-hidden bg-peach-texture`}
+        isEnvelopeOpen ? "min-h-[92vh] py-16" : "min-h-[100dvh] pt-16 pb-8 sm:py-12"
+      } flex flex-col items-center justify-center px-3 sm:px-4 overflow-hidden bg-peach-texture`}
     >
       {/* Decorative Botanical corners */}
       <div className="absolute top-3 left-3 opacity-60 pointer-events-none">
@@ -75,7 +75,7 @@ export const HeroInvitation: React.FC<HeroInvitationProps> = ({
         <BotanicalCorner size={72} color="#4A6741" position="bottom-right" />
       </div>
 
-      <div className="w-full max-w-lg md:max-w-xl lg:max-w-2xl mx-auto relative z-10">
+      <div className="w-full max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl mx-auto relative z-10">
         <AnimatePresence mode="wait">
           {!isEnvelopeOpen ? (
             /* ─── TRẠNG THÁI BÌA THIỆP (CLOSED ENVELOPE) ─── */
@@ -85,24 +85,24 @@ export const HeroInvitation: React.FC<HeroInvitationProps> = ({
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.94, y: -25 }}
               transition={{ duration: 0.6, ease: "easeOut" }}
-              className="relative w-full rounded-3xl p-6 sm:p-10 text-center shadow-xl border border-[#E8D5CF]/80 bg-[#FDFAF5]"
+              className="relative w-full rounded-3xl p-4 sm:p-8 md:p-10 text-center shadow-xl border border-[#E8D5CF]/90 bg-[#FDFAF5]"
               style={{
-                boxShadow: "0 20px 45px -12px rgba(196, 113, 90, 0.15), 0 0 0 1px rgba(232, 213, 207, 0.5)",
+                boxShadow: "0 20px 45px -12px rgba(196, 113, 90, 0.18), 0 0 0 1px rgba(232, 213, 207, 0.6)",
               }}
             >
               {/* Vòng viền thanh nhã */}
-              <div className="absolute inset-2.5 rounded-2xl border border-dashed border-[#C9A84C]/40 pointer-events-none" />
+              <div className="absolute inset-2 sm:inset-2.5 rounded-2xl border border-dashed border-[#C9A84C]/40 pointer-events-none" />
 
               {/* Tag đầu thiệp */}
-              <div className="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-[#F0F5EE] border border-[#A8BCA1]/40 text-[#4A6741] text-[11px] uppercase tracking-[0.25em] font-medium mb-5">
+              <div className="inline-flex items-center gap-1.5 px-3.5 py-0.5 rounded-full bg-[#F0F5EE] border border-[#A8BCA1]/40 text-[#4A6741] text-[10px] sm:text-[11px] uppercase tracking-[0.25em] font-medium mb-3 sm:mb-4">
                 <Sparkles className="w-3 h-3 text-[#C9A84C]" />
                 <span>Thiệp Báo Hỷ</span>
                 <Sparkles className="w-3 h-3 text-[#C9A84C]" />
               </div>
 
               {/* Hoa sen vẽ nét */}
-              <div className="flex justify-center mb-3">
-                <VietnameseLotus size={46} color="#4A6741" opacity={0.85} className="animate-breathe" />
+              <div className="flex justify-center mb-1.5 sm:mb-2">
+                <VietnameseLotus size={38} color="#4A6741" opacity={0.85} className="animate-breathe" />
               </div>
 
               {/* Badge Đích Danh Khách Mời (Nếu link có ?to= hoặc ?guest=) */}
@@ -110,68 +110,68 @@ export const HeroInvitation: React.FC<HeroInvitationProps> = ({
                 <motion.div
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="mb-4 inline-flex items-center gap-2 px-5 py-2 rounded-2xl bg-[#FDF0EC] border border-[#E8D5CF] shadow-xs"
+                  className="mb-2.5 sm:mb-3 inline-flex items-center gap-2 px-4 py-1.5 rounded-2xl bg-[#FDF0EC] border border-[#E8D5CF] shadow-xs max-w-[90%]"
                 >
-                  <span className="text-xs uppercase tracking-widest text-[#8C6A58] font-sans font-bold">
+                  <span className="text-[11px] uppercase tracking-widest text-[#8C6A58] font-sans font-bold">
                     Kính mời:
                   </span>
-                  <span className="font-calligraphy text-2xl sm:text-3xl text-[#C4715A] font-bold">
+                  <span className="font-calligraphy text-2xl sm:text-3xl text-[#C4715A] font-bold truncate">
                     {guestName}
                   </span>
                 </motion.div>
               )}
 
               {/* Tiêu đề thiệp */}
-              <p className="text-xs uppercase tracking-[0.3em] text-[#8C6A58] font-sans font-semibold mb-2">
+              <p className="text-[11px] sm:text-xs uppercase tracking-[0.28em] text-[#8C6A58] font-sans font-semibold mb-1.5">
                 {guestName ? "Tới Dự Hôn Lễ Của" : "Trân Trọng Kính Mời"}
               </p>
 
               {/* Tên dâu rể thư pháp lãng mạn */}
-              <div className="my-4 space-y-1">
-                <h1 className="font-calligraphy text-4xl sm:text-5xl md:text-6xl text-[#354D2E] leading-tight">
+              <div className="my-2 sm:my-3 space-y-0.5">
+                <h1 className="font-calligraphy text-3xl sm:text-4xl md:text-5xl text-[#354D2E] leading-tight">
                   {weddingData.groom.shortName}
                 </h1>
-                <div className="flex items-center justify-center gap-3">
-                  <div className="h-[1px] w-12 bg-gradient-to-r from-transparent to-[#C9A84C]" />
-                  <span className="font-serif italic text-2xl text-[#C4715A]">&amp;</span>
-                  <div className="h-[1px] w-12 bg-gradient-to-l from-transparent to-[#C9A84C]" />
+                <div className="flex items-center justify-center gap-2.5">
+                  <div className="h-[1px] w-8 sm:w-12 bg-gradient-to-r from-transparent to-[#C9A84C]" />
+                  <span className="font-serif italic text-xl sm:text-2xl text-[#C4715A]">&amp;</span>
+                  <div className="h-[1px] w-8 sm:w-12 bg-gradient-to-l from-transparent to-[#C9A84C]" />
                 </div>
-                <h1 className="font-calligraphy text-4xl sm:text-5xl md:text-6xl text-[#354D2E] leading-tight">
+                <h1 className="font-calligraphy text-3xl sm:text-4xl md:text-5xl text-[#354D2E] leading-tight">
                   {weddingData.bride.shortName}
                 </h1>
               </div>
 
-              <p className="text-sm sm:text-base text-[#5C4033] font-serif italic max-w-sm mx-auto leading-relaxed my-4">
+              <p className="text-xs sm:text-sm text-[#5C4033] font-serif italic max-w-xs sm:max-w-sm mx-auto leading-relaxed my-2 sm:my-3">
                 &ldquo;Duyên tao ngộ kết trăm năm ước hẹn, hoa nở đôi nhánh một tấm chân tình.&rdquo;
               </p>
 
-              <div className="flex items-center justify-center my-4">
-                <BotanicalBranch size={56} color="#4A6741" opacity={0.7} />
+              <div className="flex items-center justify-center my-2 sm:my-3">
+                <BotanicalBranch size={44} color="#4A6741" opacity={0.7} />
               </div>
 
               {/* Badge ngày cưới */}
-              <div className="inline-block px-5 py-2 rounded-xl bg-[#FDF0EC] border border-[#E8D5CF] text-[#4A6741] text-xs sm:text-sm font-serif font-medium mb-7">
+              <div className="inline-block px-4 py-1.5 rounded-xl bg-[#FDF0EC] border border-[#E8D5CF] text-[#4A6741] text-xs sm:text-sm font-serif font-medium mb-4 sm:mb-6">
                 {weddingData.weddingDateFormatted}
               </div>
 
-              {/* Nút Mở Thiệp - Nét son đào quý phái */}
-              <div className="flex flex-col items-center justify-center gap-3">
+              {/* Nút Mở Thiệp - Nổi bật, dễ bấm, không bị che khuất */}
+              <div className="flex flex-col items-center justify-center gap-2">
                 <button
                   type="button"
                   onClick={handleOpenInvitation}
-                  className="group relative inline-flex items-center gap-3 px-8 py-3.5 rounded-full text-sm sm:text-base font-serif font-semibold text-[#FDFAF5] shadow-lg transition-all duration-300 transform active:scale-95 cursor-pointer overflow-hidden"
+                  className="group relative inline-flex items-center gap-2.5 px-8 py-3 sm:px-9 sm:py-3.5 rounded-full text-sm sm:text-base font-serif font-semibold text-[#FDFAF5] shadow-xl transition-all duration-300 transform active:scale-95 hover:scale-105 cursor-pointer overflow-hidden"
                   style={{
                     background: "linear-gradient(135deg, #C4715A 0%, #A4503B 100%)",
-                    boxShadow: "0 8px 22px -4px rgba(196, 113, 90, 0.45)",
+                    boxShadow: "0 8px 25px -4px rgba(196, 113, 90, 0.55), 0 0 0 1px rgba(201, 168, 76, 0.3)",
                   }}
                 >
-                  <span className="relative z-10 flex items-center gap-2 tracking-wide">
+                  <span className="relative z-10 flex items-center gap-2 tracking-wider">
                     <span>Mở Thiệp Chúc Mừng</span>
                     <Heart className="w-4 h-4 fill-current text-[#FDFAF5] group-hover:scale-125 transition-transform" />
                   </span>
                   <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
                 </button>
-                <span className="text-[11px] text-[#8C6A58] tracking-wider uppercase font-sans">
+                <span className="text-[10px] sm:text-[11px] text-[#8C6A58] tracking-widest uppercase font-sans">
                   Chạm nhẹ để xem nội dung
                 </span>
               </div>

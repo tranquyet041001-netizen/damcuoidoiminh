@@ -1,7 +1,8 @@
-"use client";
+﻿"use client";
 
 import React, { useRef, useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Volume2, VolumeX } from "lucide-react";
 import { WeddingData } from "@/types/wedding";
 import { getGuestNameFromUrl } from "@/utils/guest";
 
@@ -16,16 +17,21 @@ export const CinematicOpeningVideo: React.FC<CinematicOpeningVideoProps> = ({
   isOpen = false,
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const loopVideoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Lấy tên khách mời đích danh từ URL (?to=, ?guest=, ?khach=)
+  // Tên khách mời đích danh
   const [guestName, setGuestName] = useState<string>("");
+
+  // Trạng thái âm thanh & lặp động
+  const [isAudioMuted, setIsAudioMuted] = useState<boolean>(false);
+  const [isLooping, setIsLooping] = useState<boolean>(false);
 
   useEffect(() => {
     setGuestName(getGuestNameFromUrl());
   }, []);
 
-  // Nhận diện thiết bị di động ngay từ lần khởi tạo đầu tiên trên client
+  // Nhận diện thiết bị di động
   const [isMobile, setIsMobile] = useState<boolean>(() => {
     if (typeof window !== "undefined") {
       return (
@@ -59,10 +65,11 @@ export const CinematicOpeningVideo: React.FC<CinematicOpeningVideoProps> = ({
     };
   }, []);
 
-  // Điện thoại: longphung2.mp4 (1080x1920 dọc không tiếng), Máy tính: longphung.mp4 (1920x1080 ngang không tiếng)
+  // Đường dẫn video chính (kèm âm thanh gốc) & video lặp vô tận (rồng phượng luôn cử động)
   const videoSrc = isMobile ? "/videos/longphung2.mp4" : "/videos/longphung.mp4";
+  const loopVideoSrc = isMobile ? "/videos/longphung2_seamless.mp4" : "/videos/longphung_seamless.mp4";
 
-  // Lắng nghe timeline video để bật con dấu Chữ Hỷ
+  // Lắng nghe timeline video để bật con dấu Chữ Hỷ và chuyển sang đoạn hoạt ảnh cử động liên tục
   const handleTimeUpdate = useCallback(() => {
     const video = videoRef.current;
     if (!video) return;
@@ -74,13 +81,16 @@ export const CinematicOpeningVideo: React.FC<CinematicOpeningVideoProps> = ({
       setShowSongHySeal(true);
     }
 
-    // Dừng tại frame cuối cùng (5.92s) để rồng và phượng ôm lấy chữ Hỷ
-    if (t >= 5.92 && !video.paused) {
-      video.pause();
+    // Khi video chính đạt ~5.7s, kích hoạt đoạn lặp hoạt ảnh rồng phượng để cử động không ngừng
+    if (t >= 5.7 && !isLooping) {
+      setIsLooping(true);
+      if (loopVideoRef.current && loopVideoRef.current.paused) {
+        loopVideoRef.current.play().catch(() => {});
+      }
     }
-  }, []);
+  }, [isLooping]);
 
-  // requestAnimationFrame để mượt mà 60fps
+  // Vòng lặp RAF mượt mà 60fps
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
@@ -93,8 +103,11 @@ export const CinematicOpeningVideo: React.FC<CinematicOpeningVideoProps> = ({
         if (t >= 3.8) {
           setShowSongHySeal(true);
         }
-        if (t >= 5.92 && !video.paused) {
-          video.pause();
+        if (t >= 5.7 && !isLooping) {
+          setIsLooping(true);
+          if (loopVideoRef.current && loopVideoRef.current.paused) {
+            loopVideoRef.current.play().catch(() => {});
+          }
         }
       }
       rafId = requestAnimationFrame(checkLoop);
@@ -105,28 +118,45 @@ export const CinematicOpeningVideo: React.FC<CinematicOpeningVideoProps> = ({
     return () => {
       cancelAnimationFrame(rafId);
     };
-  }, [videoSrc]);
+  }, [videoSrc, isLooping]);
 
-  // Đảm bảo video tự động play trên mọi thiết bị di động (kể cả Low Power Mode)
+  // Tự động phát video với âm thanh gốc
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
 
-    video.muted = true;
-    video.defaultMuted = true;
     video.playsInline = true;
     video.setAttribute("playsinline", "");
     video.setAttribute("webkit-playsinline", "true");
     video.setAttribute("x5-playsinline", "true");
 
+    // Thử phát có âm thanh trước
+    video.muted = false;
     const playPromise = video.play();
     if (playPromise !== undefined) {
       playPromise.catch(() => {
-        // Nếu trình duyệt di động chặn autoplay, hiển thị con dấu 囍 ngay để khách chạm mở
-        setShowSongHySeal(true);
+        // Nếu trình duyệt di động chặn phát kèm tiếng (Autoplay policy), tạm tắt tiếng để chạy
+        video.muted = true;
+        setIsAudioMuted(true);
+        video.play().catch(() => {
+          setShowSongHySeal(true);
+        });
       });
     }
   }, [videoSrc]);
+
+  // Bật/tắt âm thanh
+  const toggleAudio = (e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    const video = videoRef.current;
+    if (!video) return;
+    const newMuted = !video.muted;
+    video.muted = newMuted;
+    setIsAudioMuted(newMuted);
+    if (!newMuted && video.paused) {
+      video.play().catch(() => {});
+    }
+  };
 
   // CƠ CHẾ BẢO VỆ (SAFEGUARD): Sau tối đa 3.8s, chắc chắn 100% con dấu 囍 xuất hiện
   useEffect(() => {
@@ -145,6 +175,14 @@ export const CinematicOpeningVideo: React.FC<CinematicOpeningVideoProps> = ({
       if (isTransitioning) return;
       setIsTransitioning(true);
 
+      // Tạm dừng video để nhường cho nhạc nền thiệp cưới
+      if (videoRef.current) {
+        videoRef.current.pause();
+      }
+      if (loopVideoRef.current) {
+        loopVideoRef.current.pause();
+      }
+
       setTimeout(() => {
         onOpenInvitation();
       }, 1000);
@@ -152,11 +190,17 @@ export const CinematicOpeningVideo: React.FC<CinematicOpeningVideoProps> = ({
     [isTransitioning, onOpenInvitation]
   );
 
-  // Nếu video đang dừng do chính sách mobile, người dùng chạm vào màn hình sẽ kích hoạt chạy video
+  // Chạm vào màn hình để bật âm thanh hoặc phát video nếu bị trình duyệt chặn
   const handleContainerClick = () => {
     const video = videoRef.current;
-    if (video && video.paused && video.currentTime < 5.8) {
-      video.play().catch(() => {});
+    if (video) {
+      if (video.muted) {
+        video.muted = false;
+        setIsAudioMuted(false);
+      }
+      if (video.paused && video.currentTime < 5.8) {
+        video.play().catch(() => {});
+      }
     }
   };
 
@@ -173,7 +217,28 @@ export const CinematicOpeningVideo: React.FC<CinematicOpeningVideoProps> = ({
         backgroundColor: "#0C0C0C",
       }}
     >
-      {/* ── VIDEO RỒNG - PHƯỢNG TOÀN MÀN HÌNH (OBJECT-COVER) ── */}
+      {/* ── NÚT BẬT / TẮT ÂM THANH MỞ ĐẦU HOÀNG GIA ── */}
+      <button
+        type="button"
+        onClick={toggleAudio}
+        className="absolute top-5 sm:top-7 right-5 sm:right-7 z-40 p-2.5 sm:p-3 rounded-full bg-black/45 backdrop-blur-md border border-[#E5C368]/70 text-[#FDE68A] hover:bg-black/65 transition-all cursor-pointer shadow-xl active:scale-95 flex items-center gap-1.5"
+        title={isAudioMuted ? "Bật âm thanh" : "Tắt âm thanh"}
+        aria-label="Bật tắt âm thanh"
+      >
+        {isAudioMuted ? (
+          <>
+            <VolumeX className="w-4 h-4 text-[#FDE68A]" />
+            <span className="text-[10px] font-serif uppercase tracking-widest hidden sm:inline">Chạm bật tiếng</span>
+          </>
+        ) : (
+          <>
+            <Volume2 className="w-4 h-4 text-[#FDE68A] animate-pulse" />
+            <span className="text-[10px] font-serif uppercase tracking-widest hidden sm:inline">Âm thanh</span>
+          </>
+        )}
+      </button>
+
+      {/* ── VIDEO RỒNG - PHƯỢNG CHÍNH (CÓ ÂM THANH GỐC) ── */}
       <video
         ref={videoRef}
         key={videoSrc}
@@ -181,12 +246,30 @@ export const CinematicOpeningVideo: React.FC<CinematicOpeningVideoProps> = ({
         playsInline
         webkit-playsinline="true"
         x5-playsinline="true"
-        muted
         autoPlay
         preload="auto"
         onTimeUpdate={handleTimeUpdate}
         onError={() => setShowSongHySeal(true)}
-        className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+        className={`absolute inset-0 w-full h-full object-cover pointer-events-none transition-opacity duration-1000 ${
+          isLooping ? "opacity-0" : "opacity-100"
+        }`}
+      />
+
+      {/* ── HOẠT ẢNH RỒNG PHƯỢNG CỬ ĐỘNG LIÊN TỤC VÔ TẬN (SEAMLESS LOOP MOTION) ── */}
+      <video
+        ref={loopVideoRef}
+        key={loopVideoSrc}
+        src={loopVideoSrc}
+        loop
+        playsInline
+        webkit-playsinline="true"
+        x5-playsinline="true"
+        muted
+        autoPlay
+        preload="auto"
+        className={`absolute inset-0 w-full h-full object-cover pointer-events-none transition-opacity duration-1000 ${
+          isLooping ? "opacity-100" : "opacity-0"
+        }`}
       />
 
       {/* ── BỤI VÀNG CỔ PHONG BAY TRONG KHÔNG GIAN ── */}
