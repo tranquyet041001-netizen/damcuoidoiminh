@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Sparkles, Calendar, Clock, MapPin, Heart } from "lucide-react";
+import { Sparkles, Heart } from "lucide-react";
 import { useWeddingData } from "@/context/WeddingDataContext";
 import { getGuestNameFromUrl } from "@/utils/guest";
 import { VietnameseLotus, RedSealStamp } from "@/components/ui/VietnamesePattern";
@@ -14,13 +14,6 @@ export const ImperialLongPhungInvitation: React.FC = () => {
   useEffect(() => {
     setGuestName(getGuestNameFromUrl());
   }, []);
-
-  const mainEvent = weddingData.events[0] || {
-    title: "Tiệc Cưới Hỷ Sự",
-    time: "11:00",
-    venue: "Trung Tâm Tiệc Cưới Hoàng Gia",
-    address: "Hà Nội",
-  };
 
   return (
     <section id="letter" className="relative py-16 sm:py-24 px-3 sm:px-6 overflow-hidden select-none" style={{ backgroundColor: "#0F0708" }}>
@@ -244,40 +237,6 @@ export const ImperialLongPhungInvitation: React.FC = () => {
             </p>
           </div>
 
-          {/* ── THỜI KHẮC CÁT NHẬT & ĐỊA ĐIỂM HỶ PHỦ ── */}
-          <div className="my-6 p-4 sm:p-6 rounded-2xl bg-black/40 border border-[#E5C368]/50 max-w-lg mx-auto shadow-inner text-center space-y-3">
-            <div className="flex items-center justify-center gap-2 text-[#E5C368]">
-              <Calendar className="w-4 h-4 text-[#FDE68A]" />
-              <span className="text-xs uppercase tracking-[0.25em] font-serif font-bold">
-                NGÀY CỬ HÀNH HÔN LỄ
-              </span>
-              <Calendar className="w-4 h-4 text-[#FDE68A]" />
-            </div>
-
-            <div className="font-serif font-bold text-xl sm:text-2xl text-[#FFF8D6] tracking-wide">
-              {weddingData.weddingDateFormatted}
-            </div>
-
-            <div className="text-xs sm:text-sm text-[#FDE68A] italic font-serif">
-              (Nhằm ngày {weddingData.lunarDateFormatted})
-            </div>
-
-            <div className="pt-3 border-t border-[#E5C368]/30 flex flex-col items-center gap-1 text-xs text-[#E8D5CF]">
-              <div className="flex items-center gap-1.5 font-bold text-[#FFF3B0]">
-                <Clock className="w-3.5 h-3.5 text-[#E5C368]" />
-                <span>Vào lúc {mainEvent.time}</span>
-              </div>
-              <div className="flex items-center gap-1.5 mt-0.5">
-                <MapPin className="w-3.5 h-3.5 text-[#E5C368] shrink-0" />
-                <span className="font-serif font-semibold text-[#FFF8D6] text-sm">
-                  {mainEvent.venue}
-                </span>
-              </div>
-              <p className="text-[11px] text-[#E8D5CF]/80 font-serif">
-                {mainEvent.address}
-              </p>
-            </div>
-          </div>
 
           {/* Con dấu son "CÁT TƯỜNG BẢO CHỨNG" */}
           <div className="flex items-center justify-center gap-3 pt-2">
