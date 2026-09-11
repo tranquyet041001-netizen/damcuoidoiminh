@@ -1,8 +1,9 @@
-﻿"use client";
+"use client";
 
 import React, { useRef, useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { WeddingData } from "@/types/wedding";
+import { getGuestNameFromUrl } from "@/utils/guest";
 
 interface CinematicOpeningVideoProps {
   weddingData?: WeddingData;
@@ -16,6 +17,13 @@ export const CinematicOpeningVideo: React.FC<CinematicOpeningVideoProps> = ({
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // Lấy tên khách mời đích danh từ URL (?to=, ?guest=, ?khach=)
+  const [guestName, setGuestName] = useState<string>("");
+
+  useEffect(() => {
+    setGuestName(getGuestNameFromUrl());
+  }, []);
 
   // Nhận diện thiết bị di động ngay từ lần khởi tạo đầu tiên trên client
   const [isMobile, setIsMobile] = useState<boolean>(() => {
@@ -189,6 +197,44 @@ export const CinematicOpeningVideo: React.FC<CinematicOpeningVideoProps> = ({
         <div className="antique-particle particle-d" />
         <div className="antique-particle particle-e" />
       </div>
+
+      {/* ── THẺ KÍNH MỜI ĐÍCH DANH KHÁCH MỜI TRÊN MÀN HÌNH VIDEO MỞ ĐẦU ── */}
+      <AnimatePresence>
+        {guestName && !isTransitioning && (
+          <motion.div
+            initial={{ opacity: 0, y: -25, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -20, scale: 0.9 }}
+            transition={{ duration: 1.0, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
+            className="absolute top-6 sm:top-10 left-1/2 -translate-x-1/2 z-30 pointer-events-none flex flex-col items-center max-w-[92vw]"
+          >
+            <div
+              className="px-5 sm:px-7 py-2 sm:py-2.5 rounded-full flex items-center gap-2 sm:gap-3 shadow-2xl backdrop-blur-md"
+              style={{
+                background:
+                  "linear-gradient(135deg, rgba(139, 26, 30, 0.92) 0%, rgba(92, 11, 14, 0.96) 100%)",
+                border: "1.5px solid rgba(229, 195, 104, 0.9)",
+                boxShadow:
+                  "0 8px 30px rgba(0, 0, 0, 0.65), 0 0 22px rgba(201, 168, 76, 0.45), inset 0 1px 2px rgba(255, 255, 255, 0.35)",
+              }}
+            >
+              <span className="text-[#FDE68A] text-xs sm:text-sm opacity-90">❖</span>
+              <span className="font-sans text-[10px] sm:text-xs uppercase tracking-[0.25em] text-[#FDE68A] font-semibold">
+                Kính mời:
+              </span>
+              <span
+                className="font-calligraphy text-2xl sm:text-3xl md:text-4xl text-[#FFFDF7] font-bold tracking-wide"
+                style={{
+                  textShadow: "0 2px 4px rgba(0, 0, 0, 0.8), 0 0 14px rgba(254, 230, 138, 0.75)",
+                }}
+              >
+                {guestName}
+              </span>
+              <span className="text-[#FDE68A] text-xs sm:text-sm opacity-90">❖</span>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* ── XUNG ÁNH SÁNG VÀNG KIM TẠI TRUNG TÂM KHI RỒNG PHƯỢNG QUAY VỀ ── */}
       <AnimatePresence>

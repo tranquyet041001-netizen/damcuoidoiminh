@@ -13,6 +13,7 @@ import {
   BotanicalCorner,
   BotanicalBranch,
 } from "@/components/ui/VietnamesePattern";
+import { getGuestNameFromUrl } from "@/utils/guest";
 
 interface HeroInvitationProps {
   isOpen?: boolean;
@@ -33,13 +34,7 @@ export const HeroInvitation: React.FC<HeroInvitationProps> = ({
   const isEnvelopeOpen = controlledIsOpen !== undefined ? controlledIsOpen : internalIsOpen;
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const params = new URLSearchParams(window.location.search);
-      const to = params.get("to") || params.get("guest") || params.get("khach");
-      if (to) {
-        setGuestName(decodeURIComponent(to).trim());
-      }
-    }
+    setGuestName(getGuestNameFromUrl());
   }, []);
 
   const handleOpenInvitation = () => {

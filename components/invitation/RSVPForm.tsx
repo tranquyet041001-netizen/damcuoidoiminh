@@ -6,6 +6,7 @@ import { Send, CheckCircle2, Heart, Users, Check, X, HelpCircle, Loader2 } from 
 import { useWeddingData } from "@/context/WeddingDataContext";
 import { useToast } from "@/components/ui/Toast";
 import { VietnameseLotus, BotanicalBranch } from "@/components/ui/VietnamesePattern";
+import { getGuestNameFromUrl } from "@/utils/guest";
 
 export const RSVPForm: React.FC = () => {
   const { data: weddingData } = useWeddingData();
@@ -21,14 +22,11 @@ export const RSVPForm: React.FC = () => {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
-  // Đọc tên khách từ URL (?to= hoặc ?guest=)
+  // Đọc tên khách từ URL (?to=, ?guest=, ?khach=)
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const params = new URLSearchParams(window.location.search);
-      const to = params.get("to") || params.get("guest") || params.get("khach");
-      if (to) {
-        setFullName(decodeURIComponent(to).trim());
-      }
+    const name = getGuestNameFromUrl();
+    if (name) {
+      setFullName(name);
     }
   }, []);
 

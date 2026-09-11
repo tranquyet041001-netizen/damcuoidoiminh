@@ -9,6 +9,7 @@ import {
   RedSealStamp,
   BotanicalBranch,
 } from "@/components/ui/VietnamesePattern";
+import { getGuestNameFromUrl } from "@/utils/guest";
 
 interface OpeningLetterProps {
   showGuestGreeting?: boolean;
@@ -16,20 +17,14 @@ interface OpeningLetterProps {
 }
 
 export const OpeningLetter: React.FC<OpeningLetterProps> = ({
-  showGuestGreeting = false,
+  showGuestGreeting = true,
   isTopSection = false,
 }) => {
   const { data: weddingData } = useWeddingData();
   const [guestName, setGuestName] = useState<string>("");
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const params = new URLSearchParams(window.location.search);
-      const to = params.get("to") || params.get("guest") || params.get("khach");
-      if (to) {
-        setGuestName(decodeURIComponent(to).trim());
-      }
-    }
+    setGuestName(getGuestNameFromUrl());
   }, []);
 
   return (
@@ -51,8 +46,8 @@ export const OpeningLetter: React.FC<OpeningLetterProps> = ({
           }}
           className="text-center mb-8 sm:mb-10"
         >
-          {/* Badge kính mời đích danh khi dùng video mở đầu */}
-          {showGuestGreeting && guestName && (
+          {/* Badge kính mời đích danh (hiển thị trên cả 2 chế độ khi có link mời riêng) */}
+          {guestName && (
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: -6 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}

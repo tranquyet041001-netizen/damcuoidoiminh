@@ -2226,7 +2226,7 @@ function StudioContent() {
                   </div>
 
                   <p className="text-xs text-[#5C4033] leading-relaxed">
-                    Nhập tên khách mời để tạo đường link riêng. Khi khách mở thiệp, trên phong bì sẽ hiện trang trọng <strong>&quot;Kính mời: [Tên khách]&quot;</strong> và tự động điền sẵn tên vào phần xác nhận!
+                    Nhập tên khách mời để tạo đường link riêng. Khi khách mở thiệp, tên khách sẽ hiện trang trọng trên <strong>CẢ 2 KIỂU MỞ ĐẦU</strong> (Thẻ bài hoàng gia trên Video Rồng Phượng &amp; Bìa Phong Thư truyền thống) và tự động điền sẵn vào form xác nhận tham dự (RSVP)!
                   </p>
 
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
@@ -2261,12 +2261,12 @@ function StudioContent() {
                   </div>
 
                   {/* Xem trước link và nút sao chép */}
-                  <div className="p-3 bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl space-y-2">
+                  <div className="p-3 bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl space-y-2.5">
                     <div className="text-[10px] uppercase font-bold tracking-wider text-[#8C6A58]">
                       Link Mời Dành Riêng Cho Khách Này:
                     </div>
                     <div className="flex items-center justify-between gap-2">
-                      <span className="font-mono text-xs text-[#C4715A] font-bold truncate">
+                      <span className="font-mono text-xs text-[#C4715A] font-bold truncate select-all">
                         {`${origin}/i/${data.slug || "quyet-han"}${
                           guestInviteName.trim()
                             ? `?to=${encodeURIComponent(guestInviteName.trim())}`
@@ -2275,7 +2275,8 @@ function StudioContent() {
                       </span>
                     </div>
 
-                    <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-[#E8D5CF]/60">
+                    {/* Nút sao chép Zalo */}
+                    <div className="pt-2 border-t border-[#E8D5CF]/60">
                       <button
                         type="button"
                         onClick={async () => {
@@ -2291,23 +2292,43 @@ function StudioContent() {
                             showToast("Vui lòng sao chép thủ công", "info");
                           }
                         }}
-                        className="flex-1 py-2 px-3 rounded-xl bg-[#4A6741] hover:bg-[#354D2E] text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-all active:scale-95 cursor-pointer shadow-2xs"
+                        className="w-full py-2 px-3 rounded-xl bg-[#4A6741] hover:bg-[#354D2E] text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-all active:scale-95 cursor-pointer shadow-2xs"
                       >
                         <Copy className="w-3.5 h-3.5 text-[#C9A84C]" />
-                        <span>Sao Chép Lời Mời Kèm Link (Zalo)</span>
+                        <span>Sao Chép Lời Mời Kèm Link (Gửi Zalo / Tin Nhắn)</span>
                       </button>
+                    </div>
 
-                      <a
-                        href={`/i/${data.slug || "quyet-han"}${
-                          guestInviteName.trim() ? `?to=${encodeURIComponent(guestInviteName.trim())}` : ""
-                        }`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="py-2 px-3 rounded-xl bg-[#FDFAF5] hover:bg-[#FDF0EC] border border-[#E8D5CF] text-[#C4715A] text-xs font-semibold flex items-center justify-center gap-1 transition-colors"
-                      >
-                        <ExternalLink className="w-3.5 h-3.5 text-[#C4715A]" />
-                        <span>Xem Thử Bìa Thiệp</span>
-                      </a>
+                    {/* Các nút xem thử trực tiếp cả 2 loại mở đầu */}
+                    <div className="pt-2 border-t border-[#E8D5CF]/60 space-y-1.5">
+                      <div className="text-[10px] text-[#8C6A58] uppercase font-bold">
+                        Xem Thử Giao Diện Đích Danh Khách Này:
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <a
+                          href={`/i/${data.slug || "quyet-han"}${
+                            guestInviteName.trim() ? `?to=${encodeURIComponent(guestInviteName.trim())}&opening=video` : "?opening=video"
+                          }`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="py-2 px-3 rounded-xl bg-[#FDFAF5] hover:bg-[#FDF0EC] border border-[#E8D5CF] text-[#8B1A1E] text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
+                        >
+                          <span>🐉 Xem Thử Kiểu Video</span>
+                          <ExternalLink className="w-3 h-3 opacity-60" />
+                        </a>
+
+                        <a
+                          href={`/i/${data.slug || "quyet-han"}${
+                            guestInviteName.trim() ? `?to=${encodeURIComponent(guestInviteName.trim())}&opening=envelope` : "?opening=envelope"
+                          }`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="py-2 px-3 rounded-xl bg-[#FDFAF5] hover:bg-[#FDF0EC] border border-[#E8D5CF] text-[#4A6741] text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
+                        >
+                          <span>✉️ Xem Thử Kiểu Phong Bì</span>
+                          <ExternalLink className="w-3 h-3 opacity-60" />
+                        </a>
+                      </div>
                     </div>
                   </div>
                 </div>

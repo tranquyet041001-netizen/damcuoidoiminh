@@ -70,6 +70,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose }) => {
   const [origin, setOrigin] = useState("");
   const [activeTab, setActiveTab] = useState<"standard" | "lan" | "custom">("standard");
   const [customDomain, setCustomDomain] = useState("");
+  const [guestName, setGuestName] = useState("");
 
   const slug = data.slug || "quyet-han";
   const lanIp = "172.16.1.97"; // IP mạng nội bộ của máy tính đang chạy
@@ -83,31 +84,38 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose }) => {
 
   // Xác định link cần chia sẻ theo chế độ
   const getActiveLink = useCallback(() => {
+    let baseFull = "";
     if (activeTab === "custom" && customDomain.trim()) {
       const cleanDomain = customDomain.trim().replace(/\/+$/, "");
       const full = cleanDomain.startsWith("http") ? cleanDomain : `https://${cleanDomain}`;
-      return `${full}/i/${slug}`;
-    }
-    if (activeTab === "lan") {
+      baseFull = `${full}/i/${slug}`;
+    } else if (activeTab === "lan") {
       const port = typeof window !== "undefined" && window.location.port ? `:${window.location.port}` : ":3000";
-      return `http://${lanIp}${port}/i/${slug}`;
+      baseFull = `http://${lanIp}${port}/i/${slug}`;
+    } else {
+      const base = origin || "http://localhost:3000";
+      baseFull = `${base}/i/${slug}`;
     }
-    const base = origin || "http://localhost:3000";
-    return `${base}/i/${slug}`;
-  }, [activeTab, customDomain, slug, lanIp, origin]);
+
+    if (guestName.trim()) {
+      return `${baseFull}?to=${encodeURIComponent(guestName.trim())}`;
+    }
+    return baseFull;
+  }, [activeTab, customDomain, slug, lanIp, origin, guestName]);
 
   const activeLink = getActiveLink();
 
   // Soạn thảo mẫu tin nhắn mời cưới lịch sự
   const getInvitationMessage = useCallback(() => {
+    const target = guestName.trim() ? `${guestName.trim()}` : "bạn";
     return `🌸 THIỆP BÁO HỶ TRĂM NĂM 🌸\n` +
-      `Trân trọng kính mời bạn và người thương tới chung vui cùng gia đình chúng mình trong ngày hạnh phúc của:\n` +
+      `Trân trọng kính mời ${target} cùng người thương tới chung vui cùng gia đình chúng mình trong ngày hạnh phúc của:\n` +
       `💑 ${data.groom.shortName} & ${data.bride.shortName}\n` +
       `📅 Ngày cưới: ${data.weddingDateFormatted}\n` +
-      `💌 Xem thiệp cưới và xác nhận tham dự (RSVP) tại link rút gọn:\n` +
+      `💌 Xem thiệp cưới và xác nhận tham dự (RSVP) tại link dành riêng:\n` +
       `${activeLink}\n\n` +
-      `Sự hiện diện của bạn là niềm vinh hạnh lớn của chúng mình! ✨`;
-  }, [data, activeLink]);
+      `Sự hiện diện của ${target} là niềm vinh hạnh lớn của chúng mình! ✨`;
+  }, [data, activeLink, guestName]);
 
   // Tạo mã QR Code ngoại tuyến sắc nét bằng qrcode
   useEffect(() => {
@@ -318,8 +326,28 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose }) => {
           </div>
         )}
 
+        {/* Ô nhập tên khách mời đích danh */}
+        <div className="mt-4 p-3 bg-[#FFFDF9] border border-[#E8D5CF] rounded-2xl text-left space-y-1.5 shadow-2xs">
+          <label className="text-[10px] uppercase font-bold tracking-wider text-[#8C6A58] flex items-center justify-between">
+            <span>Gửi Riêng Từng Khách (In Tên Lên Thiệp)</span>
+            <span className="text-[#C4715A] font-semibold lowercase">Tùy chọn</span>
+          </label>
+          <input
+            type="text"
+            value={guestName}
+            onChange={(e) => setGuestName(e.target.value)}
+            placeholder="Ví dụ: Bác Tuấn &amp; Gia Đình, Bạn Lan C3..."
+            className="w-full bg-[#FDFAF5] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs text-[#354D2E] font-medium focus:outline-none focus:border-[#4A6741]"
+          />
+          <span className="text-[10px] text-[#8C6A58] italic block">
+            {guestName.trim()
+              ? `✓ Tên "${guestName.trim()}" sẽ hiện trang trọng trên cả Video Rồng Phượng & Phong Bì!`
+              : "Để trống nếu bạn muốn gửi đường dẫn chung cho mọi người"}
+          </span>
+        </div>
+
         {/* Khung Hiển Thị Link Rút Gọn */}
-        <div className="mt-4 p-3 bg-[#FDF0EC]/70 border border-[#E8D5CF] rounded-2xl text-left space-y-1.5">
+        <div className="mt-3 p-3 bg-[#FDF0EC]/70 border border-[#E8D5CF] rounded-2xl text-left space-y-1.5">
           <div className="flex items-center justify-between text-[10px] uppercase font-bold tracking-wider text-[#8C6A58]">
             <span>Đường Dẫn Rút Gọn (Short Link)</span>
             <span className="text-emerald-700 font-normal normal-case">✓ Chỉ xem</span>

@@ -139,8 +139,8 @@ export const WeddingInvitationView: React.FC<WeddingInvitationViewProps> = ({
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.15, ease: "easeOut" }}
             >
-              {/* 2. Lời ngỏ từ hai bên gia đình */}
-              <OpeningLetter showGuestGreeting={isVideoOpening} isTopSection={isVideoOpening} />
+              {/* 2. Lời ngỏ từ hai bên gia đình (hiển thị đích danh khách trên cả 2 chế độ) */}
+              <OpeningLetter showGuestGreeting={true} isTopSection={isVideoOpening} />
 
               {/* ── DIVIDER: ivory → sage ── */}
               <SectionDivider fromColor="#FDFAF5" toColor="#F0F5EE" variant="wave" />
