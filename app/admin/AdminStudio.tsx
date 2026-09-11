@@ -764,15 +764,15 @@ function StudioContent() {
                           )}
                         </div>
                         <h4 className="font-serif font-bold text-xs sm:text-sm text-[#3B090D]">
-                          Mở Thiệp Như Cũ (Phong Thư)
+                          Phong Thư Hoàng Gia (Sơn Son Thiếp Vàng)
                         </h4>
                         <p className="text-[11px] text-[#4A0E13] mt-1.5 leading-relaxed">
-                          Bìa thiệp hồng truyền thống mô phỏng phong thư nắp sáp đỏ. Khách bấm "Mở Thiệp Chúc Mừng" để mở và xem ảnh dâu rể (không phát video).
+                          Bìa phong thư gấm đỏ hoàng triều viền vàng dập nổi, niêm phong ấn triện Chu Sa chữ 囍. Khách chạm &ldquo;Khai Mở Hỷ Thư&rdquo; để mở thẳng vào thiệp cưới hoàng gia.
                         </p>
                       </div>
-                      <div className="mt-3 pt-2 border-t border-[#E8D5CF]/60 text-[10px] font-sans font-semibold text-[#78350F] flex items-center gap-1">
-                        <Mail className="w-3 h-3 text-[#78350F]" />
-                        <span>Cổ điển, ấm cúng, thân thuộc</span>
+                      <div className="mt-3 pt-2 border-t border-[#E8D5CF]/60 text-[10px] font-sans font-semibold text-[#BA1B22] flex items-center gap-1">
+                        <Mail className="w-3 h-3 text-[#E5C368]" />
+                        <span>Trang trọng, quý phái, hoàng gia</span>
                       </div>
                     </button>
                   </div>

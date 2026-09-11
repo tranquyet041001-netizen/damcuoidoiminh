@@ -117,8 +117,8 @@ export const WeddingInvitationView: React.FC<WeddingInvitationViewProps> = ({
       {isEnvelopeOpen && <FloatingPetals />}
 
       <main className="flex-1">
-        {/* Màn hình mở thiệp (Thiệp Báo Hỷ / Bìa Thiệp Phong Thư Cũ) - Chỉ hiển thị khi chọn envelope */}
-        {!isVideoOpening && (
+        {/* Màn hình mở thiệp (Thiệp Báo Hỷ / Bìa Phong Thư Hoàng Gia) - Chỉ hiển thị khi CHƯA MỞ */}
+        {!isVideoOpening && !isEnvelopeOpen && (
           <HeroInvitation
             isOpen={isEnvelopeOpen}
             onOpen={handleOpen}

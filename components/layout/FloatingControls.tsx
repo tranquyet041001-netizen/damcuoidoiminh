@@ -38,9 +38,9 @@ export const FloatingControls: React.FC<FloatingControlsProps> = ({
 
   const navItems = [
     ...(!isVideoMode
-      ? [{ id: "hero", label: "Bìa Thiệp", emoji: "🌸" }]
+      ? [{ id: "hero", label: "Phong Thư", emoji: "✉️" }]
       : []),
-    { id: "letter", label: "Chiếu Thư", emoji: "📜" },
+    { id: "letter", label: "Hỷ Thư", emoji: "📜" },
     { id: "details", label: "Điển Lễ", emoji: "🏮" },
     { id: "story", label: "Chuyện Tình", emoji: "✨" },
     { id: "countdown", label: "Đếm Ngược", emoji: "⏳" },
@@ -62,6 +62,10 @@ export const FloatingControls: React.FC<FloatingControlsProps> = ({
 
   const scrollToSection = (id: string) => {
     setIsMenuOpen(false);
+    if (id === "hero" && onReplayOpening) {
+      onReplayOpening();
+      return;
+    }
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
   };
 
