@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, ChevronLeft, ChevronRight, ZoomIn } from "lucide-react";
+import { X, ChevronLeft, ChevronRight, ZoomIn, Sparkles } from "lucide-react";
 import { useWeddingData } from "@/context/WeddingDataContext";
 import { VietnameseLotus, BotanicalBranch } from "@/components/ui/VietnamesePattern";
 
@@ -90,30 +90,47 @@ export const PhotoGallery: React.FC = () => {
   }, []);
 
   return (
-    <section id="gallery" className="py-16 sm:py-20 px-4 bg-sage-texture relative overflow-hidden">
+    <section
+      id="gallery"
+      className="relative py-16 sm:py-24 px-3 sm:px-6 overflow-hidden select-none"
+      style={{ backgroundColor: "#100203" }}
+    >
+      {/* Nền gấm đỏ thẫm sơn son */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background: "radial-gradient(circle at 50% 30%, #2A0508 0%, #150305 60%, #0A0102 100%)",
+        }}
+      />
+
       <div className="max-w-xl md:max-w-5xl lg:max-w-6xl mx-auto relative z-10">
-        {/* Header */}
+        {/* Header - Hoàng Triều Hỷ Ảnh */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-10 sm:mb-12"
+          className="text-center mb-10 sm:mb-14"
         >
-          <div className="inline-flex items-center justify-center mb-2">
-            <VietnameseLotus size={36} color="#4A6741" opacity={0.85} />
+          <div className="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-[#3B090D] border border-[#E5C368]/60 shadow-md mb-3">
+            <Sparkles className="w-3.5 h-3.5 text-[#FDE68A]" />
+            <span className="text-[10px] sm:text-xs uppercase tracking-[0.35em] text-[#FFF3B0] font-serif font-bold">
+              HOÀNG TRIỀU HỶ ẢNH
+            </span>
+            <Sparkles className="w-3.5 h-3.5 text-[#FDE68A]" />
           </div>
-          <p className="text-[11px] uppercase tracking-[0.3em] text-[#C4715A] font-sans font-semibold mb-1">
-            Khoảnh Khắc Đẹp
-          </p>
-          <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl font-bold text-[#354D2E] tracking-wide">
-            Album Ảnh Cưới
+
+          <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl font-bold text-[#FFF8D6] tracking-wide">
+            Khoảnh Khắc Giai Kỳ
           </h2>
-          <div className="flex items-center justify-center my-3">
-            <BotanicalBranch size={52} color="#C9A84C" opacity={0.7} />
-          </div>
-          <p className="text-xs sm:text-sm text-[#8C6A58] italic font-serif max-w-md mx-auto leading-relaxed">
-            Lưu giữ từng ánh mắt, nụ cười và những ngày tháng thanh xuân dịu dàng bên nhau.
+
+          <div
+            className="mx-auto mt-3 h-[1.5px] w-28 origin-center"
+            style={{ background: "linear-gradient(to right, transparent, #E5C368, transparent)" }}
+          />
+
+          <p className="text-xs sm:text-sm text-[#E8D5CF] italic font-serif max-w-md mx-auto mt-3 leading-relaxed">
+            Lưu giữ từng ánh mắt, nụ cười và những thời khắc thanh xuân ngọt ngào kết tóc se duyên
           </p>
         </motion.div>
 
@@ -127,7 +144,7 @@ export const PhotoGallery: React.FC = () => {
               viewport={{ once: true, margin: "-30px" }}
               transition={{ duration: 0.5, delay: (idx % 3) * 0.07 }}
               onClick={() => openLightbox(idx)}
-              className="break-inside-avoid relative overflow-hidden rounded-2xl cursor-pointer group shadow-xs hover:shadow-xl transition-all duration-300 border border-[#E8D5CF] hover:-translate-y-1"
+              className="break-inside-avoid relative overflow-hidden rounded-2xl cursor-pointer group shadow-[0_10px_25px_-5px_rgba(0,0,0,0.7)] hover:shadow-[0_15px_35px_-5px_rgba(229,195,104,0.3)] transition-all duration-300 border border-[#E5C368]/50 hover:border-[#FDE68A] hover:-translate-y-1"
               style={{
                 aspectRatio: idx % 4 === 0 ? "3/4" : idx % 4 === 1 ? "1/1" : idx % 4 === 2 ? "4/3" : "3/4",
               }}
@@ -140,9 +157,9 @@ export const PhotoGallery: React.FC = () => {
                 sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 380px"
               />
               {/* Lớp phủ tinh tế khi hover */}
-              <div className="absolute inset-0 bg-gradient-to-t from-[#354D2E]/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-3 sm:p-4">
-                <div className="flex items-center gap-1.5 text-[#FDFAF5]">
-                  <ZoomIn className="w-4 h-4 text-[#C9A84C]" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#150204]/90 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-3 sm:p-4">
+                <div className="flex items-center gap-1.5 text-[#FFF8D6]">
+                  <ZoomIn className="w-4 h-4 text-[#FDE68A]" />
                   <span className="text-xs sm:text-sm font-serif line-clamp-1 font-medium">{item.title}</span>
                 </div>
               </div>

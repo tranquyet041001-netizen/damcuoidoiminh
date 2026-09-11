@@ -23,7 +23,7 @@ export const ImperialLongPhungInvitation: React.FC = () => {
   };
 
   return (
-    <section className="relative py-16 sm:py-24 px-3 sm:px-6 overflow-hidden select-none" style={{ backgroundColor: "#0F0708" }}>
+    <section id="letter" className="relative py-16 sm:py-24 px-3 sm:px-6 overflow-hidden select-none" style={{ backgroundColor: "#0F0708" }}>
       {/* ── NỀN HOÀNG CUNG SƠN MÀI & GẤM VÓC HUYẾT DỤ ── */}
       <div
         className="absolute inset-0 pointer-events-none"

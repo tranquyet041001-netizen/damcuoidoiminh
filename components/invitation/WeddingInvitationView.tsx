@@ -6,16 +6,15 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { FloatingControls } from "@/components/layout/FloatingControls";
 import { HeroInvitation } from "@/components/invitation/HeroInvitation";
-import { OpeningLetter } from "@/components/invitation/OpeningLetter";
-import { CoupleStory } from "@/components/invitation/CoupleStory";
-import { WeddingDetails } from "@/components/invitation/WeddingDetails";
-import { Countdown } from "@/components/invitation/Countdown";
-import { RSVPForm } from "@/components/invitation/RSVPForm";
-import { PhotoGallery } from "@/components/invitation/PhotoGallery";
-import { WishBook } from "@/components/invitation/WishBook";
-import { GiftCard } from "@/components/invitation/GiftCard";
 import { CinematicOpeningVideo } from "@/components/invitation/CinematicOpeningVideo";
 import { ImperialLongPhungInvitation } from "@/components/invitation/ImperialLongPhungInvitation";
+import { ImperialCeremonySchedule } from "@/components/invitation/ImperialCeremonySchedule";
+import { ImperialCoupleStory } from "@/components/invitation/ImperialCoupleStory";
+import { ImperialCountdown } from "@/components/invitation/ImperialCountdown";
+import { ImperialRSVPForm } from "@/components/invitation/ImperialRSVPForm";
+import { PhotoGallery } from "@/components/invitation/PhotoGallery";
+import { WishBook } from "@/components/invitation/WishBook";
+import { ImperialGiftCard } from "@/components/invitation/ImperialGiftCard";
 import { SectionDivider } from "@/components/ui/SectionDivider";
 import { FloatingPetals } from "@/components/ui/FloatingPetals";
 import { useWeddingData } from "@/context/WeddingDataContext";
@@ -43,7 +42,7 @@ export const WeddingInvitationView: React.FC<WeddingInvitationViewProps> = ({
   });
 
   const { data: weddingData } = useWeddingData();
-  const { playMusic, isPlaying } = useMusic();
+  const { playMusic } = useMusic();
 
   // Cho phép kiểm tra nhanh qua URL ?opening=video hoặc ?opening=envelope
   const [urlOpeningStyle, setUrlOpeningStyle] = useState<"video" | "envelope" | null>(null);
@@ -98,7 +97,7 @@ export const WeddingInvitationView: React.FC<WeddingInvitationViewProps> = ({
         isEnvelopeOpen
           ? "min-h-full"
           : "min-h-[100dvh] overflow-x-hidden overscroll-none"
-      } bg-ivory-texture flex flex-col selection:bg-[#C4715A] selection:text-[#FDFAF5] ${
+      } bg-[#0D0203] text-[#FFF8D6] flex flex-col selection:bg-[#BA1B22] selection:text-[#FFF8D6] ${
         isPreview ? "text-[95%]" : ""
       }`}
     >
@@ -111,16 +110,14 @@ export const WeddingInvitationView: React.FC<WeddingInvitationViewProps> = ({
         />
       )}
 
-      {/* Thanh tiêu đề cuộn nhẹ */}
+      {/* Thanh tiêu đề cuộn hoàng gia */}
       <Header isGuestView={isGuestView} isPreview={isPreview} />
 
       {/* ── AMBIENT FLOATING PETALS (chỉ sau khi mở thiệp, desktop only) ── */}
       {isEnvelopeOpen && <FloatingPetals />}
 
       <main className="flex-1">
-        {/* 1. Màn hình mở thiệp (Thiệp Báo Hỷ / Bìa Thiệp Phong Thư Cũ)
-            CHỈ hiển thị khi người dùng chọn phong cách "envelope".
-            Khi chọn "video", ẩn hoàn toàn màn hình mở thiệp cũ này. */}
+        {/* Màn hình mở thiệp (Thiệp Báo Hỷ / Bìa Thiệp Phong Thư Cũ) - Chỉ hiển thị khi chọn envelope */}
         {!isVideoOpening && (
           <HeroInvitation
             isOpen={isEnvelopeOpen}
@@ -129,7 +126,7 @@ export const WeddingInvitationView: React.FC<WeddingInvitationViewProps> = ({
           />
         )}
 
-        {/* ── CÁC PHẦN SAU CHỈ HIỂN THỊ KHI ĐÃ ẤN "MỞ THIỆP" ── */}
+        {/* ── CÁC PHẦN HOÀNG GIA ĐỒNG BỘ - CHỈ HIỂN THỊ KHI ĐÃ ẤN "MỞ THIỆP" ── */}
         <AnimatePresence>
           {isEnvelopeOpen && (
             <motion.div
@@ -137,62 +134,57 @@ export const WeddingInvitationView: React.FC<WeddingInvitationViewProps> = ({
               initial={{ opacity: 0, y: 35 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.15, ease: "easeOut" }}
+              className="space-y-0"
             >
-              {/* 1. HOÀNG GIA HỶ THƯ • LONG PHỤNG CÁT TƯỜNG (CỔ PHONG SƠN SON THIẾP VÀNG) */}
+              {/* 1. HOÀNG GIA HỶ THƯ • LONG PHỤNG CÁT TƯỜNG (Kính mời đích danh & Phụ mẫu dâu rể) */}
               <ImperialLongPhungInvitation />
 
-              {/* ── DIVIDER: lacquer dark red → ivory ── */}
-              <SectionDivider fromColor="#0F0708" toColor="#FDFAF5" variant="wave" />
+              {/* Dải phân cách hoa văn kim chỉ hoàng gia */}
+              <SectionDivider fromColor="#0F0708" toColor="#140406" variant="lotus" />
 
-              {/* 2. Lời ngỏ từ hai bên gia đình */}
-              <OpeningLetter showGuestGreeting={false} isTopSection={false} />
+              {/* 2. ĐIỂN LỄ HỶ SỰ HOÀNG TRIỀU (Lễ Thành Hôn & Tiệc Cưới Hoa Đường, Chỉ đường & Lưu lịch) */}
+              <ImperialCeremonySchedule />
 
-              {/* ── DIVIDER: ivory → sage ── */}
-              <SectionDivider fromColor="#FDFAF5" toColor="#F0F5EE" variant="wave" />
+              {/* Dải phân cách */}
+              <SectionDivider fromColor="#140406" toColor="#120204" variant="lotus" />
 
-              {/* 3. Dòng thời gian chuyện tình yêu */}
-              <CoupleStory />
+              {/* 3. DUYÊN KHỞI TRĂM NĂM • THƯ HỌA CHUYỆN TÌNH YÊU (Trục cuộn gấm thêu hoàng cung) */}
+              <ImperialCoupleStory />
 
-              {/* ── DIVIDER: sage → ivory ── */}
-              <SectionDivider fromColor="#F0F5EE" toColor="#FDFAF5" variant="botanical" />
+              {/* Dải phân cách */}
+              <SectionDivider fromColor="#120204" toColor="#150305" variant="lotus" />
 
-              {/* 4. Thông tin Lễ Thành Hôn & Tiệc Cưới */}
-              <WeddingDetails />
+              {/* 4. KHẮC THỜI HOÀNG ĐẠO • ĐẾM NGƯỢC NGÀY CÁT NHẬT */}
+              <ImperialCountdown />
 
-              {/* ── DIVIDER: ivory → dark green (for countdown dark bg) ── */}
-              <SectionDivider fromColor="#FDFAF5" toColor="#1C2919" variant="wave-reverse" />
+              {/* Dải phân cách */}
+              <SectionDivider fromColor="#150305" toColor="#110204" variant="lotus" />
 
-              {/* 5. Bộ đếm ngược thời gian */}
-              <Countdown />
+              {/* 5. HỶ BÁO TƯƠNG TRI • KÍNH BÁO THAM DỰ HÔN LỄ (Tráp thư hồi đáp hoàng gia) */}
+              <ImperialRSVPForm />
 
-              {/* ── DIVIDER: dark green → peach ── */}
-              <SectionDivider fromColor="#1C2919" toColor="#FDF0EC" variant="wave" />
+              {/* Dải phân cách */}
+              <SectionDivider fromColor="#110204" toColor="#100203" variant="lotus" />
 
-              {/* 6. Form xác nhận tham dự */}
-              <RSVPForm />
-
-              {/* ── DIVIDER: peach → sage ── */}
-              <SectionDivider fromColor="#FDF0EC" toColor="#F0F5EE" variant="botanical" />
-
-              {/* 7. Album ảnh cưới & Lightbox */}
+              {/* 6. HOÀNG TRIỀU HỶ ẢNH • KHOẢNH KHẮC GIAI KỲ (Album ảnh cưới & Lightbox) */}
               <PhotoGallery />
 
-              {/* ── DIVIDER: sage → peach ── */}
-              <SectionDivider fromColor="#F0F5EE" toColor="#FDF0EC" variant="wave-reverse" />
+              {/* Dải phân cách */}
+              <SectionDivider fromColor="#100203" toColor="#0C0204" variant="lotus" />
 
-              {/* 8. Sổ lưu bút */}
+              {/* 7. BẦU TRỜI HOA ĐĂNG & THẮP SÁNG HOA ĐĂNG CUNG ĐÌNH */}
               <WishBook />
 
-              {/* ── DIVIDER: peach → ivory ── */}
-              <SectionDivider fromColor="#FDF0EC" toColor="#FDFAF5" variant="lotus" />
+              {/* Dải phân cách */}
+              <SectionDivider fromColor="#0C0204" toColor="#140305" variant="lotus" />
 
-              {/* 9. Mừng cưới kín đáo / QR ngân hàng */}
-              <GiftCard />
+              {/* 8. TRÁP CƯỚI CÁT TƯỜNG • HỘP MỪNG CƯỚI CHÚC PHÚC & VIETQR KHUNG VÀNG */}
+              <ImperialGiftCard />
 
-              {/* ── DIVIDER: ivory → dark green (footer) ── */}
-              <SectionDivider fromColor="#FDFAF5" toColor="#354D2E" variant="botanical" />
+              {/* Dải phân cách */}
+              <SectionDivider fromColor="#140305" toColor="#160305" variant="lotus" />
 
-              {/* 10. Lời cảm ơn & Chữ ký */}
+              {/* 9. LỜI CẢM TẠ & DẤU ẤN TRIỆN SON HOÀNG GIA */}
               <Footer isGuestView={isGuestView} />
             </motion.div>
           )}
