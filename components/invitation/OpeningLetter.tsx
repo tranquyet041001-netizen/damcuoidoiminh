@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useWeddingData } from "@/context/WeddingDataContext";
 import {
@@ -10,11 +10,35 @@ import {
   BotanicalBranch,
 } from "@/components/ui/VietnamesePattern";
 
-export const OpeningLetter: React.FC = () => {
+interface OpeningLetterProps {
+  showGuestGreeting?: boolean;
+  isTopSection?: boolean;
+}
+
+export const OpeningLetter: React.FC<OpeningLetterProps> = ({
+  showGuestGreeting = false,
+  isTopSection = false,
+}) => {
   const { data: weddingData } = useWeddingData();
+  const [guestName, setGuestName] = useState<string>("");
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const to = params.get("to") || params.get("guest") || params.get("khach");
+      if (to) {
+        setGuestName(decodeURIComponent(to).trim());
+      }
+    }
+  }, []);
 
   return (
-    <section id="letter" className="py-16 sm:py-20 px-4 bg-ivory-texture relative overflow-hidden">
+    <section
+      id="letter"
+      className={`${
+        isTopSection ? "pt-24 sm:pt-28 pb-16 sm:pb-20" : "py-16 sm:py-20"
+      } px-4 bg-ivory-texture relative overflow-hidden`}
+    >
       <div className="max-w-xl md:max-w-2xl lg:max-w-3xl mx-auto relative z-10">
         {/* Header section */}
         <motion.div
@@ -24,6 +48,22 @@ export const OpeningLetter: React.FC = () => {
           transition={{ duration: 0.6 }}
           className="text-center mb-8 sm:mb-10"
         >
+          {/* Badge kính mời đích danh khi dùng video mở đầu */}
+          {showGuestGreeting && guestName && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: -6 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              className="inline-flex items-center gap-2.5 px-5 py-2 rounded-full bg-[#FDF0EC] border border-[#E8D5CF] shadow-xs mb-5"
+            >
+              <span className="text-[11px] uppercase tracking-widest text-[#8C6A58] font-sans font-bold">
+                Kính mời:
+              </span>
+              <span className="font-calligraphy text-2xl text-[#C4715A] font-bold">
+                {guestName}
+              </span>
+            </motion.div>
+          )}
+
           <div className="inline-flex items-center justify-center mb-3">
             <VietnameseLotus size={38} color="#4A6741" opacity={0.9} />
           </div>

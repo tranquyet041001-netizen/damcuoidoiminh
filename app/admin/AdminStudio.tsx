@@ -37,6 +37,7 @@ import {
   Bell,
   HelpCircle,
   MessageSquare,
+  Video,
 } from "lucide-react";
 import { WeddingDataProvider, useWeddingData } from "@/context/WeddingDataContext";
 import { MusicProvider, useMusic } from "@/context/MusicContext";
@@ -552,8 +553,8 @@ function StudioContent() {
               }`}
               title={
                 previewEnvelopeOpen
-                  ? "Xem bìa thiệp đóng"
-                  : "Xem thiệp khi đã mở"
+                  ? "Xem màn hình mở đầu (Chưa mở)"
+                  : "Xem nội dung thiệp (Đã mở)"
               }
             >
               {previewEnvelopeOpen ? (
@@ -563,8 +564,14 @@ function StudioContent() {
                 </>
               ) : (
                 <>
-                  <Mail className="w-3.5 h-3.5 text-[#C4715A]" />
-                  <span className="hidden sm:inline">Bìa Đóng</span>
+                  {data.openingStyle === "envelope" ? (
+                    <Mail className="w-3.5 h-3.5 text-[#C4715A]" />
+                  ) : (
+                    <Video className="w-3.5 h-3.5 text-[#C4715A]" />
+                  )}
+                  <span className="hidden sm:inline">
+                    {data.openingStyle === "envelope" ? "Bìa Đóng" : "Màn Video"}
+                  </span>
                 </>
               )}
             </button>
@@ -666,6 +673,111 @@ function StudioContent() {
             {/* 1. DÂU & RỂ */}
             {activeTab === "couple" && (
               <div className="space-y-5 animate-in fade-in duration-300">
+                {/* LỰA CHỌN KIỂU MỞ ĐẦU THIỆP */}
+                <div className="bg-[#FDFAF5] border border-[#E8D5CF] p-4 rounded-2xl space-y-3 shadow-2xs">
+                  <div className="flex items-center justify-between pb-2 border-b border-[#E8D5CF]">
+                    <div className="flex items-center gap-2">
+                      <Sparkles className="w-4 h-4 text-[#C9A84C]" />
+                      <h3 className="font-serif font-bold text-sm text-[#354D2E]">
+                        Kiểu Mở Đầu Thiệp Cưới
+                      </h3>
+                    </div>
+                    <span className="text-[10px] text-[#4A6741] bg-[#F0F5EE] px-2 py-0.5 rounded-full uppercase font-bold tracking-wider">
+                      Cài Đặt Mở Màn
+                    </span>
+                  </div>
+
+                  <p className="text-xs text-[#8C6A58] leading-relaxed">
+                    Tùy chọn cách khách mời bắt đầu khám phá thiệp cưới khi truy cập liên kết:
+                  </p>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                    {/* Lựa chọn 1: Video Rồng Phượng */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        updateData((prev) => ({
+                          ...prev,
+                          openingStyle: "video",
+                        }));
+                        showToast("Đã chọn mở màn: Video Rồng - Phượng", "success");
+                      }}
+                      className={`p-3.5 rounded-2xl border text-left transition-all cursor-pointer relative flex flex-col justify-between ${
+                        (data.openingStyle ?? "video") === "video"
+                          ? "bg-[#F0F5EE] border-[#4A6741] ring-2 ring-[#4A6741]/30 shadow-xs"
+                          : "bg-[#FFFDF9] border-[#E8D5CF] hover:border-[#A8BCA1]"
+                      }`}
+                    >
+                      <div>
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-2xl">🐉</span>
+                          {(data.openingStyle ?? "video") === "video" ? (
+                            <span className="text-[10px] font-bold text-[#4A6741] bg-white px-2 py-0.5 rounded-full border border-[#A8BCA1]/60 flex items-center gap-1 shadow-2xs">
+                              <Check className="w-3 h-3 text-[#4A6741]" /> Đang Dùng
+                            </span>
+                          ) : (
+                            <span className="text-[10px] text-[#8C6A58] bg-[#FDFAF5] px-2 py-0.5 rounded-full border border-[#E8D5CF]">
+                              Chọn kiểu này
+                            </span>
+                          )}
+                        </div>
+                        <h4 className="font-serif font-bold text-xs sm:text-sm text-[#354D2E]">
+                          Video Rồng - Phượng
+                        </h4>
+                        <p className="text-[11px] text-[#5C4033] mt-1.5 leading-relaxed">
+                          Mở màn bằng Cinematic Video Long Phụng uốn lượn cổ phong. Bấm "Mở Thiệp" mở thẳng vào nội dung (không hiện bìa thiệp cũ).
+                        </p>
+                      </div>
+                      <div className="mt-3 pt-2 border-t border-[#E8D5CF]/60 text-[10px] font-sans font-semibold text-[#C4715A] flex items-center gap-1">
+                        <Sparkles className="w-3 h-3 text-[#C9A84C]" />
+                        <span>Hoàng gia, sống động, ấn tượng</span>
+                      </div>
+                    </button>
+
+                    {/* Lựa chọn 2: Mở Thiệp Như Cũ (Phong Thư Bìa Thiệp) */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        updateData((prev) => ({
+                          ...prev,
+                          openingStyle: "envelope",
+                        }));
+                        showToast("Đã chọn: Mở Thiệp Như Cũ (Phong Thư)", "success");
+                      }}
+                      className={`p-3.5 rounded-2xl border text-left transition-all cursor-pointer relative flex flex-col justify-between ${
+                        data.openingStyle === "envelope"
+                          ? "bg-[#FDF0EC] border-[#C4715A] ring-2 ring-[#C4715A]/30 shadow-xs"
+                          : "bg-[#FFFDF9] border-[#E8D5CF] hover:border-[#A8BCA1]"
+                      }`}
+                    >
+                      <div>
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-2xl">✉️</span>
+                          {data.openingStyle === "envelope" ? (
+                            <span className="text-[10px] font-bold text-[#C4715A] bg-white px-2 py-0.5 rounded-full border border-[#E8D5CF] flex items-center gap-1 shadow-2xs">
+                              <Check className="w-3 h-3 text-[#C4715A]" /> Đang Dùng
+                            </span>
+                          ) : (
+                            <span className="text-[10px] text-[#8C6A58] bg-[#FDFAF5] px-2 py-0.5 rounded-full border border-[#E8D5CF]">
+                              Chọn kiểu này
+                            </span>
+                          )}
+                        </div>
+                        <h4 className="font-serif font-bold text-xs sm:text-sm text-[#354D2E]">
+                          Mở Thiệp Như Cũ (Phong Thư)
+                        </h4>
+                        <p className="text-[11px] text-[#5C4033] mt-1.5 leading-relaxed">
+                          Bìa thiệp hồng truyền thống mô phỏng phong thư nắp sáp đỏ. Khách bấm "Mở Thiệp Chúc Mừng" để mở và xem ảnh dâu rể (không phát video).
+                        </p>
+                      </div>
+                      <div className="mt-3 pt-2 border-t border-[#E8D5CF]/60 text-[10px] font-sans font-semibold text-[#8C6A58] flex items-center gap-1">
+                        <Mail className="w-3 h-3 text-[#8C6A58]" />
+                        <span>Cổ điển, ấm cúng, thân thuộc</span>
+                      </div>
+                    </button>
+                  </div>
+                </div>
+
                 {/* Chú Rể */}
                 <div className="bg-[#FDFAF5] border border-[#E8D5CF] p-4 rounded-2xl space-y-3 shadow-2xs">
                   <div className="flex items-center justify-between pb-2 border-b border-[#E8D5CF]">

@@ -22,28 +22,33 @@ import { YouTubeIcon } from "@/utils/youtube";
 
 interface FloatingControlsProps {
   isGuestView?: boolean;
+  onReplayOpening?: () => void;
 }
-
-const navItems = [
-  { id: "hero", label: "Bìa Thiệp", emoji: "🌸" },
-  { id: "letter", label: "Lời Ngỏ", emoji: "✉️" },
-  { id: "story", label: "Chuyện Tình", emoji: "🌿" },
-  { id: "details", label: "Hôn Lễ", emoji: "🏮" },
-  { id: "countdown", label: "Đếm Ngược", emoji: "⏳" },
-  { id: "rsvp", label: "RSVP", emoji: "✅" },
-  { id: "gallery", label: "Album Ảnh", emoji: "📷" },
-  { id: "wishes", label: "Lời Chúc", emoji: "💌" },
-  { id: "gift", label: "Mừng Cưới", emoji: "🎁" },
-];
 
 export const FloatingControls: React.FC<FloatingControlsProps> = ({
   isGuestView = false,
+  onReplayOpening,
 }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isShareOpen, setIsShareOpen] = useState(false);
   const [isPillDismissed, setIsPillDismissed] = useState(false);
 
   const { data } = useWeddingData();
+  const isVideoMode = (data.openingStyle ?? "video") === "video";
+
+  const navItems = [
+    ...(!isVideoMode
+      ? [{ id: "hero", label: "Bìa Thiệp", emoji: "🌸" }]
+      : []),
+    { id: "letter", label: "Lời Ngỏ", emoji: "✉️" },
+    { id: "story", label: "Chuyện Tình", emoji: "🌿" },
+    { id: "details", label: "Hôn Lễ", emoji: "🏮" },
+    { id: "countdown", label: "Đếm Ngược", emoji: "⏳" },
+    { id: "rsvp", label: "RSVP", emoji: "✅" },
+    { id: "gallery", label: "Album Ảnh", emoji: "📷" },
+    { id: "wishes", label: "Lời Chúc", emoji: "💌" },
+    { id: "gift", label: "Mừng Cưới", emoji: "🎁" },
+  ];
   const {
     isPlaying,
     toggleMusic,
@@ -210,6 +215,24 @@ export const FloatingControls: React.FC<FloatingControlsProps> = ({
                     </span>
                   </button>
                 ))}
+
+                {/* Nút xem lại màn hình mở thiệp */}
+                {onReplayOpening && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsMenuOpen(false);
+                      onReplayOpening();
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                    }}
+                    className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-2xl text-left transition-all bg-[#FDF0EC]/70 hover:bg-[#FDF0EC] active:scale-98 group border border-dashed border-[#C4715A]/40 hover:border-[#C4715A] cursor-pointer col-span-2 text-[#C4715A]"
+                  >
+                    <span className="text-base">{isVideoMode ? "🐉" : "🌸"}</span>
+                    <span className="font-serif text-xs font-semibold">
+                      {isVideoMode ? "Xem Lại Video Rồng Phượng" : "Xem Lại Bìa Mở Thiệp"}
+                    </span>
+                  </button>
+                )}
               </div>
 
               {/* Nút tác vụ chân menu */}

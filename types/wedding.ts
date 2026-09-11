@@ -82,6 +82,7 @@ export interface WeddingData {
   };
   notifications?: NotificationSettings;
   rsvpSettings?: RSVPSettings;
+  openingStyle?: "video" | "envelope"; // "video": Mở đầu bằng Video Cinematic, "envelope": Mở thiệp như cũ
 }
 
 export interface RSVPSettings {

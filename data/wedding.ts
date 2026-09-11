@@ -2,6 +2,7 @@ import { WeddingData } from "@/types/wedding";
 
 export const weddingData: WeddingData = {
   "slug": "quyet-han",
+  "openingStyle": "video",
   "groom": {
     "fullName": "Trần Công Quyết",
     "shortName": "Công Quyết",

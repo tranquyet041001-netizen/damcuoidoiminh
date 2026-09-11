@@ -42,6 +42,22 @@ export const WeddingInvitationView: React.FC<WeddingInvitationViewProps> = ({
   const { data: weddingData } = useWeddingData();
   const { playMusic, isPlaying } = useMusic();
 
+  // Cho phép kiểm tra nhanh qua URL ?opening=video hoặc ?opening=envelope
+  const [urlOpeningStyle, setUrlOpeningStyle] = useState<"video" | "envelope" | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const param = new URLSearchParams(window.location.search).get("opening");
+      if (param === "video" || param === "envelope") {
+        setUrlOpeningStyle(param);
+      }
+    }
+  }, []);
+
+  const activeOpeningStyle: "video" | "envelope" =
+    urlOpeningStyle || weddingData.openingStyle || "video";
+  const isVideoOpening = activeOpeningStyle === "video";
+
   const isEnvelopeOpen = controlledIsOpen !== undefined ? controlledIsOpen : internalIsOpen;
 
   const handleOpen = () => {
@@ -65,14 +81,15 @@ export const WeddingInvitationView: React.FC<WeddingInvitationViewProps> = ({
   useEffect(() => {
     if (typeof window !== "undefined" && window.location.hash) {
       const hash = window.location.hash;
-      if (hash && hash !== "#hero") {
+      const ignoredHash = isVideoOpening ? "" : "#hero";
+      if (hash && hash !== ignoredHash) {
         if (controlledIsOpen === undefined) {
           setInternalIsOpen(true);
         }
         onOpenChange?.(true);
       }
     }
-  }, [controlledIsOpen, onOpenChange]);
+  }, [controlledIsOpen, onOpenChange, isVideoOpening]);
 
   return (
     <div
@@ -84,8 +101,8 @@ export const WeddingInvitationView: React.FC<WeddingInvitationViewProps> = ({
         isPreview ? "text-[95%]" : ""
       }`}
     >
-      {/* ── MÀN HÌNH MỞ ĐẦU CINEMATIC VIDEO RỒNG - PHƯỢNG ── */}
-      {!isEnvelopeOpen && (
+      {/* ── MÀN HÌNH MỞ ĐẦU CINEMATIC VIDEO RỒNG - PHƯỢNG (CHỈ KHI CHỌN VIDEO) ── */}
+      {isVideoOpening && !isEnvelopeOpen && (
         <CinematicOpeningVideo
           weddingData={weddingData}
           onOpenInvitation={handleOpen}
@@ -97,14 +114,18 @@ export const WeddingInvitationView: React.FC<WeddingInvitationViewProps> = ({
       <Header isGuestView={isGuestView} isPreview={isPreview} />
 
       <main className="flex-1">
-        {/* 1. Màn hình mở thiệp (Thiệp Báo Hỷ / Bìa Thiệp) */}
-        <HeroInvitation
-          isOpen={isEnvelopeOpen}
-          onOpen={handleOpen}
-          onReplayOpening={handleReplayOpening}
-        />
+        {/* 1. Màn hình mở thiệp (Thiệp Báo Hỷ / Bìa Thiệp Phong Thư Cũ)
+            CHỈ hiển thị khi người dùng chọn phong cách "envelope".
+            Khi chọn "video", ẩn hoàn toàn màn hình mở thiệp cũ này. */}
+        {!isVideoOpening && (
+          <HeroInvitation
+            isOpen={isEnvelopeOpen}
+            onOpen={handleOpen}
+            onReplayOpening={handleReplayOpening}
+          />
+        )}
 
-        {/* ── CÁC PHẦN SAU CHỈ HIỂN THỊ KHI ĐÃ ẤN "MỞ THIỆP CHÚC MỪNG" ── */}
+        {/* ── CÁC PHẦN SAU CHỈ HIỂN THỊ KHI ĐÃ ẤN "MỞ THIỆP" ── */}
         <AnimatePresence>
           {isEnvelopeOpen && (
             <motion.div
@@ -113,8 +134,8 @@ export const WeddingInvitationView: React.FC<WeddingInvitationViewProps> = ({
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.15, ease: "easeOut" }}
             >
-              {/* 2. Lời ngỏ từ hai bên gia đình */}
-              <OpeningLetter />
+              {/* 2. Lời ngỏ từ hai bên gia đình (Hiển thị thiệp kính mời đích danh nếu ở chế độ video) */}
+              <OpeningLetter showGuestGreeting={isVideoOpening} isTopSection={isVideoOpening} />
 
               {/* 3. Dòng thời gian chuyện tình yêu */}
               <CoupleStory />
@@ -155,7 +176,10 @@ export const WeddingInvitationView: React.FC<WeddingInvitationViewProps> = ({
               exit={{ opacity: 0, y: 25 }}
               transition={{ duration: 0.4, delay: 0.3 }}
             >
-              <FloatingControls isGuestView={isGuestView} />
+              <FloatingControls
+                isGuestView={isGuestView}
+                onReplayOpening={handleReplayOpening}
+              />
             </motion.div>
           )}
         </AnimatePresence>
