@@ -184,77 +184,104 @@ export const ImperialLongPhungInvitation: React.FC = () => {
             </h1>
           </div>
 
-          {/* ── THÔNG TIN HAI BÊN THÂN TỘC & DÂU RỂ ── */}
-          <div className="my-6 sm:my-8 py-5 sm:py-6 border-y border-[#E5C368]/40 grid grid-cols-1 sm:grid-cols-2 gap-6 relative">
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 hidden sm:flex flex-col items-center justify-center pointer-events-none">
-              <div className="w-[1px] h-20 bg-gradient-to-b from-transparent via-[#E5C368] to-transparent" />
-              <div className="w-7 h-7 rounded-full bg-[#8B1217] border border-[#E5C368] flex items-center justify-center my-1 shadow-md">
-                <Heart className="w-3.5 h-3.5 text-[#FDE68A] fill-[#FDE68A]" />
+          {/* ── THÔNG TIN HAI BÊN THÂN TỘC & DÂU RỂ (TỰ ĐỘNG CÂN BẰNG ĐỐI XỨNG) ── */}
+          <div className="my-6 sm:my-8 py-5 sm:py-6 border-y border-[#E5C368]/40 relative">
+            {/* Đường trục phân cách ở giữa hai nhà */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-center pointer-events-none z-20">
+              <div className="w-[1px] h-24 sm:h-36 bg-gradient-to-b from-transparent via-[#E5C368]/70 to-transparent" />
+              <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-[#8B1217] border border-[#E5C368] flex items-center justify-center my-1 shadow-[0_0_10px_rgba(229,195,104,0.5)]">
+                <Heart className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#FDE68A] fill-[#FDE68A]" />
               </div>
-              <div className="w-[1px] h-20 bg-gradient-to-b from-transparent via-[#E5C368] to-transparent" />
+              <div className="w-[1px] h-24 sm:h-36 bg-gradient-to-b from-transparent via-[#E5C368]/70 to-transparent" />
             </div>
 
-            {/* NHÀ TRAI */}
-            <div className="flex flex-col items-center text-center space-y-2 sm:pr-4">
-              <span className="text-[10px] sm:text-[11px] uppercase tracking-[0.25em] text-[#E5C368] font-serif font-bold">
-                NHÀ TRAI
-              </span>
-              <p className="text-xs text-[#E8D5CF] font-serif max-w-[240px] leading-relaxed">
-                {weddingData.groom.parents}
-              </p>
+            {/* Bố cục 2 cột cân xứng tuyệt đối: Nhà Trai (bên Tả) & Nhà Gái (bên Hữu) */}
+            <div className="grid grid-cols-2 gap-2 sm:gap-6 relative z-10">
+              {/* HÀNG 1: TIÊU ĐỀ THÂN TỘC */}
+              <div className="text-center pb-1 sm:pr-3">
+                <span className="text-[10px] sm:text-xs uppercase tracking-[0.25em] text-[#E5C368] font-serif font-bold">
+                  NHÀ TRAI
+                </span>
+              </div>
+              <div className="text-center pb-1 sm:pl-3">
+                <span className="text-[10px] sm:text-xs uppercase tracking-[0.25em] text-[#E5C368] font-serif font-bold">
+                  NHÀ GÁI
+                </span>
+              </div>
 
-              {/* Avatar Tân Lang */}
-              <div className="pt-2 flex flex-col items-center">
-                {weddingData.groom.avatarUrl && (
-                  <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-full p-1 bg-gradient-to-tr from-[#996515] via-[#FDE68A] to-[#C99B26] shadow-[0_0_20px_rgba(229,195,104,0.55)] border border-[#FFF8D6] mb-2 group">
-                    <div className="relative w-full h-full rounded-full overflow-hidden border-2 border-[#1A0305]">
-                      <Image
-                        src={weddingData.groom.avatarUrl}
-                        alt={weddingData.groom.fullName}
-                        fill
-                        className="object-cover transition-transform duration-500 group-hover:scale-110"
-                        sizes="(max-width: 640px) 96px, 112px"
-                      />
-                    </div>
+              {/* HÀNG 2: THÔNG TIN PHỤ MẪU (Tự động co giãn đồng nhất chiều cao) */}
+              <div className="flex items-center justify-center sm:pr-3 px-1 min-h-[48px] sm:min-h-[58px]">
+                <p className="text-[11px] sm:text-xs text-[#E8D5CF] font-serif max-w-[220px] text-center leading-relaxed whitespace-pre-line">
+                  {weddingData.groom.parents}
+                </p>
+              </div>
+              <div className="flex items-center justify-center sm:pl-3 px-1 min-h-[48px] sm:min-h-[58px]">
+                <p className="text-[11px] sm:text-xs text-[#E8D5CF] font-serif max-w-[220px] text-center leading-relaxed whitespace-pre-line">
+                  {weddingData.bride.parents}
+                </p>
+              </div>
+
+              {/* HÀNG 3: AVATAR CHÂN DUNG (Luôn thẳng hàng ngang hoàn hảo) */}
+              {(weddingData.groom.avatarUrl || weddingData.bride.avatarUrl) && (
+                <>
+                  <div className="flex items-center justify-center pt-2 sm:pr-3">
+                    {weddingData.groom.avatarUrl ? (
+                      <div className="relative w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-full p-1 bg-gradient-to-tr from-[#996515] via-[#FDE68A] to-[#C99B26] shadow-[0_0_20px_rgba(229,195,104,0.55)] border border-[#FFF8D6] group">
+                        <div className="relative w-full h-full rounded-full overflow-hidden border-2 border-[#1A0305]">
+                          <Image
+                            src={weddingData.groom.avatarUrl}
+                            alt={weddingData.groom.fullName}
+                            fill
+                            className="object-cover transition-transform duration-500 group-hover:scale-110"
+                            sizes="(max-width: 640px) 80px, 112px"
+                          />
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28" />
+                    )}
                   </div>
-                )}
-                <span className="text-[10px] uppercase tracking-wider text-[#E5C368]/80 block font-sans font-semibold">
+
+                  <div className="flex items-center justify-center pt-2 sm:pl-3">
+                    {weddingData.bride.avatarUrl ? (
+                      <div className="relative w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-full p-1 bg-gradient-to-tr from-[#C99B26] via-[#FDE68A] to-[#996515] shadow-[0_0_20px_rgba(229,195,104,0.55)] border border-[#FFF8D6] group">
+                        <div className="relative w-full h-full rounded-full overflow-hidden border-2 border-[#1A0305]">
+                          <Image
+                            src={weddingData.bride.avatarUrl}
+                            alt={weddingData.bride.fullName}
+                            fill
+                            className="object-cover transition-transform duration-500 group-hover:scale-110"
+                            sizes="(max-width: 640px) 80px, 112px"
+                          />
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28" />
+                    )}
+                  </div>
+                </>
+              )}
+
+              {/* HÀNG 4: DANH PHẬN TÂN LANG / TÂN NƯƠNG */}
+              <div className="text-center pt-1.5 sm:pr-3">
+                <span className="text-[9px] sm:text-[10px] uppercase tracking-wider text-[#E5C368]/80 font-sans font-semibold">
                   Tân Lang (Chú Rể)
                 </span>
-                <span className="font-calligraphy text-3xl sm:text-4xl text-[#FFF8D6] font-bold block mt-0.5 drop-shadow-[0_2px_10px_rgba(229,195,104,0.6)]">
+              </div>
+              <div className="text-center pt-1.5 sm:pl-3">
+                <span className="text-[9px] sm:text-[10px] uppercase tracking-wider text-[#E5C368]/80 font-sans font-semibold">
+                  Tân Nương (Cô Dâu)
+                </span>
+              </div>
+
+              {/* HÀNG 5: TÊN ĐẠI TỰ THƯ PHÁP (Nằm trên cùng một đường thẳng chân trời) */}
+              <div className="text-center sm:pr-3 px-1">
+                <span className="font-calligraphy text-2xl sm:text-3xl md:text-4xl text-[#FFF8D6] font-bold block drop-shadow-[0_2px_10px_rgba(229,195,104,0.65)] break-words">
                   {weddingData.groom.fullName}
                 </span>
               </div>
-            </div>
-
-            {/* NHÀ GÁI */}
-            <div className="flex flex-col items-center text-center space-y-2 sm:pl-4">
-              <span className="text-[10px] sm:text-[11px] uppercase tracking-[0.25em] text-[#E5C368] font-serif font-bold">
-                NHÀ GÁI
-              </span>
-              <p className="text-xs text-[#E8D5CF] font-serif max-w-[240px] leading-relaxed">
-                {weddingData.bride.parents}
-              </p>
-
-              {/* Avatar Tân Nương */}
-              <div className="pt-2 flex flex-col items-center">
-                {weddingData.bride.avatarUrl && (
-                  <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-full p-1 bg-gradient-to-tr from-[#C99B26] via-[#FDE68A] to-[#996515] shadow-[0_0_20px_rgba(229,195,104,0.55)] border border-[#FFF8D6] mb-2 group">
-                    <div className="relative w-full h-full rounded-full overflow-hidden border-2 border-[#1A0305]">
-                      <Image
-                        src={weddingData.bride.avatarUrl}
-                        alt={weddingData.bride.fullName}
-                        fill
-                        className="object-cover transition-transform duration-500 group-hover:scale-110"
-                        sizes="(max-width: 640px) 96px, 112px"
-                      />
-                    </div>
-                  </div>
-                )}
-                <span className="text-[10px] uppercase tracking-wider text-[#E5C368]/80 block font-sans font-semibold">
-                  Tân Nương (Cô Dâu)
-                </span>
-                <span className="font-calligraphy text-3xl sm:text-4xl text-[#FFF8D6] font-bold block mt-0.5 drop-shadow-[0_2px_10px_rgba(229,195,104,0.6)]">
+              <div className="text-center sm:pl-3 px-1">
+                <span className="font-calligraphy text-2xl sm:text-3xl md:text-4xl text-[#FFF8D6] font-bold block drop-shadow-[0_2px_10px_rgba(229,195,104,0.65)] break-words">
                   {weddingData.bride.fullName}
                 </span>
               </div>

@@ -61,19 +61,28 @@ export const Footer: React.FC<FooterProps> = ({ isGuestView = false }) => {
           <LacBirdPair color="#E5C368" className="mb-4 opacity-75" />
         </motion.div>
 
-        {/* Tên dâu rể thư pháp — shimmer */}
+        {/* Tên dâu rể thư pháp — Rõ nét, rực rỡ vàng kim sơn son */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.7, delay: 0.1 }}
-          className="mb-4"
+          className="mb-5 flex flex-col items-center"
         >
-          <div
-            className="font-calligraphy text-4xl sm:text-5xl shimmer-gold-text"
-            style={{ color: "#FFF8D6" }}
-          >
-            {data.groom.shortName} &amp; {data.bride.shortName}
+          <span className="inline-block px-3.5 py-0.5 rounded-full bg-[#3B090D] border border-[#E5C368]/60 text-[10px] uppercase tracking-[0.3em] text-[#FDE68A] font-serif font-bold mb-2.5 shadow-sm">
+            Tân Lang &bull; Tân Nương
+          </span>
+
+          <div className="flex items-center justify-center gap-2 sm:gap-4 flex-wrap text-center">
+            <span className="font-calligraphy text-3xl sm:text-4xl md:text-5xl text-[#FFF8D6] font-bold tracking-wide drop-shadow-[0_2px_14px_rgba(229,195,104,0.9)]">
+              {data.groom.fullName || data.groom.shortName}
+            </span>
+            <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-[#BA1B22] border border-[#E5C368] flex items-center justify-center shadow-[0_0_8px_rgba(229,195,104,0.5)] mx-1">
+              <Heart className="w-3.5 h-3.5 text-[#FFF8D6] fill-[#FFF8D6]" />
+            </div>
+            <span className="font-calligraphy text-3xl sm:text-4xl md:text-5xl text-[#FFF8D6] font-bold tracking-wide drop-shadow-[0_2px_14px_rgba(229,195,104,0.9)]">
+              {data.bride.fullName || data.bride.shortName}
+            </span>
           </div>
         </motion.div>
 

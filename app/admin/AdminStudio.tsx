@@ -2197,10 +2197,10 @@ function StudioContent() {
                         </select>
                       </div>
 
-                      {/* Tên ngân hàng tùy chỉnh / Chi nhánh */}
+                      {/* Tên ngân hàng hiển thị */}
                       <div>
                         <label className="text-[11px] text-[#78350F] block mb-1 font-medium">
-                          Tên Ngân Hàng Hiển Thị (hoặc ghi rõ chi nhánh nếu muốn)
+                          Tên Ngân Hàng Hiển Thị
                         </label>
                         <input
                           type="text"

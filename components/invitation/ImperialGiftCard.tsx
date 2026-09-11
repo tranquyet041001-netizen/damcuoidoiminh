@@ -304,12 +304,6 @@ export const ImperialGiftCard: React.FC = () => {
                   {currentAccount.accountHolder || "Chưa cập nhật"}
                 </div>
               </div>
-
-              {currentAccount.branch && (
-                <div className="pt-2 border-t border-[#E5C368]/20 text-[11px] text-[#E8D5CF]/80 font-serif">
-                  <span className="text-[#FDE68A]/80 font-semibold">Chi nhánh:</span> {currentAccount.branch}
-                </div>
-              )}
             </div>
           </div>
         </motion.div>
