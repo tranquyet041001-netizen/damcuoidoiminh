@@ -15,6 +15,8 @@ import { PhotoGallery } from "@/components/invitation/PhotoGallery";
 import { WishBook } from "@/components/invitation/WishBook";
 import { GiftCard } from "@/components/invitation/GiftCard";
 import { CinematicOpeningVideo } from "@/components/invitation/CinematicOpeningVideo";
+import { VIPInvitationPass3D } from "@/components/invitation/VIPInvitationPass3D";
+import { DresscodeAndUtilities } from "@/components/invitation/DresscodeAndUtilities";
 import { SectionDivider } from "@/components/ui/SectionDivider";
 import { FloatingPetals } from "@/components/ui/FloatingPetals";
 import { useWeddingData } from "@/context/WeddingDataContext";
@@ -140,6 +142,9 @@ export const WeddingInvitationView: React.FC<WeddingInvitationViewProps> = ({
               {/* 2. Lời ngỏ từ hai bên gia đình (hiển thị đích danh khách trên cả 2 chế độ) */}
               <OpeningLetter showGuestGreeting={true} isTopSection={isVideoOpening} />
 
+              {/* ── THẺ KHÁCH MỜI VIP HOLOGRAM 3D ĐỘC QUYỀN ── */}
+              <VIPInvitationPass3D />
+
               {/* ── DIVIDER: ivory → sage ── */}
               <SectionDivider fromColor="#FDFAF5" toColor="#F0F5EE" variant="wave" />
 
@@ -152,8 +157,11 @@ export const WeddingInvitationView: React.FC<WeddingInvitationViewProps> = ({
               {/* 4. Thông tin Lễ Thành Hôn & Tiệc Cưới */}
               <WeddingDetails />
 
+              {/* ── BỘ GỢI Ý DRESSCODE THÔNG MINH & TIỆN ÍCH 1-CHẠM ── */}
+              <DresscodeAndUtilities />
+
               {/* ── DIVIDER: ivory → dark green (for countdown dark bg) ── */}
-              <SectionDivider fromColor="#FDFAF5" toColor="#1C2919" variant="wave-reverse" />
+              <SectionDivider fromColor="#FAF6F0" toColor="#1C2919" variant="wave-reverse" />
 
               {/* 5. Bộ đếm ngược thời gian */}
               <Countdown />
