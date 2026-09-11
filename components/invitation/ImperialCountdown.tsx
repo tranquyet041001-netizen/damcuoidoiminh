@@ -161,7 +161,7 @@ export const ImperialCountdown: React.FC = () => {
       className="relative py-16 sm:py-24 px-3 sm:px-6 overflow-hidden select-none"
       style={{ backgroundColor: "#150305" }}
     >
-      {/* Nền gấm hoàng cung sâu thẳm */}
+      {/* Nền gấm sâu thẳm */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{

@@ -182,7 +182,7 @@ export const WishLanternSky: React.FC<WishLanternSkyProps> = ({
               }}
             />
 
-            {/* Thân Đèn Lồng Hoa Đăng Hoàng Gia */}
+            {/* Thân Đèn Lồng Hoa Đăng Chúc Phúc */}
             <div
               className="relative w-11 h-14 sm:w-13 sm:h-16 rounded-2xl flex flex-col items-center justify-between p-1 shadow-lg transition-transform duration-300"
               style={{

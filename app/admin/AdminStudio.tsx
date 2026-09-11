@@ -725,12 +725,12 @@ function StudioContent() {
                           Video Rồng - Phượng
                         </h4>
                         <p className="text-[11px] text-[#4A0E13] mt-1.5 leading-relaxed">
-                          Mở màn bằng Cinematic Video Long Phụng uốn lượn cổ phong. Ấn chữ Hỷ mở thẳng vào thiệp cưới hoàng gia lộng lẫy.
+                          Mở màn bằng Cinematic Video Long Phụng uốn lượn cổ phong. Ấn chữ Hỷ mở thẳng vào thiệp cưới cổ phong đại hỷ.
                         </p>
                       </div>
                       <div className="mt-3 pt-2 border-t border-[#E8D5CF]/60 text-[10px] font-sans font-semibold text-[#BA1B22] flex items-center gap-1">
                         <Sparkles className="w-3 h-3 text-[#E5C368]" />
-                        <span>Hoàng gia, sống động, ấn tượng</span>
+                        <span>Cổ phong, sống động, ấn tượng</span>
                       </div>
                     </button>
 
@@ -764,15 +764,15 @@ function StudioContent() {
                           )}
                         </div>
                         <h4 className="font-serif font-bold text-xs sm:text-sm text-[#3B090D]">
-                          Phong Thư Hoàng Gia (Sơn Son Thiếp Vàng)
+                          Phong Thư Hỷ Sự (Sơn Son Thiếp Vàng)
                         </h4>
                         <p className="text-[11px] text-[#4A0E13] mt-1.5 leading-relaxed">
-                          Bìa phong thư gấm đỏ hoàng triều viền vàng dập nổi, niêm phong ấn triện Chu Sa chữ 囍. Khách chạm &ldquo;Khai Mở Hỷ Thư&rdquo; để mở thẳng vào thiệp cưới hoàng gia.
+                          Bìa phong thư gấm đỏ truyền thống viền vàng dập nổi, niêm phong ấn triện Chu Sa chữ 囍. Khách chạm &ldquo;Khai Mở Hỷ Thư&rdquo; để mở thẳng vào thiệp cưới đại hỷ.
                         </p>
                       </div>
                       <div className="mt-3 pt-2 border-t border-[#E8D5CF]/60 text-[10px] font-sans font-semibold text-[#BA1B22] flex items-center gap-1">
                         <Mail className="w-3 h-3 text-[#E5C368]" />
-                        <span>Trang trọng, quý phái, hoàng gia</span>
+                        <span>Trang trọng, quý phái, cổ phong</span>
                       </div>
                     </button>
                   </div>
@@ -2226,7 +2226,7 @@ function StudioContent() {
                   </div>
 
                   <p className="text-xs text-[#4A0E13] leading-relaxed">
-                    Nhập tên khách mời để tạo đường link riêng. Khi khách mở thiệp, tên khách sẽ hiện trang trọng trên <strong>CẢ 2 KIỂU MỞ ĐẦU</strong> (Thẻ bài hoàng gia trên Video Rồng Phượng &amp; Bìa Phong Thư truyền thống) và tự động điền sẵn vào form xác nhận tham dự (RSVP)!
+                    Nhập tên khách mời để tạo đường link riêng. Khi khách mở thiệp, tên khách sẽ hiện trang trọng trên <strong>CẢ 2 KIỂU MỞ ĐẦU</strong> (Thẻ bài cổ phong trên Video Rồng Phượng &amp; Bìa Phong Thư truyền thống) và tự động điền sẵn vào form xác nhận tham dự (RSVP)!
                   </p>
 
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
@@ -2788,7 +2788,7 @@ function StudioContent() {
 
         {/* Right Side: Real-time Live Interactive Preview */}
         <div className="flex-1 bg-[#090102] p-3 sm:p-5 flex items-center justify-center overflow-hidden relative">
-          {/* Hào quang nền hoàng cung huyền bí */}
+          {/* Hào quang nền cổ phong huyền bí */}
           <div
             className="absolute inset-0 pointer-events-none"
             style={{

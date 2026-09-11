@@ -234,7 +234,7 @@ export const CinematicOpeningVideo: React.FC<CinematicOpeningVideoProps> = ({
         backgroundColor: "#0C0C0C",
       }}
     >
-      {/* ── NÚT BẬT / TẮT ÂM THANH MỞ ĐẦU HOÀNG GIA (GÓC PHẢI) ── */}
+      {/* ── NÚT BẬT / TẮT ÂM THANH MỞ ĐẦU (GÓC PHẢI) ── */}
       <button
         type="button"
         onClick={toggleAudio}

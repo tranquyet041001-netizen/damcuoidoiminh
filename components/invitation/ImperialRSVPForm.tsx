@@ -115,7 +115,7 @@ export const ImperialRSVPForm: React.FC = () => {
           </p>
         </motion.div>
 
-        {/* Tráp Thư Hoàng Cung */}
+        {/* Tráp Thư Đại Hỷ */}
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}

@@ -85,7 +85,7 @@ export const DongSonSun: React.FC<PatternProps> = ({
 };
 
 /**
- * Biểu tượng Cặp Nhẫn Cưới & Kim Cương Hoàng Gia lồng nhau (Trang nhã, ý nghĩa trọn vẹn, không nhạy cảm)
+ * Biểu tượng Cặp Nhẫn Cưới & Kim Cương Quý Phái lồng nhau (Trang nhã, ý nghĩa trọn vẹn, không nhạy cảm)
  */
 export const WeddingRingsCrest: React.FC<PatternProps> = ({
   className = "",

@@ -63,7 +63,7 @@ export const HeroInvitation: React.FC<HeroInvitationProps> = ({
         background: "radial-gradient(circle at 50% 40%, #35070B 0%, #170305 60%, #080102 100%)",
       }}
     >
-      {/* Vầng hào quang hoàng gia huyền ảo */}
+      {/* Vầng hào quang đại hỷ huyền ảo */}
       <div
         className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[320px] sm:w-[520px] h-[320px] sm:h-[520px] rounded-full pointer-events-none opacity-40"
         style={{
@@ -95,7 +95,7 @@ export const HeroInvitation: React.FC<HeroInvitationProps> = ({
       <div className="w-full max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl mx-auto relative z-10">
         <AnimatePresence mode="wait">
           {!isEnvelopeOpen && (
-            /* ─── BÌA PHONG THƯ HOÀNG GIA (IMPERIAL ENVELOPE) ─── */
+            /* ─── BÌA PHONG THƯ ĐẠI HỶ (CEREMONIAL ENVELOPE) ─── */
             <motion.div
               key="closed-envelope"
               initial={{ opacity: 0, scale: 0.95, y: 15 }}
@@ -114,7 +114,7 @@ export const HeroInvitation: React.FC<HeroInvitationProps> = ({
                   "0 25px 60px -10px rgba(0,0,0,0.95), 0 0 35px rgba(229,195,104,0.35)",
               }}
             >
-              {/* Hoa văn dập nổi gấm cung đình */}
+              {/* Hoa văn dập nổi gấm truyền thống */}
               <div
                 className="absolute inset-0 opacity-15 pointer-events-none"
                 style={{
@@ -150,7 +150,7 @@ export const HeroInvitation: React.FC<HeroInvitationProps> = ({
               <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#3B090D] border border-[#E5C368]/80 shadow-md mb-2">
                 <Sparkles className="w-3 h-3 text-[#FDE68A]" />
                 <span className="text-[10px] sm:text-xs uppercase tracking-[0.25em] font-serif font-bold text-[#FFF3B0]">
-                  HOÀNG GIA HỶ THƯ &bull; THIỆP BÁO HỶ
+                  KIM THIẾP HỶ THƯ &bull; THIỆP BÁO HỶ
                 </span>
                 <Sparkles className="w-3 h-3 text-[#FDE68A]" />
               </div>
@@ -176,7 +176,7 @@ export const HeroInvitation: React.FC<HeroInvitationProps> = ({
                 {guestName ? "TỚI DỰ ĐẠI LỄ HÔN PHỐI CỦA" : "TRÂN TRỌNG KÍNH MỜI QUÝ QUAN KHÁCH"}
               </p>
 
-              {/* Cặp Avatar Tân Lang & Tân Nương Hoàng Gia */}
+              {/* Cặp Avatar Tân Lang & Tân Nương */}
               {(weddingData.groom.avatarUrl || weddingData.bride.avatarUrl) && (
                 <div className="flex items-center justify-center gap-3 sm:gap-5 my-3">
                   {weddingData.groom.avatarUrl && (
@@ -246,7 +246,7 @@ export const HeroInvitation: React.FC<HeroInvitationProps> = ({
                 <span className="text-[#E8D5CF]/80 text-[11px] block mt-0.5">({weddingData.lunarDateFormatted})</span>
               </div>
 
-              {/* Nút Mở Thiệp Hoàng Gia - Nổi bật, sang trọng, hiệu ứng vàng kim lộng lẫy */}
+              {/* Nút Mở Thiệp Đại Hỷ - Nổi bật, sang trọng, hiệu ứng vàng kim lộng lẫy */}
               <div className="flex flex-col items-center justify-center gap-2 mt-2 sm:mt-3">
                 <button
                   type="button"
@@ -265,7 +265,7 @@ export const HeroInvitation: React.FC<HeroInvitationProps> = ({
                   <div className="absolute inset-0 bg-white/30 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
                 </button>
                 <span className="text-[10px] sm:text-[11px] text-[#E5C368]/80 tracking-widest uppercase font-serif">
-                  Chạm nhẹ để mở thiệp cưới hoàng gia
+                  Chạm nhẹ để mở thiệp cưới đại hỷ
                 </span>
               </div>
             </motion.div>

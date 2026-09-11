@@ -27,7 +27,7 @@ export const ImperialCeremonySchedule: React.FC = () => {
 
   return (
     <section id="details" className="relative py-16 sm:py-24 px-3 sm:px-6 overflow-hidden select-none" style={{ backgroundColor: "#140406" }}>
-      {/* Nền gấm hoàng gia đỏ thẫm */}
+      {/* Nền gấm đại hỷ đỏ thẫm */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
@@ -36,7 +36,7 @@ export const ImperialCeremonySchedule: React.FC = () => {
       />
 
       <div className="max-w-xl md:max-w-4xl lg:max-w-5xl mx-auto relative z-10">
-        {/* Header Điển Lễ Hoàng Cung */}
+        {/* Header Điển Lễ Giai Kỳ */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -53,7 +53,7 @@ export const ImperialCeremonySchedule: React.FC = () => {
           </div>
 
           <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl font-bold text-[#FFF8D6] tracking-wide">
-            Điển Lễ Hỷ Sự Hoàng Triều
+            Điển Lễ Hỷ Sự Giai Kỳ
           </h2>
 
           <p className="text-xs sm:text-sm text-[#E8D5CF] italic font-serif max-w-md mx-auto mt-2 leading-relaxed">
@@ -98,7 +98,7 @@ export const ImperialCeremonySchedule: React.FC = () => {
                       <span className="text-[10px] uppercase tracking-[0.25em] text-[#E5C368] font-serif font-bold block">
                         {isKhaiTiec
                           ? "HOA ĐƯỜNG ĐẠI HỶ • KHAI TIỆC CHUNG VUI"
-                          : event.subtitle || (index === 0 ? "HOÀNG GIA ĐIỂN LỄ" : "HOA ĐƯỜNG ĐẠI HỶ")}
+                          : event.subtitle || (index === 0 ? "NGHI ĐIỂN HỶ SỰ" : "HOA ĐƯỜNG ĐẠI HỶ")}
                       </span>
                       <h3 className="font-serif font-bold text-xl sm:text-2xl text-[#FFF8D6] mt-0.5">
                         {event.title}

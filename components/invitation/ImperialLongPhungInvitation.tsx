@@ -18,7 +18,7 @@ export const ImperialLongPhungInvitation: React.FC = () => {
 
   return (
     <section id="letter" className="relative py-16 sm:py-24 px-3 sm:px-6 overflow-hidden select-none" style={{ backgroundColor: "#0F0708" }}>
-      {/* ── NỀN HOÀNG CUNG SƠN MÀI & GẤM VÓC HUYẾT DỤ ── */}
+      {/* ── NỀN TRUYỀN THỐNG SƠN MÀI & GẤM VÓC HUYẾT DỤ ── */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
@@ -56,7 +56,7 @@ export const ImperialLongPhungInvitation: React.FC = () => {
         ))}
       </div>
 
-      {/* ── KHUNG CHIẾU THƯ HOÀNG GIA LONG PHỤNG SƠN SON THIẾP VÀNG ── */}
+      {/* ── KHUNG KIM THIẾP LONG PHỤNG SƠN SON THIẾP VÀNG ── */}
       <div className="relative max-w-xl md:max-w-2xl lg:max-w-3xl mx-auto z-10">
         <motion.div
           initial={{ opacity: 0, scale: 0.94, y: 25 }}
@@ -69,7 +69,7 @@ export const ImperialLongPhungInvitation: React.FC = () => {
               "linear-gradient(165deg, #240507 0%, #170304 40%, #2A0609 70%, #150204 100%)",
           }}
         >
-          {/* Họa tiết dập chìm gấm hoàng cung */}
+          {/* Họa tiết dập chìm gấm truyền thống */}
           <div
             className="absolute inset-0 opacity-10 pointer-events-none"
             style={{
@@ -78,7 +78,7 @@ export const ImperialLongPhungInvitation: React.FC = () => {
             }}
           />
 
-          {/* Viền đôi mạ vàng dập nổi hoàng gia */}
+          {/* Viền đôi mạ vàng dập nổi truyền thống */}
           <div className="absolute inset-2 sm:inset-3 rounded-2xl border border-dashed border-[#FDE68A]/60 pointer-events-none" />
           <div className="absolute inset-3.5 sm:inset-4.5 rounded-xl border border-[#E5C368]/30 pointer-events-none" />
 
@@ -119,11 +119,11 @@ export const ImperialLongPhungInvitation: React.FC = () => {
               </div>
             </div>
 
-            {/* Dòng biểu tự hoàng gia */}
+            {/* Dòng biểu tự đại hỷ */}
             <div className="mt-3 inline-flex items-center gap-2 px-4 py-0.5 rounded-full bg-[#3B090D] border border-[#E5C368]/60 shadow-md">
               <Sparkles className="w-3 h-3 text-[#FDE68A]" />
               <span className="text-[10px] sm:text-xs uppercase tracking-[0.35em] text-[#FFF3B0] font-serif font-bold">
-                LONG PHỤNG HÒA MINH • HOÀNG GIA HỶ THƯ
+                LONG PHỤNG HÒA MINH • KIM THIẾP HỶ THƯ
               </span>
               <Sparkles className="w-3 h-3 text-[#FDE68A]" />
             </div>
@@ -203,7 +203,7 @@ export const ImperialLongPhungInvitation: React.FC = () => {
                 {weddingData.groom.parents}
               </p>
 
-              {/* Avatar Tân Lang Hoàng Gia */}
+              {/* Avatar Tân Lang */}
               <div className="pt-2 flex flex-col items-center">
                 {weddingData.groom.avatarUrl && (
                   <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-full p-1 bg-gradient-to-tr from-[#996515] via-[#FDE68A] to-[#C99B26] shadow-[0_0_20px_rgba(229,195,104,0.55)] border border-[#FFF8D6] mb-2 group">
@@ -236,7 +236,7 @@ export const ImperialLongPhungInvitation: React.FC = () => {
                 {weddingData.bride.parents}
               </p>
 
-              {/* Avatar Tân Nương Hoàng Gia */}
+              {/* Avatar Tân Nương */}
               <div className="pt-2 flex flex-col items-center">
                 {weddingData.bride.avatarUrl && (
                   <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-full p-1 bg-gradient-to-tr from-[#C99B26] via-[#FDE68A] to-[#996515] shadow-[0_0_20px_rgba(229,195,104,0.55)] border border-[#FFF8D6] mb-2 group">
@@ -261,7 +261,7 @@ export const ImperialLongPhungInvitation: React.FC = () => {
             </div>
           </div>
 
-          {/* ── CÂU ĐỐI HOÀNG GIA TRĂM NĂM ── */}
+          {/* ── CÂU ĐỐI GIAI KỲ TRĂM NĂM ── */}
           <div className="my-5 max-w-lg mx-auto">
             <p className="text-sm sm:text-base text-[#FFF3B0] font-serif italic leading-relaxed">
               &ldquo;Duyên tao ngộ trăm năm ước hẹn • Hoa kết đôi nhánh một tấm chân tình&rdquo;

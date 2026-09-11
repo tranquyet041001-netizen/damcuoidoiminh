@@ -124,7 +124,7 @@ export const Footer: React.FC<FooterProps> = ({ isGuestView = false }) => {
         </div>
 
         <div className="text-[10px] tracking-wider uppercase font-serif mb-4 text-[#E5C368]/60">
-          © {data.groom.shortName} &amp; {data.bride.shortName} • Hoàng Gia Hỷ Sự • Sơn Son Thiếp Vàng
+          © {data.groom.shortName} &amp; {data.bride.shortName} • Đại Lễ Hỷ Sự • Sơn Son Thiếp Vàng
         </div>
 
         {/* Link admin */}

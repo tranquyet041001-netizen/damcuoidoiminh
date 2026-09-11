@@ -104,7 +104,7 @@ export const PhotoGallery: React.FC = () => {
       />
 
       <div className="max-w-xl md:max-w-5xl lg:max-w-6xl mx-auto relative z-10">
-        {/* Header - Hoàng Triều Hỷ Ảnh */}
+        {/* Header - Giai Kỳ Hỷ Ảnh */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -115,7 +115,7 @@ export const PhotoGallery: React.FC = () => {
           <div className="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-[#3B090D] border border-[#E5C368]/60 shadow-md mb-3">
             <Sparkles className="w-3.5 h-3.5 text-[#FDE68A]" />
             <span className="text-[10px] sm:text-xs uppercase tracking-[0.35em] text-[#FFF3B0] font-serif font-bold">
-              HOÀNG TRIỀU HỶ ẢNH
+              GIAI KỲ HỶ ẢNH
             </span>
             <Sparkles className="w-3.5 h-3.5 text-[#FDE68A]" />
           </div>

@@ -37,7 +37,7 @@ export const ImperialGiftCard: React.FC = () => {
       className="relative py-16 sm:py-24 px-3 sm:px-6 overflow-hidden select-none"
       style={{ backgroundColor: "#140305" }}
     >
-      {/* Nền gấm hoàng cung sâu thẳm */}
+      {/* Nền gấm sâu thẳm */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
@@ -46,7 +46,7 @@ export const ImperialGiftCard: React.FC = () => {
       />
 
       <div className="max-w-xl md:max-w-3xl lg:max-w-4xl mx-auto relative z-10">
-        {/* Header - Hộp Mừng Cưới Hoàng Gia */}
+        {/* Header - Hộp Mừng Cưới Chúc Phúc */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}

@@ -81,7 +81,7 @@ export const WishBook: React.FC = () => {
       className="relative py-16 sm:py-24 px-3 sm:px-6 overflow-hidden select-none"
       style={{ backgroundColor: "#0C0204" }}
     >
-      {/* Nền dạ yến hoàng cung */}
+      {/* Nền dạ yến chúc phúc */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
@@ -90,7 +90,7 @@ export const WishBook: React.FC = () => {
       />
 
       <div className="max-w-xl md:max-w-3xl lg:max-w-4xl mx-auto relative z-10">
-        {/* Header Mục Sổ Lưu Bút Hoàng Gia */}
+        {/* Header Mục Sổ Lưu Bút Hỷ Sự */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -116,7 +116,7 @@ export const WishBook: React.FC = () => {
           />
 
           <p className="text-xs sm:text-sm text-[#E8D5CF] italic font-serif max-w-md mx-auto mt-3 leading-relaxed">
-            Mỗi lời chúc phúc chân thành sẽ thắp sáng một ngọn đèn hoa đăng lung linh bay vút lên bầu trời đêm hoàng triều chúc phúc cho đôi tân nhân.
+            Mỗi lời chúc phúc chân thành sẽ thắp sáng một ngọn đèn hoa đăng lung linh bay vút lên bầu trời đêm chúc phúc cho đôi tân nhân.
           </p>
 
           {/* Thanh chuyển đổi chế độ xem: Bầu trời 3D / Danh sách */}
@@ -240,7 +240,7 @@ export const WishBook: React.FC = () => {
             <div className="flex items-center gap-2">
               <Flame className="w-5 h-5 text-[#FDE68A]" />
               <span className="text-xs sm:text-sm uppercase tracking-wider font-serif font-bold text-[#FFF8D6]">
-                Thắp Sáng Đèn Hoa Đăng Cung Đình
+                Thắp Sáng Đèn Hoa Đăng Chúc Phúc
               </span>
             </div>
             <Sparkles className="w-4 h-4 text-[#FDE68A]" />

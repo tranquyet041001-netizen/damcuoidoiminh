@@ -110,14 +110,14 @@ export const WeddingInvitationView: React.FC<WeddingInvitationViewProps> = ({
         />
       )}
 
-      {/* Thanh tiêu đề cuộn hoàng gia */}
+      {/* Thanh tiêu đề cuộn cổ phong */}
       <Header isGuestView={isGuestView} isPreview={isPreview} />
 
       {/* ── AMBIENT FLOATING PETALS (chỉ sau khi mở thiệp, desktop only) ── */}
       {isEnvelopeOpen && <FloatingPetals />}
 
       <main className="flex-1">
-        {/* Màn hình mở thiệp (Thiệp Báo Hỷ / Bìa Phong Thư Hoàng Gia) - Chỉ hiển thị khi CHƯA MỞ */}
+        {/* Màn hình mở thiệp (Thiệp Báo Hỷ / Bìa Phong Thư Đại Hỷ) - Chỉ hiển thị khi CHƯA MỞ */}
         {!isVideoOpening && !isEnvelopeOpen && (
           <HeroInvitation
             isOpen={isEnvelopeOpen}
@@ -126,7 +126,7 @@ export const WeddingInvitationView: React.FC<WeddingInvitationViewProps> = ({
           />
         )}
 
-        {/* ── CÁC PHẦN HOÀNG GIA ĐỒNG BỘ - CHỈ HIỂN THỊ KHI ĐÃ ẤN "MỞ THIỆP" ── */}
+        {/* ── CÁC PHẦN ĐỒNG BỘ - CHỈ HIỂN THỊ KHI ĐÃ ẤN "MỞ THIỆP" ── */}
         <AnimatePresence>
           {isEnvelopeOpen && (
             <motion.div
@@ -136,19 +136,19 @@ export const WeddingInvitationView: React.FC<WeddingInvitationViewProps> = ({
               transition={{ duration: 0.8, delay: 0.15, ease: "easeOut" }}
               className="space-y-0"
             >
-              {/* 1. HOÀNG GIA HỶ THƯ • LONG PHỤNG CÁT TƯỜNG (Kính mời đích danh & Phụ mẫu dâu rể) */}
+              {/* 1. KIM THIẾP HỶ THƯ • LONG PHỤNG CÁT TƯỜNG (Kính mời đích danh & Phụ mẫu dâu rể) */}
               <ImperialLongPhungInvitation />
 
-              {/* Dải phân cách hoa văn kim chỉ hoàng gia */}
+              {/* Dải phân cách hoa văn kim chỉ cổ phong */}
               <SectionDivider fromColor="#0F0708" toColor="#140406" variant="lotus" />
 
-              {/* 2. ĐIỂN LỄ HỶ SỰ HOÀNG TRIỀU (Lễ Thành Hôn & Tiệc Cưới Hoa Đường, Chỉ đường & Lưu lịch) */}
+              {/* 2. ĐIỂN LỄ HỶ SỰ GIAI KỲ (Lễ Thành Hôn & Tiệc Cưới Hoa Đường, Chỉ đường & Lưu lịch) */}
               <ImperialCeremonySchedule />
 
               {/* Dải phân cách */}
               <SectionDivider fromColor="#140406" toColor="#120204" variant="lotus" />
 
-              {/* 3. DUYÊN KHỞI TRĂM NĂM • THƯ HỌA CHUYỆN TÌNH YÊU (Trục cuộn gấm thêu hoàng cung) */}
+              {/* 3. DUYÊN KHỞI TRĂM NĂM • THƯ HỌA CHUYỆN TÌNH YÊU (Trục cuộn gấm thêu truyền thống) */}
               <ImperialCoupleStory />
 
               {/* Dải phân cách */}
@@ -160,19 +160,19 @@ export const WeddingInvitationView: React.FC<WeddingInvitationViewProps> = ({
               {/* Dải phân cách */}
               <SectionDivider fromColor="#150305" toColor="#110204" variant="lotus" />
 
-              {/* 5. HỶ BÁO TƯƠNG TRI • KÍNH BÁO THAM DỰ HÔN LỄ (Tráp thư hồi đáp hoàng gia) */}
+              {/* 5. HỶ BÁO TƯƠNG TRI • KÍNH BÁO THAM DỰ HÔN LỄ (Tráp thư hồi đáp đại hỷ) */}
               <ImperialRSVPForm />
 
               {/* Dải phân cách */}
               <SectionDivider fromColor="#110204" toColor="#100203" variant="lotus" />
 
-              {/* 6. HOÀNG TRIỀU HỶ ẢNH • KHOẢNH KHẮC GIAI KỲ (Album ảnh cưới & Lightbox) */}
+              {/* 6. GIAI KỲ HỶ ẢNH • KHOẢNH KHẮC TRĂM NĂM (Album ảnh cưới & Lightbox) */}
               <PhotoGallery />
 
               {/* Dải phân cách */}
               <SectionDivider fromColor="#100203" toColor="#0C0204" variant="lotus" />
 
-              {/* 7. BẦU TRỜI HOA ĐĂNG & THẮP SÁNG HOA ĐĂNG CUNG ĐÌNH */}
+              {/* 7. BẦU TRỜI HOA ĐĂNG & THẮP SÁNG HOA ĐĂNG CHÚC PHÚC */}
               <WishBook />
 
               {/* Dải phân cách */}
@@ -184,7 +184,7 @@ export const WeddingInvitationView: React.FC<WeddingInvitationViewProps> = ({
               {/* Dải phân cách */}
               <SectionDivider fromColor="#140305" toColor="#160305" variant="lotus" />
 
-              {/* 9. LỜI CẢM TẠ & DẤU ẤN TRIỆN SON HOÀNG GIA */}
+              {/* 9. LỜI CẢM TẠ & DẤU ẤN TRIỆN SON ĐẠI HỶ */}
               <Footer isGuestView={isGuestView} />
             </motion.div>
           )}

@@ -29,7 +29,7 @@ export const ImperialCoupleStory: React.FC = () => {
       />
 
       <div className="max-w-xl md:max-w-3xl lg:max-w-4xl mx-auto relative z-10">
-        {/* Header - Thư Họa Gấm Hoàng Gia */}
+        {/* Header - Thư Họa Gấm Truyền Thống */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -92,7 +92,7 @@ export const ImperialCoupleStory: React.FC = () => {
                 </motion.div>
               </div>
 
-              {/* Thẻ Thư Họa Hoàng Gia */}
+              {/* Thẻ Thư Họa Giai Kỳ */}
               <div
                 className="rounded-3xl p-5 sm:p-7 border border-[#E5C368]/60 shadow-[0_15px_35px_-10px_rgba(0,0,0,0.7)] transition-all duration-300 hover:-translate-y-1 hover:border-[#FDE68A] hover:shadow-[0_20px_45px_-10px_rgba(229,195,104,0.25)] relative overflow-hidden"
                 style={{

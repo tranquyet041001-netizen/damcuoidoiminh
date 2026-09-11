@@ -107,7 +107,7 @@ export const FloatingControls: React.FC<FloatingControlsProps> = ({
                     <span className="w-0.5 bg-[#FDE68A] animate-equalizer-3 rounded-full" />
                   </div>
                   <span className="text-[9px] text-[#E5C368]/80 uppercase tracking-wider font-serif font-medium">
-                    {isYouTube ? "YouTube Audio" : "Hoàng Triều Nhã Nhạc"}
+                    {isYouTube ? "YouTube Audio" : "Cổ Phong Nhã Nhạc"}
                   </span>
                 </div>
               </div>
