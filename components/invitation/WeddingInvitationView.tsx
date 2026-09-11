@@ -15,6 +15,7 @@ import { ImperialRSVPForm } from "@/components/invitation/ImperialRSVPForm";
 import { PhotoGallery } from "@/components/invitation/PhotoGallery";
 import { WishBook } from "@/components/invitation/WishBook";
 import { ImperialGiftCard } from "@/components/invitation/ImperialGiftCard";
+import { ImperialScrollOpeningAnimation } from "@/components/invitation/ImperialScrollOpeningAnimation";
 import { SectionDivider } from "@/components/ui/SectionDivider";
 import { FloatingPetals } from "@/components/ui/FloatingPetals";
 import { useWeddingData } from "@/context/WeddingDataContext";
@@ -41,6 +42,8 @@ export const WeddingInvitationView: React.FC<WeddingInvitationViewProps> = ({
     return false;
   });
 
+  const [isShowingScrollAnimation, setIsShowingScrollAnimation] = useState<boolean>(false);
+
   const { data: weddingData } = useWeddingData();
   const { playMusic } = useMusic();
 
@@ -62,6 +65,19 @@ export const WeddingInvitationView: React.FC<WeddingInvitationViewProps> = ({
 
   const isEnvelopeOpen = controlledIsOpen !== undefined ? controlledIsOpen : internalIsOpen;
 
+  const handleStartScrollOpening = () => {
+    playMusic();
+    setIsShowingScrollAnimation(true);
+  };
+
+  const handleScrollAnimationComplete = () => {
+    setIsShowingScrollAnimation(false);
+    if (controlledIsOpen === undefined) {
+      setInternalIsOpen(true);
+    }
+    onOpenChange?.(true);
+  };
+
   const handleOpen = () => {
     playMusic();
     if (controlledIsOpen === undefined) {
@@ -71,6 +87,7 @@ export const WeddingInvitationView: React.FC<WeddingInvitationViewProps> = ({
   };
 
   const handleReplayOpening = () => {
+    setIsShowingScrollAnimation(false);
     if (controlledIsOpen === undefined) {
       setInternalIsOpen(false);
     }
@@ -102,11 +119,19 @@ export const WeddingInvitationView: React.FC<WeddingInvitationViewProps> = ({
       }`}
     >
       {/* ── MÀN HÌNH MỞ ĐẦU CINEMATIC VIDEO RỒNG - PHƯỢNG (CHỈ KHI CHỌN VIDEO) ── */}
-      {isVideoOpening && !isEnvelopeOpen && (
+      {isVideoOpening && !isEnvelopeOpen && !isShowingScrollAnimation && (
         <CinematicOpeningVideo
           weddingData={weddingData}
-          onOpenInvitation={handleOpen}
+          onOpenInvitation={handleStartScrollOpening}
           isOpen={isEnvelopeOpen}
+        />
+      )}
+
+      {/* ── HOẠT ẢNH MỞ CHIẾU THƯ HOÀNG GIA (SAU KHI ẤN CHỮ HỶ) ── */}
+      {isShowingScrollAnimation && (
+        <ImperialScrollOpeningAnimation
+          weddingData={weddingData}
+          onComplete={handleScrollAnimationComplete}
         />
       )}
 

@@ -201,10 +201,10 @@ export const CinematicOpeningVideo: React.FC<CinematicOpeningVideoProps> = ({
       // trực tiếp tại sự kiện chạm của người dùng, không được để trong setTimeout!
       playMusic();
 
-      // 3. Sau hiệu ứng ánh sáng hoàng kim 1s, chuyển hẳn sang giao diện thiệp cưới
+      // 3. Sau hiệu ứng ánh sáng hoàng kim 700ms, chuyển sang hoạt ảnh mở chiếu thư
       setTimeout(() => {
         onOpenInvitation();
-      }, 1000);
+      }, 700);
     },
     [isTransitioning, onOpenInvitation, playMusic]
   );
