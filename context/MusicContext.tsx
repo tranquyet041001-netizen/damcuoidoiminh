@@ -56,6 +56,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const ytPlayerRef = useRef<any>(null);
+  const ytContainerRef = useRef<HTMLDivElement | null>(null);
   const pendingPlayRef = useRef(false);
   const prevMusicUrlRef = useRef(data.musicUrl);
   const audioCtxRef = useRef<any>(null);
@@ -186,15 +187,31 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({
     }
 
     let isSubscribed = true;
+    let pollTimer: any = null;
 
     const initPlayer = () => {
       if (!isSubscribed) return;
       try {
         if (ytPlayerRef.current && typeof ytPlayerRef.current.destroy === "function") {
-          ytPlayerRef.current.destroy();
+          try {
+            ytPlayerRef.current.destroy();
+          } catch {
+            // ignore
+          }
+          ytPlayerRef.current = null;
         }
 
-        ytPlayerRef.current = new window.YT.Player("wedding-yt-player", {
+        // Tái tạo phần tử DOM #wedding-yt-player sạch sẽ trước khi gắn YT.Player
+        if (ytContainerRef.current) {
+          ytContainerRef.current.innerHTML = '<div id="wedding-yt-player" style="width:100%;height:100%"></div>';
+        }
+
+        const targetEl = document.getElementById("wedding-yt-player");
+        if (!targetEl) {
+          return;
+        }
+
+        ytPlayerRef.current = new (window as any).YT.Player("wedding-yt-player", {
           videoId: ytId,
           playerVars: {
             autoplay: 0,
@@ -208,7 +225,6 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({
             playsinline: 1,
             rel: 0,
             enablejsapi: 1,
-            origin: typeof window !== "undefined" ? window.location.origin : undefined,
           },
           events: {
             onReady: (event: any) => {
@@ -223,7 +239,6 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({
                   iframe.setAttribute("webkit-playsinline", "true");
                   iframe.setAttribute("allow", "autoplay; encrypted-media");
                   iframe.setAttribute("tabindex", "-1");
-                  iframe.style.pointerEvents = "none";
                 }
               } catch {
                 // ignore
@@ -236,23 +251,26 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({
             },
             onStateChange: (event: any) => {
               if (!isSubscribed) return;
-              // 1 = PLAYING, 2 = PAUSED, 0 = ENDED
+              // 1 = PLAYING, 2 = PAUSED, 0 = ENDED, 3 = BUFFERING
               if (event.data === 1) {
                 setIsPlaying(true);
               } else if (event.data === 2) {
                 setIsPlaying(false);
               } else if (event.data === 0) {
-                // Loop
+                // Loop lại bài hát
                 event.target.playVideo();
               }
             },
             onError: (event: any) => {
               console.warn("YouTube player error code:", event.data);
               if (!isSubscribed) return;
-              showToast(
-                "Đang phát nhạc nền tiệc cưới lãng mạn 🎵",
-                "info"
-              );
+              let reason = "Video YouTube không hỗ trợ nhúng phát nền";
+              if (event.data === 101 || event.data === 150) {
+                reason = "Video này bị chủ sở hữu chặn nhúng ngoài YouTube";
+              } else if (event.data === 100) {
+                reason = "Video YouTube không tồn tại hoặc đã chuyển sang riêng tư";
+              }
+              showToast(`${reason}. Đang chuyển sang nhạc nền Acoustic 🎵`, "info");
               setUseFallbackAudio(true);
               setTimeout(() => {
                 if (audioRef.current) {
@@ -261,7 +279,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({
                     .then(() => setIsPlaying(true))
                     .catch(() => {});
                 }
-              }, 300);
+              }, 400);
             },
           },
         });
@@ -270,10 +288,18 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({
       }
     };
 
-    if (window.YT && window.YT.Player) {
-      initPlayer();
+    if ((window as any).YT && (window as any).YT.Player) {
+      setTimeout(initPlayer, 60);
     } else {
-      // Tải script iframe_api
+      // Polling kiểm tra API sẵn sàng
+      pollTimer = setInterval(() => {
+        if ((window as any).YT && (window as any).YT.Player) {
+          clearInterval(pollTimer);
+          initPlayer();
+        }
+      }, 120);
+
+      // Tải script iframe_api nếu chưa có
       const existingScript = document.getElementById("youtube-iframe-api");
       if (!existingScript) {
         const tag = document.createElement("script");
@@ -283,15 +309,17 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({
         firstScriptTag?.parentNode?.insertBefore(tag, firstScriptTag);
       }
 
-      const prevOnReady = window.onYouTubeIframeAPIReady;
-      window.onYouTubeIframeAPIReady = () => {
+      const prevOnReady = (window as any).onYouTubeIframeAPIReady;
+      (window as any).onYouTubeIframeAPIReady = () => {
         if (typeof prevOnReady === "function") prevOnReady();
+        if (pollTimer) clearInterval(pollTimer);
         initPlayer();
       };
     }
 
     return () => {
       isSubscribed = false;
+      if (pollTimer) clearInterval(pollTimer);
     };
   }, [isYt, ytId, showToast]);
 
@@ -370,30 +398,20 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({
   }, [currentSongTitle, showToast, unlockAudioEngine]);
 
   const playMusic = useCallback(() => {
-    // Nếu nhạc đang chạy êm rồi thì giữ nguyên, tránh giật nhạc
-    if (audioRef.current && !audioRef.current.paused && isPlaying) {
+    // Nếu nhạc MP3 đang chạy êm rồi thì giữ nguyên, tránh giật nhạc
+    if (!isYt && audioRef.current && !audioRef.current.paused && isPlaying) {
       return;
     }
 
     unlockAudioEngine();
 
-    const isMobileDevice =
-      typeof window !== "undefined" &&
-      (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ||
-        window.innerWidth <= 768);
-
-    // Trên điện thoại, YouTube iframe nền bị iOS Safari & Android Chrome chặn phát tự động
-    // Chuyển sang file MP3 nội bộ để âm thanh luôn vang lên mượt mà nhất
-    if (isYt && ytId && !useFallbackAudio && !isMobileDevice) {
+    // 1. NẾU LÀ BÀI HÁT YOUTUBE:
+    if (isYt && ytId && !useFallbackAudio) {
       if (ytPlayerRef.current && typeof ytPlayerRef.current.playVideo === "function") {
         try {
           ytPlayerRef.current.unMute();
           ytPlayerRef.current.setVolume(100);
           ytPlayerRef.current.playVideo();
-          const iframe = ytPlayerRef.current.getIframe?.();
-          if (iframe) {
-            iframe.blur?.();
-          }
           setIsPlaying(true);
           showToast(`Đang phát: ${currentSongTitle} 🎵`, "success");
         } catch (e) {
@@ -403,14 +421,13 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({
         }
       } else {
         pendingPlayRef.current = true;
-        showToast("Đang tải nhạc nền...", "info");
+        showToast("Đang kết nối nhạc YouTube...", "info");
       }
-    } else {
-      if (isMobileDevice && isYt && !useFallbackAudio) {
-        setUseFallbackAudio(true);
-      }
-      playLocalAudio();
+      return;
     }
+
+    // 2. NẾU LÀ FILE MP3 NỘI BỘ:
+    playLocalAudio();
   }, [isYt, ytId, useFallbackAudio, currentSongTitle, showToast, playLocalAudio, unlockAudioEngine, isPlaying]);
 
   const pauseMusic = useCallback((notify = false) => {
@@ -523,14 +540,13 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({
       {/* Trình phát YouTube */}
       {isYt && ytId && !useFallbackAudio && (
         <>
-          {/* Container YouTube: Khi ẩn sẽ ở ngoài màn hình với kích thước chuẩn 16:9 để tránh iOS fullscreen và không bị nhảy cuộn trang */}
+          {/* Container YouTube: Kích thước chuẩn để không bị WebKit/Safari tạm dừng */}
           <div
             className={`transition-all duration-300 ${
               showVideoPreview
-                ? "fixed bottom-20 right-4 z-50 w-72 h-44 rounded-2xl overflow-hidden shadow-2xl border-2 border-[#C9A84C] bg-black pointer-events-auto"
-                : "fixed -top-[9999px] -left-[9999px] w-[320px] h-[180px] pointer-events-none overflow-hidden"
+                ? "fixed bottom-20 right-4 z-50 w-72 h-44 rounded-2xl overflow-hidden shadow-2xl border-2 border-[#E5C368] bg-black pointer-events-auto"
+                : "fixed bottom-1 right-1 w-8 h-8 rounded opacity-[0.01] pointer-events-none overflow-hidden z-10"
             }`}
-            style={showVideoPreview ? {} : { opacity: 0.001, pointerEvents: "none" }}
             aria-hidden={!showVideoPreview}
           >
             {showVideoPreview && (
@@ -544,7 +560,9 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({
                 </button>
               </div>
             )}
-            <div id="wedding-yt-player" className="w-full h-full" />
+            <div ref={ytContainerRef} className="w-full h-full">
+              <div id="wedding-yt-player" className="w-full h-full" />
+            </div>
           </div>
         </>
       )}

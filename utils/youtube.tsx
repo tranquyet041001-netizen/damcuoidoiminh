@@ -7,10 +7,30 @@ import React from "react";
 export function extractYouTubeId(url: string): string | null {
   if (!url) return null;
   const trimmed = url.trim();
+
+  // Nhập trực tiếp 11 ký tự Video ID
+  if (/^[a-zA-Z0-9_-]{11}$/.test(trimmed)) {
+    return trimmed;
+  }
+
+  // Khớp tất cả các định dạng URL: youtube.com, youtu.be, m.youtube.com, music.youtube.com
   const match = trimmed.match(
-    /(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|shorts\/))([\w-]{11})/
+    /(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|shorts\/|live\/))([a-zA-Z0-9_-]{11})/i
   );
-  return match ? match[1] : null;
+  if (match) return match[1];
+
+  // Hỗ trợ trích xuất từ search param v=
+  try {
+    const parsed = new URL(trimmed.startsWith("http") ? trimmed : `https://${trimmed}`);
+    const v = parsed.searchParams.get("v");
+    if (v && /^[a-zA-Z0-9_-]{11}$/.test(v)) {
+      return v;
+    }
+  } catch {
+    // ignore
+  }
+
+  return null;
 }
 
 export function isYouTubeUrl(url: string): boolean {
