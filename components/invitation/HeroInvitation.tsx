@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, Sparkles, Heart } from "lucide-react";
@@ -30,6 +30,7 @@ export const HeroInvitation: React.FC<HeroInvitationProps> = ({
   const { playMusic, isPlaying } = useMusic();
   const [internalIsOpen, setInternalIsOpen] = useState(false);
   const [guestName, setGuestName] = useState<string>("");
+  const openTriggeredRef = useRef(false);
 
   const isEnvelopeOpen = controlledIsOpen !== undefined ? controlledIsOpen : internalIsOpen;
 
@@ -37,14 +38,20 @@ export const HeroInvitation: React.FC<HeroInvitationProps> = ({
     setGuestName(getGuestNameFromUrl());
   }, []);
 
-  const handleOpenInvitation = () => {
+  const handleOpenInvitation = (e?: React.MouseEvent | React.TouchEvent) => {
+    if (e) {
+      e.stopPropagation();
+    }
+    if (openTriggeredRef.current) return;
+    openTriggeredRef.current = true;
+
+    // Kích hoạt phát nhạc cưới tức thì trong call stack tương tác người dùng
+    playMusic();
+
     if (controlledIsOpen === undefined) {
       setInternalIsOpen(true);
     }
     onOpen?.();
-    if (!isPlaying) {
-      playMusic();
-    }
   };
 
   const scrollToContent = () => {
@@ -159,6 +166,7 @@ export const HeroInvitation: React.FC<HeroInvitationProps> = ({
                 <button
                   type="button"
                   onClick={handleOpenInvitation}
+                  onTouchEnd={handleOpenInvitation}
                   className="group relative inline-flex items-center gap-2.5 px-8 py-3 sm:px-9 sm:py-3.5 rounded-full text-sm sm:text-base font-serif font-semibold text-[#FDFAF5] shadow-xl transition-all duration-300 transform active:scale-95 hover:scale-105 cursor-pointer overflow-hidden"
                   style={{
                     background: "linear-gradient(135deg, #C4715A 0%, #A4503B 100%)",

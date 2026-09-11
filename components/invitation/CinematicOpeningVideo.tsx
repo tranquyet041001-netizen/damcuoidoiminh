@@ -1,10 +1,11 @@
-﻿"use client";
+"use client";
 
 import React, { useRef, useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Volume2, VolumeX } from "lucide-react";
 import { WeddingData } from "@/types/wedding";
 import { getGuestNameFromUrl } from "@/utils/guest";
+import { useMusic } from "@/context/MusicContext";
 
 interface CinematicOpeningVideoProps {
   weddingData?: WeddingData;
@@ -19,6 +20,9 @@ export const CinematicOpeningVideo: React.FC<CinematicOpeningVideoProps> = ({
   const videoRef = useRef<HTMLVideoElement>(null);
   const loopVideoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const openedRef = useRef(false);
+
+  const { playMusic, pauseMusic } = useMusic();
 
   // Tên khách mời đích danh
   const [guestName, setGuestName] = useState<string>("");
@@ -26,6 +30,14 @@ export const CinematicOpeningVideo: React.FC<CinematicOpeningVideoProps> = ({
   // Trạng thái âm thanh & lặp động
   const [isAudioMuted, setIsAudioMuted] = useState<boolean>(false);
   const [isLooping, setIsLooping] = useState<boolean>(false);
+
+  // Khi màn hình video mở đầu đang hiển thị, tạm dừng nhạc thiệp cưới để nhường chỗ cho âm thanh rồng phượng
+  useEffect(() => {
+    if (!isOpen) {
+      pauseMusic();
+      openedRef.current = false;
+    }
+  }, [isOpen, pauseMusic]);
 
   useEffect(() => {
     setGuestName(getGuestNameFromUrl());
@@ -172,10 +184,11 @@ export const CinematicOpeningVideo: React.FC<CinematicOpeningVideoProps> = ({
       if (e) {
         e.stopPropagation();
       }
-      if (isTransitioning) return;
+      if (openedRef.current || isTransitioning) return;
+      openedRef.current = true;
       setIsTransitioning(true);
 
-      // Tạm dừng video để nhường cho nhạc nền thiệp cưới
+      // 1. Tạm dừng video mở màn rồng phượng
       if (videoRef.current) {
         videoRef.current.pause();
       }
@@ -183,11 +196,17 @@ export const CinematicOpeningVideo: React.FC<CinematicOpeningVideoProps> = ({
         loopVideoRef.current.pause();
       }
 
+      // 2. KÍCH HOẠT NHẠC NỀN THIỆP CƯỚI ĐỒNG BỘ NGAY TẠI USER GESTURE (KHÔNG CHỜ SETTIMEOUT)
+      // Đây là mấu chốt kỹ thuật: iOS Safari & Android Chrome yêu cầu audio.play() phải kích hoạt
+      // trực tiếp tại sự kiện chạm của người dùng, không được để trong setTimeout!
+      playMusic();
+
+      // 3. Sau hiệu ứng ánh sáng hoàng kim 1s, chuyển hẳn sang giao diện thiệp cưới
       setTimeout(() => {
         onOpenInvitation();
       }, 1000);
     },
-    [isTransitioning, onOpenInvitation]
+    [isTransitioning, onOpenInvitation, playMusic]
   );
 
   // Chạm vào màn hình để bật âm thanh hoặc phát video nếu bị trình duyệt chặn
@@ -362,6 +381,7 @@ export const CinematicOpeningVideo: React.FC<CinematicOpeningVideoProps> = ({
               key="ceremonial-songhy-seal"
               type="button"
               onClick={handleOpenClick}
+              onTouchEnd={handleOpenClick}
               initial={{ opacity: 0, scale: 0.65, y: 15 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9 }}

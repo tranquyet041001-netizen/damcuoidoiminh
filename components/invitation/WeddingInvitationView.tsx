@@ -63,9 +63,7 @@ export const WeddingInvitationView: React.FC<WeddingInvitationViewProps> = ({
   const isEnvelopeOpen = controlledIsOpen !== undefined ? controlledIsOpen : internalIsOpen;
 
   const handleOpen = () => {
-    if (!isPlaying) {
-      playMusic();
-    }
+    playMusic();
     if (controlledIsOpen === undefined) {
       setInternalIsOpen(true);
     }
