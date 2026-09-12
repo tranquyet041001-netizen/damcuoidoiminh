@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { Calendar, Clock, MapPin, Navigation, CalendarPlus, Sparkles, Flame } from "lucide-react";
 import { useWeddingData } from "@/context/WeddingDataContext";
 import { VietnameseLotus, RedSealStamp } from "@/components/ui/VietnamesePattern";
+import { getGoogleMapsUrl } from "@/utils/mapUtils";
 
 export const ImperialCeremonySchedule: React.FC = () => {
   const { data: weddingData } = useWeddingData();
@@ -152,9 +153,10 @@ export const ImperialCeremonySchedule: React.FC = () => {
                   }`}
                 >
                   <a
-                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${event.venue} ${event.address}`)}`}
+                    href={getGoogleMapsUrl(event)}
                     target="_blank"
                     rel="noopener noreferrer"
+                    title={`Xem bản đồ & chỉ đường tới ${event.venue}`}
                     className="flex-1 min-w-[150px] inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-full text-xs font-serif font-bold text-[#FDFAF5] transition-all transform active:scale-95 hover:scale-102 cursor-pointer shadow-md"
                     style={{
                       background: "linear-gradient(135deg, #BA1B22 0%, #8C1217 100%)",

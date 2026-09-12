@@ -47,6 +47,7 @@ import { ShareModal } from "@/components/invitation/ShareModal";
 import { processAndUploadImage } from "@/utils/imageUpload";
 import { copyToClipboard } from "@/utils/clipboard";
 import { VIETNAM_BANKS, findBank, generateVietQrUrl } from "@/utils/vietnamBanks";
+import { getGoogleMapsUrl, generateDefaultGoogleMapsUrl } from "@/utils/mapUtils";
 import {
   extractYouTubeId,
   isYouTubeUrl,
@@ -1698,8 +1699,8 @@ function StudioContent() {
                         isoDate: data.weddingDate,
                         time: "10:30 Sáng",
                         venue: "Tư Gia Hôn Trường",
-                        address: "Khu 5, Xóm 6, Xã Minh Châu, Thành phố Hà Nội",
-                        mapUrl: "https://maps.google.com/?q=Khu+5+Xóm+6+Minh+Châu+Hà+Nội",
+                        address: "Khu 5, Xóm 6, Xã Minh Châu, Ba Vì, Hà Nội",
+                        mapUrl: "https://www.google.com/maps/search/?api=1&query=Khu+5%2C+X%C3%B3m+6%2C+X%C3%A3+Minh+Ch%C3%A2u%2C+Ba+V%C3%AC%2C+H%C3%A0+N%E1%BB%99i",
                         notes: "Trân trọng kính mời quý khách tới chung vui cùng gia đình.",
                       };
                       updateData((prev) => ({ ...prev, events: [...prev.events, newEvt] }));
@@ -1902,13 +1903,40 @@ function StudioContent() {
 
                     {/* Đường dẫn Google Maps */}
                     <div>
-                      <label className="text-[10px] text-[#78350F] block mb-1 font-bold uppercase tracking-wider">
-                        Đường Dẫn Bản Đồ Google Maps
-                      </label>
+                      <div className="flex items-center justify-between mb-1">
+                        <label className="text-[10px] text-[#78350F] font-bold uppercase tracking-wider">
+                          Đường Dẫn Bản Đồ Google Maps
+                        </label>
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const evts = [...data.events];
+                              evts[idx].mapUrl = generateDefaultGoogleMapsUrl(evt.address, evt.venue);
+                              updateData({ events: evts });
+                            }}
+                            className="text-[10px] text-[#BA1B22] hover:underline font-semibold flex items-center gap-1 cursor-pointer"
+                            title="Tự động tạo đường dẫn Google Maps chuẩn từ địa chỉ trên"
+                          >
+                            <span>⚡ Tạo từ địa chỉ</span>
+                          </button>
+                          {evt.mapUrl && (
+                            <a
+                              href={getGoogleMapsUrl(evt)}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-[10px] text-[#4A6741] hover:underline font-semibold flex items-center gap-1 cursor-pointer"
+                              title="Mở thử bản đồ trên tab mới để kiểm tra"
+                            >
+                              <span>🔍 Mở thử ↗</span>
+                            </a>
+                          )}
+                        </div>
+                      </div>
                       <input
                         type="url"
                         value={evt.mapUrl}
-                        placeholder="https://maps.google.com/?q=..."
+                        placeholder="https://maps.app.goo.gl/... hoặc https://www.google.com/maps/search/?api=1&query=..."
                         onChange={(e) => {
                           const evts = [...data.events];
                           evts[idx].mapUrl = e.target.value;
@@ -1916,6 +1944,9 @@ function StudioContent() {
                         }}
                         className="w-full bg-[#FFFDF9] border border-[#E8D5CF] rounded-xl px-3 py-2 text-xs font-mono text-[#BA1B22] focus:outline-none focus:border-[#BA1B22]"
                       />
+                      <p className="text-[10px] text-[#8C6A58] mt-1 leading-relaxed">
+                        💡 Hướng dẫn: Mở ứng dụng Google Maps trên điện thoại, tìm đúng vị trí hôn trường/nhà bạn, nhấn <strong>Chia sẻ (Share) &rarr; Sao chép liên kết</strong> rồi dán vào đây (dạng <code>https://maps.app.goo.gl/...</code>). Hoặc bấm nút <strong>⚡ Tạo từ địa chỉ</strong> ở trên.
+                      </p>
                     </div>
                   </div>
                 ))}

@@ -48,8 +48,8 @@ export const weddingData: WeddingData = {
       "isoDate": "2027-01-24T08:30:00+07:00",
       "time": "08:30 Sáng",
       "venue": "Tư Gia Họ Nhà Gái",
-      "address": "Khu 5, Xóm 6, Xã Minh Châu, Thành phố Hà Nội",
-      "mapUrl": "https://maps.google.com/?q=Khu+5+Xóm+6+Minh+Châu+Hà+Nội",
+      "address": "Khu 5, Xóm 6, Xã Minh Châu, Ba Vì, Hà Nội",
+      "mapUrl": "https://www.google.com/maps/search/?api=1&query=Khu+5%2C+X%C3%B3m+6%2C+X%C3%A3+Minh+Ch%C3%A2u%2C+Ba+V%C3%AC%2C+H%C3%A0+N%E1%BB%99i",
       "notes": "Nghi thức bái tạ gia tiên nhà gái và tiễn cô dâu về nhà chồng."
     },
     {
@@ -60,8 +60,8 @@ export const weddingData: WeddingData = {
       "isoDate": "2027-01-24T10:00:00+07:00",
       "time": "10:00 Sáng",
       "venue": "Tư Gia Họ Nhà Trai",
-      "address": "Khu 5, Xóm 6, Xã Minh Châu, Thành phố Hà Nội",
-      "mapUrl": "https://maps.google.com/?q=Khu+5+Xóm+6+Minh+Châu+Hà+Nội",
+      "address": "Khu 5, Xóm 6, Xã Minh Châu, Ba Vì, Hà Nội",
+      "mapUrl": "https://www.google.com/maps/search/?api=1&query=Khu+5%2C+X%C3%B3m+6%2C+X%C3%A3+Minh+Ch%C3%A2u%2C+Ba+V%C3%AC%2C+H%C3%A0+N%E1%BB%99i",
       "notes": "Nghi thức thành hôn đón dâu và bái gia tiên họ nhà trai."
     },
     {
@@ -72,8 +72,8 @@ export const weddingData: WeddingData = {
       "isoDate": "2027-01-24T11:30:00+07:00",
       "time": "11:30 Trưa (Đón khách từ 11:00)",
       "venue": "Hôn Trường Tư Gia Hai Họ",
-      "address": "Khu 5, Xóm 6, Xã Minh Châu, Thành phố Hà Nội",
-      "mapUrl": "https://maps.google.com/?q=Khu+5+Xóm+6+Minh+Châu+Hà+Nội",
+      "address": "Khu 5, Xóm 6, Xã Minh Châu, Ba Vì, Hà Nội",
+      "mapUrl": "https://www.google.com/maps/search/?api=1&query=Khu+5%2C+X%C3%B3m+6%2C+X%C3%A3+Minh+Ch%C3%A2u%2C+Ba+V%C3%AC%2C+H%C3%A0+N%E1%BB%99i",
       "notes": "Trân trọng kính mời quý khách dùng bữa cơm thân mật chung vui cùng gia đình."
     }
   ],

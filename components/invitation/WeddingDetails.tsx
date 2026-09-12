@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { Clock, Calendar, MapPin, Navigation, CalendarPlus } from "lucide-react";
 import { useWeddingData } from "@/context/WeddingDataContext";
 import { VietnameseLotus, BotanicalBranch } from "@/components/ui/VietnamesePattern";
+import { getGoogleMapsUrl } from "@/utils/mapUtils";
 
 export const WeddingDetails: React.FC = () => {
   const { data: weddingData } = useWeddingData();
@@ -127,17 +128,15 @@ export const WeddingDetails: React.FC = () => {
 
               {/* Các nút hành động: Chỉ đường & Thêm lịch */}
               <div className="flex items-center gap-3 pt-4 border-t border-[#E8D5CF]/60">
-                {event.mapUrl && (
-                  <a
-                    href={event.mapUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-full bg-[#4A6741] hover:bg-[#354D2E] text-[#FDFAF5] text-xs font-serif font-semibold tracking-wide transition-all shadow-xs active:scale-98"
-                  >
-                    <Navigation className="w-3.5 h-3.5" />
-                    <span>Xem Bản Đồ &amp; Chỉ Đường</span>
-                  </a>
-                )}
+                <a
+                  href={getGoogleMapsUrl(event)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-full bg-[#4A6741] hover:bg-[#354D2E] text-[#FDFAF5] text-xs font-serif font-semibold tracking-wide transition-all shadow-xs active:scale-98"
+                >
+                  <Navigation className="w-3.5 h-3.5" />
+                  <span>Xem Bản Đồ &amp; Chỉ Đường</span>
+                </a>
 
                 <button
                   type="button"
