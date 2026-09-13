@@ -51,7 +51,7 @@ export const HeroInvitation: React.FC<HeroInvitationProps> = ({
       onOpen?.();
       setIsOpening(false);
       openTriggeredRef.current = false;
-    }, 600);
+    }, 1800); // Tăng thời gian chờ để chiếu hiệu ứng mây mù tan biến
   };
 
   return (
@@ -101,11 +101,11 @@ export const HeroInvitation: React.FC<HeroInvitationProps> = ({
               initial={{ opacity: 0, scale: 0.95, y: 15 }}
               animate={
                 isOpening
-                  ? { opacity: 0, scale: 1.08, filter: "blur(4px)" }
+                  ? { opacity: 0, scale: 1.1, filter: "blur(8px)" }
                   : { opacity: 1, scale: 1, y: 0 }
               }
-              exit={{ opacity: 0, scale: 1.05 }}
-              transition={{ duration: 0.6, ease: "easeOut" }}
+              exit={{ opacity: 0, scale: 1.1 }}
+              transition={{ duration: 1.2, ease: "easeInOut" }}
               className="relative w-full rounded-3xl p-6 sm:p-8 md:p-10 text-center shadow-2xl border-2 border-[#E5C368] overflow-hidden"
               style={{
                 background:
@@ -138,7 +138,11 @@ export const HeroInvitation: React.FC<HeroInvitationProps> = ({
 
               {/* Con dấu triện sáp đỏ Chu Sa mạ vàng chữ 囍 ở tâm nắp thư */}
               <div className="flex justify-center my-3">
-                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br from-[#D32F2F] via-[#BA1B22] to-[#7F1D1D] border-2 border-[#FFF8D6] shadow-[0_0_25px_rgba(229,195,104,0.7)] flex items-center justify-center relative transform hover:scale-105 transition-transform cursor-pointer">
+                <div 
+                  className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br from-[#D32F2F] via-[#BA1B22] to-[#7F1D1D] border-2 border-[#FFF8D6] shadow-[0_0_25px_rgba(229,195,104,0.7)] flex items-center justify-center relative transform hover:scale-110 transition-transform cursor-pointer"
+                  onClick={handleOpenInvitation}
+                  onTouchEnd={handleOpenInvitation}
+                >
                   <div className="absolute inset-1 rounded-full border border-dashed border-[#FFF8D6]/60 pointer-events-none" />
                   <span className="font-serif font-bold text-3xl sm:text-4xl text-[#FFF8D6] drop-shadow-[0_2px_6px_rgba(0,0,0,0.8)]">
                     囍
@@ -246,7 +250,7 @@ export const HeroInvitation: React.FC<HeroInvitationProps> = ({
                 <span className="text-[#E8D5CF]/80 text-[11px] block mt-0.5">({weddingData.lunarDateFormatted})</span>
               </div>
 
-              {/* Nút Mở Thiệp Đại Hỷ - Nổi bật, sang trọng, hiệu ứng vàng kim lộng lẫy */}
+              {/* Nút Mở Thiệp Đại Hỷ */}
               <div className="flex flex-col items-center justify-center gap-2 mt-2 sm:mt-3">
                 <button
                   type="button"
@@ -273,21 +277,61 @@ export const HeroInvitation: React.FC<HeroInvitationProps> = ({
         </AnimatePresence>
       </div>
 
-      {/* Luồng ánh sáng hoàng kim khi ấn mở */}
+      {/* Hiệu ứng mây mù tan biến và luồng ánh sáng khi mở thiệp */}
       <AnimatePresence>
         {isOpening && (
           <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: [0, 0.85, 0], scale: [0.8, 1.4, 2.0] }}
-            transition={{ duration: 0.7, ease: "easeInOut" }}
-            className="absolute inset-0 pointer-events-none z-40 flex items-center justify-center"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5 }}
+            className="fixed inset-0 z-50 pointer-events-none flex items-center justify-center overflow-hidden"
           >
-            <div
-              className="w-full h-full rounded-full"
+            {/* Lớp sương mù dày đặc che phủ toàn màn hình */}
+            <motion.div
+              initial={{ opacity: 0, scale: 1 }}
+              animate={{ opacity: [0, 1, 1, 0], scale: [1, 1.1, 1.3, 1.5] }}
+              transition={{ duration: 1.8, ease: "easeInOut" }}
+              className="absolute inset-0 mix-blend-screen"
               style={{
-                background:
-                  "radial-gradient(circle, rgba(254, 240, 138, 0.9) 0%, rgba(212, 175, 55, 0.5) 45%, transparent 75%)",
-                filter: "blur(32px)",
+                background: "radial-gradient(circle at center, rgba(255,248,214,0.95) 0%, rgba(229,195,104,0.6) 40%, rgba(255,255,255,0) 70%)",
+                filter: "blur(20px)"
+              }}
+            />
+            
+            {/* Cụm mây mù bên trái trôi dạt ra ngoài */}
+            <motion.div
+              initial={{ x: "-10%", opacity: 0 }}
+              animate={{ x: "-100%", opacity: [0, 1, 0] }}
+              transition={{ duration: 1.8, ease: "easeIn" }}
+              className="absolute left-0 top-0 bottom-0 w-full md:w-1/2"
+              style={{
+                background: "radial-gradient(ellipse at center, rgba(255,248,214,0.85) 0%, rgba(229,195,104,0.4) 40%, rgba(255,255,255,0) 70%)",
+                filter: "blur(35px)"
+              }}
+            />
+
+            {/* Cụm mây mù bên phải trôi dạt ra ngoài */}
+            <motion.div
+              initial={{ x: "10%", opacity: 0 }}
+              animate={{ x: "100%", opacity: [0, 1, 0] }}
+              transition={{ duration: 1.8, ease: "easeIn" }}
+              className="absolute right-0 top-0 bottom-0 w-full md:w-1/2"
+              style={{
+                background: "radial-gradient(ellipse at center, rgba(255,248,214,0.85) 0%, rgba(229,195,104,0.4) 40%, rgba(255,255,255,0) 70%)",
+                filter: "blur(35px)"
+              }}
+            />
+
+            {/* Ánh hào quang trung tâm chói lóa rồi vụt tắt để lộ thiệp */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.2 }}
+              animate={{ opacity: [0, 1, 0], scale: [0.2, 2, 5] }}
+              transition={{ duration: 1.5, delay: 0.1, ease: "easeOut" }}
+              className="absolute inset-0 rounded-full"
+              style={{
+                background: "radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(253,230,138,0.9) 25%, transparent 55%)",
+                filter: "blur(25px)"
               }}
             />
           </motion.div>
