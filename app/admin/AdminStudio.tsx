@@ -3051,7 +3051,7 @@ function StudioContent() {
                   <span className="w-2.5 h-2.5 rounded-full bg-[#BA1B22]" />
                 </div>
                 <div className="flex-1 max-w-sm mx-auto bg-[#2E0508] border border-[#E5C368]/30 rounded-md py-0.5 px-3 text-[11px] text-[#FDE68A] font-mono text-center truncate">
-                  https://an-minh.vn/i/{data.slug || "quyet-han"}
+                  https://damcuoidoiminh.vn/i/{data.slug || "quyet-han"}
                 </div>
               </div>
 
